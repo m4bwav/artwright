@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 TEXT = {".md", ".py", ".json", ".yml", ".yaml", ".txt", ".toml", ".cfg", ".hex", ".gpl"}
 IMAGES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", "dist", "node_modules", ".fixtures-cache"}
-SKIP_PREFIXES = ("evals/cases/results/", "evals/fixtures/out/")  # local eval output and fixtures, git-ignored
+SKIP_PREFIXES = ("evals/results/", "evals/cases/results/", "evals/fixtures/out/")  # local eval output and fixtures, git-ignored
 DESC_MAX = 700  # this repository's budget; the Agent Skills spec allows 1,024
 BODY_MAX = 200
 # Knowledge files must say when they were checked and flag what is verified.
