@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TEXT = {".md", ".py", ".json", ".yml", ".yaml", ".txt", ".toml", ".cfg", ".hex", ".gpl"}
+TEXT = {".md", ".py", ".json", ".yml", ".yaml", ".txt", ".toml", ".cfg", ".hex", ".gpl", ".sh"}
 IMAGES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", "dist", "node_modules", ".fixtures-cache"}
 SKIP_PREFIXES = ("evals/results/", "evals/cases/results/", "evals/fixtures/out/")  # local eval output and fixtures, git-ignored
@@ -170,7 +170,7 @@ def check_text():
         text = data.decode("utf-8", "replace")
         for n, line in enumerate(text.splitlines(), 1):
             if r != "tests/check_skills.py":
-                for tok in TOKEN.findall(line):
+                for tok in ([] if r.endswith("/fixture.sh") else TOKEN.findall(line)):  # base64 fixtures
                     if looks_like_token(tok, line):
                         problems.append("%s:%d: token-like string (%d chars); keys never go in the repository" % (r, n, len(tok)))
                 if HOME.search(line):

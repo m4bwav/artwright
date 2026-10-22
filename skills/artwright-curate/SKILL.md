@@ -1,6 +1,6 @@
 ---
 name: artwright-curate
-description: "Use to maintain artwright's knowledge and the user's private taste record: add, fix, source or retire a movement, theory entry, style term, model profile or law row; record which image the user preferred and why; label calibration pairs ('remember I liked this one', 'add this movement', 'this date is wrong', 'label pairs for the judge'); promote a lesson from taste into the public files. Every public row gets a source, a date and a verified flag; private taste stays in ARTWRIGHT_HOME, never in the repository. Judging is artwright-judge. Also 'refresh artwright-curate'."
+description: "Use to maintain artwright's knowledge and the user's private taste record: add, fix, source or retire a movement, theory entry, style term, model profile or law row; record which image the user preferred and why; label calibration pairs ('remember I liked this one', 'add this movement', 'this date is wrong', 'label pairs for the judge'); promote a lesson from taste into the public files. Public rows get a source, date and verified flag; private taste stays in ARTWRIGHT_HOME. Judging is artwright-judge. Also 'refresh artwright-curate'."
 ---
 
 # artwright-curate
