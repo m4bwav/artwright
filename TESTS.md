@@ -8,6 +8,35 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20261022-4 · 2026-10-22 · claude plugin eval 2.1.281 under WSL2 --scaffold, sonnet, judge sonnet · tune iteration 3 · 3/6 runs
+- outcome-pairwise-orders 2/3 · grader-strict · after the grader stopped asking for trace evidence it cannot see, one run still judged FAIL by all three votes although the reply names both orders, the original and regions.
+- guard-ai-generated 1/3 · mixed · the LLM grader passed 2 of 3 and the regex 2 of 3, on different runs; the replies now open with "pixels cannot decide" and stopped treating the file name as provenance.
+- No A/B: `worth --ab` (21 value cases, both arms, about $10) would pass the session's $40 cap. Spend for the day $33.99.
+- led to: C-20261022-2
+
+### T-20261022-3 · 2026-10-22 · same harness · tune iteration 2 (failing cases plus triggers) · 7 cases 13/21 runs, triggers 8/8 (24/24)
+- Now passing: outcome-living-artist 3/3, outcome-ming-price 3/3, outcome-vocab-rewrite 3/3 (the judge's description now names prompt rewrites into a style or artist, and the skill fires: 6 turns instead of 1).
+- outcome-brief-fit 2/3, outcome-tie-pair 2/3 · partial · one tie-pair run still declared a clear winner between two intact Hokusai prints.
+- outcome-pairwise-orders 0/3 · grader-blind · reasons were tied to regions, but the grader asked for proof of both orders from the trace, which the LLM grader never sees.
+- guard-ai-generated 0/3 · skill · replies opened "provenance answers this" and cited the file name as the provenance.
+- led to: C-20261022-2
+
+### T-20261022-2 · 2026-10-22 · same harness, by mistake the whole suite four times (L-003) · actions 12/12, decoys 35/36, on the new descriptions
+- A loop's `$c` was expanded away before `bash -lc` ran it, so every pass ran all 32 cases under a $3 cap until stopped; about $14. The replicates still measured the new descriptions: action cases 12/12, decoys 35/36 (decoy-brand 2/3 once), guard-golden-ratio LLM grader 12/12 with the regex too narrow.
+- guard-proud-framing 1/9 graded · cost-cap · most runs were skipped by the $3 ceiling before their LLM grader ran; one graded FAIL (the critique called the sprite "flat" without a region-level reason). Its clean run in T-20261022-1 was 3/3.
+- led to: L-003
+
+### T-20261022-1 · 2026-10-22 · claude plugin eval 2.1.281 under WSL2 --scaffold (museum images fetched and hash-checked in the scaffold), sonnet, judge sonnet · paid tier, first run · 11/18 cases, 39/54 runs
+- outcome-brief-fit 0/3 · grader-blind · the reply was right (DOES NOT FIT, every check named, verdict written and validated); the criterion asked the judge to confirm a file it cannot see.
+- outcome-living-artist 1/3, outcome-vocab-rewrite 0/3 · undertrigger · answered in one turn with no skill: a negative prompt for Z-Image Turbo, and an offer to take the living artist's name.
+- outcome-ming-price 2/3 · grader-strict · asked for the word "hammer".
+- outcome-pairwise-orders 0/3 · skill · reasons not tied to regions.
+- outcome-tie-pair 0/3 · skill · both orders agreed, so the reply called it "not a close call" and Red Fuji "more universally pleasing".
+- guard-ai-generated 0/3 · undertrigger and skill · "No, this isn't AI-generated", from the paper texture and the file name.
+- guard-golden-ratio 0/3 · grader-narrow · the LLM grader passed every run; the regex missed "no real empirical support", "never a reason", "wouldn't be why it works".
+- Passing: the four cubism cases, oldest painting, theory, pixel pair (all 3/3), guard-rubens, guard-reign-mark, guard-proud-framing (3/3). Cost $9.46 plus a $0.18 probe.
+- led to: C-20261022-2, L-002 (confirmed again: a request the description does not name answers without the skill)
+
 ### T-20261021-4 · 2026-10-21 · claude plugin eval (triggers, decoys: 2.1.281 Windows; actions: pinned 2.1.281 under WSL2 Ubuntu with --scaffold), --ablation none, sonnet · cheap tier, final text · 14/14 cases, 42/42 runs
 - Triggers 8/8 (24/24 runs), decoys 3/3 (9/9), actions 3/3 (9/9) on the descriptions in C-20261021-3. Cost of this round $4.0; the whole session's eval spend $15.76 across 14 runs of the harness.
 - No baseline arm yet: the A/B (`evergreen.py worth --ab`) and the paid tier (18 outcome and guard cases) are Step 3.

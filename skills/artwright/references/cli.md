@@ -2,7 +2,7 @@
 
 `python <plugin>/skills/artwright/scripts/aw.py <command> ...`. Python 3.9+, standard library; Pillow (11 or
 later) when present for speed and every format; otherwise PNG is read in pure Python and JPEG or WebP through
-ffmpeg. Each command prints one JSON object; failures print `{"ok": false, "error": ...}` and exit 1.
+ffmpeg. Each command prints one JSON object; failures print `{"ok": false, "error": ...}` and exit 1. Usage mistakes (a missing or unknown option) print argparse's usage text and exit 2; `--version` prints plain text.
 
 Back to [SKILL.md](../SKILL.md).
 
@@ -11,10 +11,10 @@ Back to [SKILL.md](../SKILL.md).
 | `doctor [--probe]` | Python, Pillow, ffmpeg, `ARTWRIGHT_HOME`; `--probe` makes one request to Cleveland's API and Lospec |
 | `info IMG...` | format, bytes, size, SHA-256, alpha (`none`, `binary`, `partial`), unique colours, token cost per tier |
 | `fit IMG -o OUT [--long N] [--tokens N] [--crop x,y,w,h] [--cell RxC:i] [--pixel]` | downscale (area average) to a long edge (default 1024) or a token budget; crop a box or a grid cell (row-major from 0); `--pixel` uses nearest neighbour and integer upscales |
-| `sheet IMG|DIR... -o OUT [--cols N] [--cell PX] [--pixel] [--no-labels]` | contact sheet, cells labelled A, B, C with a built-in bitmap font, at most 2000 px a side; `map` gives letter to file |
+| `sheet IMG|DIR... -o OUT [--cols N] [--cell 384] [--pixel] [--no-labels]` | contact sheet, cells labelled A, B, C with a built-in bitmap font, at most 2000 px a side; `map` gives letter to file |
 | `stats IMG [--edge 256] [--notan DIR]` | value mean, key and histogram, value groups, RMS contrast (SD of L*), colourfulness (Hasler–Süsstrunk), saturation, warm share, edge density, mirror symmetry, centre of mass and imbalance, focal cell, thirds distance (description only), box-counting fractal dimension; `--notan` writes grey, two- and three-value thumbnails |
 | `palette IMG [-k 8] [--against PAL]` | dominant colours by median cut with shares; `--against` gives nearest palette colour and delta-E 2000 |
-| `pixel IMG... [--budget N] [--palette PAL] [--scale S] [--tile] [--frames] [--preview OUT] [--zoom 4]` | pixel-art checks; see artwright-pixel |
+| `pixel IMG... [--budget N] [--palette PAL] [--scale S] [--tile] [--frames] [--preview OUT] [--zoom 4] [--tol 24]` | pixel-art checks (`--tol`: neighbours whose summed RGBA difference is at most this count as one colour); see artwright-pixel |
 | `hash IMG...` | 64-bit aHash and dHash, SHA-256 |
 | `dedupe IMG|DIR... [--threshold 6]` | groups by dHash Hamming distance; `keep` lists one file per group |
 | `compare prepare A B [--work DIR] [--cell 768]` | writes the pair in both orders, labelled 1 and 2; returns the pair id |

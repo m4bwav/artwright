@@ -64,3 +64,27 @@ comfyui-gen and polywright in Step 3, living-artist names rewritten into traits.
 
 Mark merged PR #3 (release workflow). On the MiniMax H3 licence territory question he is in the USA and accepts
 local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; tagging still waits for his go.
+
+## 2026-10-22: Step 3 session: paid evals tuned, calibration page live, hand-offs, banner, wiki
+
+- Paid tier run for the first time (T-20261022-1 to -4): first pass 11/18 cases; after three tune iterations
+  28 of 32 cases pass every run, four pass some (pairwise-orders 2/3, ai-generated 1/3, brief-fit 2/3,
+  tie-pair 2/3). Triggers 8/8 and decoys 35/36 on the new descriptions (596 of 600 tokens). Fixes: the judge
+  says a taste call between two intact works is close, ties each reason to a region; the hub opens AI-made
+  questions with "pixels cannot tell", a file name is not provenance; descriptions name AI-made questions and
+  prompt rewrites into a style; five graders reworded to what a last-message judge can see.
+- Eval spend $33.99 (about $14 of it a mistaken loop that ran the whole suite four times, L-003). The A/B
+  (`worth --ab`, about $10) was not run: it would pass the $40 cap. Waits for the owner.
+- Calibration: 40 pairs built (16 degraded CC0, 3 pixel, 16 of the owner's own seed pairs, 5 ties) in
+  ARTWRIGHT_HOME/calibration/set-2026-10-22; the judge's both-orders agreement on them is 0.775 (target 0.8; most
+  flips on the close seed pairs). Labelling page https://claude.ai/artifact/TFZxKLEmSr41WXP1Gszs23 (private,
+  picks in its `picks` collection); the owner had labelled 9 when the session ended. `import_picks.py` in the
+  calibration folder writes the labels and prints the agreement. Relative image paths did not render in the
+  artifact viewer; images are now embedded as data URIs.
+- Bug fixed: a tie in both orders resolved as `decided` with no winner (rank counted it, agreement crashed).
+- Hand-off PRs open for the owner: m4bwav/comfyui-gen#82, m4bwav/polywright#24.
+- Banner: four Z-Image Turbo seeds on both hosts, picked by artwright-judge (seed 202, 3-0 in both orders).
+- Wiki: 10 pages live at https://github.com/m4bwav/artwright/wiki (by an agent with wikiwright; note in
+  notes/2026-10-22-github-wiki.md). It lists the double-tie bug as known until this PR merges.
+- Rulings C1-C8 in decisions/2026-10-22-step3-rulings.md.
+## [2026-10-22] index | rebuilt (9 entries)

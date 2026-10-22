@@ -48,7 +48,8 @@ then "after a batch, call artwright-judge on <folder> with the brief". When done
 - `items[].sha256` lets a caller see whether a file changed after the verdict; `validate` reports a mismatch.
 - `fit[].verdict`: `FITS`, `FITS WITH FIXES` or `DOES NOT FIT`; `DOES NOT FIT` lists `hard_fails`.
 - `fixes[].channel`: `prompt`, `setting`, `control`, `reference`, `inpaint` or `model`.
-- `close_to_next: true` means the order between that row and the next is not established.
+- `close_to_next: true` means the order between that row and the next is not established; the last row has `null`
+  (there is no next row).
 - `abstained` lists pairs a human should see. A caller must not silently pick between them.
 - No absolute score unless the user asked; then `score` with `score_anchors` (three labelled references).
 - Working files beside it (`pairs.jsonl`, `matches.jsonl`, `pairs/*.png`) are artwright's own; callers ignore them.

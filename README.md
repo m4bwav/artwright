@@ -1,5 +1,7 @@
 # artwright
 
+![A painted artist's studio at golden hour: two near-identical mountain landscapes on twin easels set side by side for comparison, a paint palette, a brass loupe and colour wheels on the bench, a celadon vase, a monitor showing a pixel-art dragon, and charcoal figure sketches pinned to the wall](https://raw.githubusercontent.com/m4bwav/artwright/main/.github/images/banner.jpg)
+
 Four self-maintaining ("evergreen") skills and a command-line tool that give an AI agent an artist's eye. It
 critiques and analyses art of every kind, from drawing and ceramics to pixel art and 3D renders. It compares and
 ranks generated images the way the evidence says works: two at a time, in both orders, blind to file names. It
@@ -86,4 +88,6 @@ Security: [SECURITY.md](SECURITY.md).
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). The banner was made with Z-Image Turbo in ComfyUI and picked from four seeds by
+artwright-judge itself; the workflow, prompt, seeds, contact sheet and the judge's `verdict.json` are in
+`.github/images/`.

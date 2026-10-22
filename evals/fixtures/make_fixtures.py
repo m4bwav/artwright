@@ -41,23 +41,40 @@ def sprite(seed):
 
 
 def emit_scaffold():
-    """Writes fixture.sh into each action case: the synthetic PNGs as base64, unpacked into the run's workspace."""
+    """Writes fixture.sh into each case that names a fixture: its synthetic PNGs as base64, and its Cleveland CC0
+    images fetched by curl and checked against the hashes pinned in tests/test_aw.py (never committed)."""
     import base64
-    lines = ["#!/usr/bin/env bash",
-             "# Scaffold (runs only with `claude plugin eval --scaffold`). Written by evals/fixtures/make_fixtures.py",
-             "# --emit-scaffold; synthetic images drawn in code, never committed as files.",
-             "set -euo pipefail",
-             "mkdir -p evals/fixtures/out/renders"]
-    for p in sorted(OUT.rglob("*.png")):
-        rel = p.relative_to(OUT).as_posix()
-        b64 = base64.b64encode(p.read_bytes()).decode()
-        lines.append("base64 -d > evals/fixtures/out/%s <<'B64'" % rel)
-        lines += [b64[i:i + 76] for i in range(0, len(b64), 76)]
-        lines.append("B64")
-    body = "\n".join(lines) + "\n"
-    for case in sorted((ROOT / "evals" / "cases").glob("action-*")):
+    import test_aw
+    head = ["#!/usr/bin/env bash",
+            "# Scaffold (runs only with `claude plugin eval --scaffold`). Written by evals/fixtures/make_fixtures.py",
+            "# --emit-scaffold; synthetic images drawn in code, museum images fetched and hash-checked.",
+            "set -euo pipefail",
+            "mkdir -p evals/fixtures/out/renders"]
+    for case in sorted((ROOT / "evals" / "cases").iterdir()):
+        prompt = case / "prompt.md"
+        if not prompt.is_file():
+            continue
+        text = prompt.read_text(encoding="utf-8")
+        pngs = sorted(OUT.rglob("*.png"))
+        if not case.name.startswith("action-"):
+            pngs = [p for p in pngs if p.relative_to(OUT).as_posix() in text]
+        museum = [acc for acc in test_aw.FIXTURES if "cma-%s.jpg" % acc in text]
+        if not pngs and not museum:
+            continue
+        lines = list(head)
+        for p in pngs:
+            rel = p.relative_to(OUT).as_posix()
+            b64 = base64.b64encode(p.read_bytes()).decode()
+            lines.append("base64 -d > evals/fixtures/out/%s <<'B64'" % rel)
+            lines += [b64[i:i + 76] for i in range(0, len(b64), 76)]
+            lines.append("B64")
+        for acc in museum:
+            dest = "evals/fixtures/out/cma-%s.jpg" % acc
+            lines.append("curl -fsSL -A '%s' -o %s https://openaccess-cdn.clevelandart.org/%s/%s_web.jpg"
+                         % (aw.UA, dest, acc, acc))
+            lines.append("echo '%s  %s' | sha256sum -c --quiet" % (test_aw.FIXTURES[acc], dest))
         with open(case / "fixture.sh", "w", encoding="utf-8", newline="\n") as f:
-            f.write(body)
+            f.write("\n".join(lines) + "\n")
         (case / "case.yaml").write_bytes(('schema_version: "1.1"\nname: %s\ncontext:\n  scaffold_script: fixture.sh\n'
                                           % case.name).encode())
 

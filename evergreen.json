@@ -58,14 +58,19 @@
   },
   "consolidate_every": 25,
   "tests": {
-    "last_run": "2026-10-21T23:36",
-    "harness": "claude plugin eval 2.1.281 (triggers/decoys Windows; actions WSL2 --scaffold), sonnet, cheap tier",
-    "env": "windows",
-    "cases": 14,
-    "passed": 14,
-    "failed": 0,
-    "failing": [],
-    "last_failure": null,
+    "last_run": "2026-10-22T18:30",
+    "harness": "claude plugin eval 2.1.281 under WSL2 --scaffold, sonnet, judge sonnet; cheap and paid tiers",
+    "env": "windows+wsl2",
+    "cases": 32,
+    "passed": 28,
+    "failed": 4,
+    "failing": [
+      "outcome-pairwise-orders (2/3)",
+      "guard-ai-generated (1/3)",
+      "outcome-brief-fit (2/3)",
+      "outcome-tie-pair (2/3)"
+    ],
+    "last_failure": "2026-10-22",
     "research_after_days": null
   }
 }

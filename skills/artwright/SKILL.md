@@ -1,6 +1,6 @@
 ---
 name: artwright
-description: "Use whenever art or an image needs an artist's eye: critique a painting, drawing, print, sculpture, ceramic, illustration or 3D render; style or movement ('is this cubist'); art theory ('what is postmodernism'); art facts ('most expensive Ming vase', 'oldest painting'); an image's main colours; many images side by side on one contact sheet. aw.py measures, claims tie to regions, facts go through historywright. Ranking or brief fit: artwright-judge. Pixel art: artwright-pixel. Not brand palettes (brandwright) or website direction (sitewright-direction). Also 'refresh artwright'."
+description: "Use whenever art or an image needs an artist's eye: critique a painting, drawing, print, sculpture, ceramic, illustration or 3D render; style or movement ('is this cubist'); art theory ('what is postmodernism'); art facts ('most expensive Ming vase', 'oldest painting'); 'is this AI-made'; an image's main colours; many images side by side on one contact sheet. aw.py measures, claims tie to regions, facts go through historywright. Ranking or brief fit: artwright-judge. Pixel art: artwright-pixel. Not brand palettes (brandwright) or website direction (sitewright-direction). Also 'refresh artwright'."
 ---
 
 # artwright
@@ -91,10 +91,12 @@ Law and AI art (copyright, disclosure): [references/law.md](references/law.md), 
 
 - No attribution, authentication or valuation from pixels ("is this a real Rubens", "what is it worth"):
   decline with the reason, and say what would answer it (provenance, technical study, a specialist).
-- No "is this AI-made" from pixels: Claude cannot tell. Describe visible traits; never call them proof.
+- No "is this AI-made" from pixels: Claude cannot tell, so open with that, not with yes or no. Describe visible
+  traits, never as proof. Only provenance answers it (a museum record you fetched, C2PA or other embedded metadata);
+  a file name is not provenance. When a fetched record decides it, say so; otherwise say what would.
 - A living artist named in a prompt or a request for "in the style of" becomes descriptive traits (medium,
-  palette, line, subject, era), with one line saying so. Public-domain masters, movements and studio genres may be
-  named.
+  palette, line, subject, era), with one line saying so. Never ask for the name. Public-domain masters,
+  movements and studio genres may be named.
 - The golden ratio is never a reason; thirds is a description, never a score.
 - An absolute score (1–10) only when asked, anchored by three labelled references, with the warning that scores
   bunch at the top.
