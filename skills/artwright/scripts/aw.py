@@ -1216,6 +1216,11 @@ def jl_read(p):
     return rows
 
 
+def write_json(p, obj):
+    with open(p, "w", encoding="utf-8", newline="\n") as f:  # Path.write_text has no newline= before 3.10
+        f.write(json.dumps(obj, indent=1, ensure_ascii=False) + "\n")
+
+
 def jl_add(p, row):
     p = Path(p)
     p.parent.mkdir(parents=True, exist_ok=True)
@@ -1384,7 +1389,7 @@ def cmd_rank(a):
                          "close_to_next": r["close_to_next"]} for r in rows]
         v["abstained"] = [{"files": [rel_to(f, base) for f in t["files"]], "reason": t["reason"]} for t in ties]
         v["updated"] = now()
-        vp.write_text(json.dumps(v, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+        write_json(vp, v)
         res["verdict"] = str(vp)
     return out(res)
 
@@ -1540,7 +1545,7 @@ def cmd_verdict(a):
             r = rel_to(f, base)
             if r not in known:
                 v["items"].append({"id": letters(len(v["items"])), "file": r, "sha256": sha256(f)})
-        vp.write_text(json.dumps(v, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+        write_json(vp, v)
         return out({"verdict": str(vp), "items": v["items"]})
     if a.action == "validate":
         if not vp.is_file():
