@@ -1,6 +1,6 @@
 # Kickoff: artwright Step 3 (prove, calibrate, connect, launch)
 
-Written 2026-10-21 at the end of Step 2. Paste this into a fresh session started in the artwright folder (the
+Written 2026-10-21 at the end of Step 2; updated 2026-10-22 with Mark's answers. Paste this into a fresh session started in the artwright folder (the
 m4bwav/artwright clone). Step 2 is done: the repository is public, the build is merged, the cheap eval tier passes
 and the plugin is installed as artwright@mark-local.
 
@@ -17,8 +17,9 @@ and the plugin is installed as artwright@mark-local.
 
 ## Step 3
 
-1. **Ask Mark first** (one short question each, plain words): merge PR #3 (release workflow)? Is local MiniMax H3
-   use covered by its licence (R-20261021-27)? Then go on; do not wait for the answers to do the rest.
+1. **Settled on 2026-10-22 (no need to ask):** Mark merged PR #3, the release workflow. On the MiniMax H3 licence
+   he is in the USA and accepts the local use: treat R-20261021-27's territory question as closed for him and do
+   not raise it again (the public model profile keeps its neutral licence note for other users).
 2. **Paid evals and the A/B.** `python evals/fixtures/make_fixtures.py --net --emit-scaffold`, then the 18 paid
    cases under WSL2 (`scripts/eval-wsl.sh "outcome-*" --judge-model sonnet --max-cost-usd N`, same for `guard-*`).
    Image cases need the fixtures in the run's workspace: extend the scaffold to carry the Cleveland images (fetch
@@ -36,8 +37,9 @@ and the plugin is installed as artwright@mark-local.
 5. **Launch set.** README banner (comfyui-gen, 1536x640, four seeds on a contact sheet, `.github/images/banner.jpg`
    with the workflow, prompt and seed beside it; judge the four with artwright-judge itself); GitHub wiki
    (wikiwright; the first page must be saved in the web interface before a push works).
-6. **Release.** Only after Mark merges PR #3 and says go: bump nothing unless files changed since 0.1.0's notes,
-   tag `v0.1.0`, verify the release zip.
+6. **Release.** The release workflow is on main. Tag only when Mark says go: bump the version if packaged files
+   changed after 0.1.0 was installed (then update the CHANGELOG release notes), tag `vX.Y.Z`, and verify the
+   release zip on the release page.
 
 Limits: no release tag without Mark's go-ahead. No new image models or torch. Calibration images must be CC0 or
 the owner's own renders. Estimate in files, lines, size and agent hours.
