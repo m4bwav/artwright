@@ -19,7 +19,7 @@ MAINTENANCE and `evergreen.json`.
   model profile, a law row or a `verified` flag from memory: cite the source in RESEARCH.md (an `R-` entry) and
   log the change. Rows not backed by a fetched source ship `verified: no`.
 - `aw.py` stays standard-library Python 3.9+ with Pillow optional, prints exactly one JSON object per command,
-  fails soft (`ok: false` with `error`), and runs on Windows, macOS and Linux. Never add numpy, scipy, OpenCV,
+  fails soft (`ok: false` with `error`, exit 1; argparse usage errors print usage text and exit 2), and runs on Windows, macOS and Linux. Never add numpy, scipy, OpenCV,
   scikit-image or imagehash. Every new command or option gets an offline test in `tests/test_aw.py` with its
   fixture drawn in code. Keep `aw.py` under 100 KB.
 - No images in the repository except the README banner. Museum fixtures are fetched by accession number and

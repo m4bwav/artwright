@@ -6,9 +6,15 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
-- unreleased: C-20261021-1 to C-20261022-3 (0.1.0 waits for the owner's go-ahead).
+- 0.1.1 · 2026-10-22: C-20261021-1 to C-20261022-4, the first tagged release (0.1.0 was installed locally,
+  never tagged).
 
 ## Changes
+
+### C-20261022-4 · 2026-10-22 · 0.1.1: exit codes in the README and AGENTS.md
+- because: the wiki pass's mismatch list (ai-docs/notes/2026-10-22-github-wiki.md, item 1)
+- files: README.md (aw.py), AGENTS.md (rules), .claude-plugin/plugin.json and skills/artwright/scripts/aw.py (version 0.1.1)
+- "Every command prints one JSON object" now says what a failure, a usage error and `--version` print.
 
 ### C-20261022-3 · 2026-10-22 · Banner, wiki, doc fixes, calibration records
 - because: user request (Step 3 launch set); the wiki pass's mismatch list (ai-docs/notes/2026-10-22-github-wiki.md)

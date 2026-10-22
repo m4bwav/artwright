@@ -46,7 +46,8 @@ established, and writes the ranking, the brief checks and the next prompt into `
 
 `skills/artwright/scripts/aw.py` is one standard-library Python file (3.9 or later). Pillow is used when present
 and never required; without it, PNG is decoded in pure Python and JPEG or WebP through ffmpeg. Every command prints
-one JSON object.
+one JSON object (a failure is `{"ok": false, "error": ...}` with exit 1); a usage mistake prints argparse's usage
+text and exits 2, and `--version` prints plain text.
 
 ```
 python aw.py info photo.jpg                 # size, alpha, SHA-256, token cost before any Read
