@@ -11,6 +11,7 @@ PINNED="$HOME/.local/share/claude-pinned/claude-2.1.281"
 echo "harness: $("$CLAUDE" --version 2>/dev/null | head -1)"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT" || exit 1
+if [ $# -ge 1 ] && [ -z "$1" ]; then echo "empty case glob (expanded away by a shell?); pass '*' for all" >&2; exit 2; fi  # L-003
 GLOB="${1:-*}"
 shift || true
 OUT="evals/cases/results/$(printf '%s' "$GLOB" | tr -c 'A-Za-z0-9-' '_').json"

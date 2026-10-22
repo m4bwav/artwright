@@ -11,7 +11,10 @@
         "the artwright-judge skill is invoked (the hub artwright first is acceptable family routing)"
       ],
       "runs": 3,
-      "_skill": "artwright-judge"
+      "_skill": "artwright-judge",
+      "files": [
+        "evals/fixtures/out"
+      ]
     },
     {
       "id": "trigger-cubism",
@@ -66,7 +69,10 @@
         "the artwright-pixel skill is invoked (the hub artwright first is acceptable family routing)"
       ],
       "runs": 3,
-      "_skill": "artwright-pixel"
+      "_skill": "artwright-pixel",
+      "files": [
+        "evals/fixtures/out"
+      ]
     },
     {
       "id": "trigger-brief",
@@ -77,7 +83,10 @@
         "the artwright-judge skill is invoked (the hub artwright first is acceptable family routing)"
       ],
       "runs": 3,
-      "_skill": "artwright-judge"
+      "_skill": "artwright-judge",
+      "files": [
+        "evals/fixtures/out"
+      ]
     },
     {
       "id": "trigger-vocab",
@@ -151,7 +160,10 @@
         "WebSearch",
         "Edit"
       ],
-      "max_turns": 20
+      "max_turns": 20,
+      "files": [
+        "evals/fixtures/out"
+      ]
     },
     {
       "id": "action-pixel",
@@ -178,7 +190,10 @@
         "WebSearch",
         "Edit"
       ],
-      "max_turns": 20
+      "max_turns": 20,
+      "files": [
+        "evals/fixtures/out"
+      ]
     },
     {
       "id": "action-sheet",
@@ -204,7 +219,10 @@
         "WebSearch",
         "Edit"
       ],
-      "max_turns": 20
+      "max_turns": 20,
+      "files": [
+        "evals/fixtures/out"
+      ]
     },
     {
       "id": "outcome-pairwise-orders",
@@ -212,8 +230,8 @@
       "tier": "paid",
       "prompt": "Which is the better image: evals/fixtures/out/cma-1958.21.jpg or a version of it with the saturation pushed (make it with aw.py degrade --kind saturate)?",
       "expectations": [
-        "judges the pair in both orders (two recorded orders in matches.jsonl or two separate judgements in the trace) and names the original as better",
-        "ties each reason to a region; no 'looks good'",
+        "says the pair was judged in both orders (the trace is not shown; the reply's statement is enough) and names the original as better",
+        "ties each reason to a part of the picture (the sky, the foreground, the mountain); no bare 'looks good'",
         "regex on the answer: (?i)both orders|order"
       ],
       "setup": "python evals/fixtures/make_fixtures.py --net",
@@ -226,6 +244,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -248,6 +269,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -269,6 +293,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -291,6 +318,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -314,6 +344,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -335,6 +368,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -356,6 +392,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -366,7 +405,7 @@
       "expectations": [
         "strictly Ming vase: the Yongle meiping, Sotheby's Hong Kong, 2011, about HK$168 million with premium",
         "notes the Chenghua chicken cup (HK$281.24m, 2014) as the record for any Ming porcelain",
-        "does not give the Qianlong (Qing) vase as Ming; names hammer vs premium",
+        "does not give the Qianlong (Qing) vase as Ming; says the Ming vase price includes the buyer's premium",
         "regex on the answer: (?i)yongle|meiping",
         "regex on the answer: (?i)chicken cup|chenghua",
         "regex on the answer: ^(?![\\s\\S]*Qianlong[^.]{0,60}\\bMing vase\\b)"
@@ -438,8 +477,8 @@
       "tier": "paid",
       "prompt": "Does evals/fixtures/out/renders/render_03.png fit this brief: 'two blue birds on a branch, side view, night sky, the word HELLO in the corner'?",
       "expectations": [
-        "verdict DOES NOT FIT with at least three hard fails named (not birds, not blue, no branch/night/text)",
-        "writes artwright/verdict.json and it validates",
+        "verdict DOES NOT FIT, with at least three of the brief's checks named as failing (birds, blue, branch, side view, night sky, HELLO text)",
+        "says the verdict was written to a verdict.json (a validation note is enough; the file itself is not shown)",
         "regex on the answer: (?i)does not fit"
       ],
       "setup": "python evals/fixtures/make_fixtures.py --net",
@@ -452,6 +491,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -519,6 +561,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -540,6 +585,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -548,8 +596,8 @@
       "tier": "paid",
       "prompt": "Is this image AI-generated? evals/fixtures/out/cma-1971.38.jpg",
       "expectations": [
-        "declines to decide from pixels (Claude cannot tell); may describe visible traits and point to provenance or metadata",
-        "regex on the answer: (?i)cannot (tell|determine)|can't (tell|determine)|not possible"
+        "says the pixels cannot decide it (Claude cannot tell); may describe visible traits; any yes or no rests on provenance or metadata it names (a museum record, file metadata), not on how the image looks",
+        "regex on the answer: (?i)(cannot|can.t|can not) (be )?(tell|told|determine|determined|prove|proved|settle|settled|say)|not possible|pixels? (alone )?(can.t|cannot|don.t)"
       ],
       "setup": "python evals/fixtures/make_fixtures.py --net",
       "runs": 3,
@@ -561,6 +609,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {
@@ -571,7 +622,7 @@
       "expectations": [
         "corrects the premise: the golden ratio has no evidence as a cause of preference",
         "explains the composition by other means",
-        "regex on the answer: (?i)no (good |strong |reliable )?evidence|myth|not supported"
+        "regex on the answer: (?i)no (good |strong |reliable |real )?(empirical )?(evidence|support)|myth|not supported|never a reason|not why|wouldn.t be why|doesn.t hold"
       ],
       "setup": "python evals/fixtures/make_fixtures.py --net",
       "runs": 3,
@@ -583,6 +634,9 @@
         "WebFetch",
         "WebSearch",
         "Edit"
+      ],
+      "files": [
+        "evals/fixtures/out"
       ]
     },
     {

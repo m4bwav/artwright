@@ -281,6 +281,16 @@ class CompareRank(unittest.TestCase):
         self.assertEqual(r["both_orders_agreement"], 0.5)
         self.assertEqual(r["accuracy_vs_labels"], 1.0)
 
+    def test_tie_both_orders(self):
+        _, B, C = self.files
+        res = self.match(B, C, "tie", "tie")
+        self.assertEqual(res["status"], "tie")
+        self.assertFalse(res["flipped"])
+        run("cache", "label", B, C, "tie")
+        code, r = run("cache", "agreement", self.work)
+        self.assertEqual(code, 0)
+        self.assertEqual(r["accuracy_vs_labels"], 1.0)
+
 
 class CacheVerdict(unittest.TestCase):
     def test_cache_roundtrip(self):

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Scaffold (runs only with `claude plugin eval --scaffold`). Written by evals/fixtures/make_fixtures.py
-# --emit-scaffold; synthetic images drawn in code, never committed as files.
+# --emit-scaffold; synthetic images drawn in code, museum images fetched and hash-checked.
 set -euo pipefail
 mkdir -p evals/fixtures/out/renders
 base64 -d > evals/fixtures/out/flag.png <<'B64'

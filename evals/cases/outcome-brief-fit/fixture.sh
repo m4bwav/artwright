@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Scaffold (runs only with `claude plugin eval --scaffold`). Written by evals/fixtures/make_fixtures.py
+# --emit-scaffold; synthetic images drawn in code, museum images fetched and hash-checked.
+set -euo pipefail
+mkdir -p evals/fixtures/out/renders
+base64 -d > evals/fixtures/out/renders/render_03.png <<'B64'
+iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAB9UlEQVR4nO3SsVEEMRAEwA8AE5MQ
+MAiElDBJEAOTEEgBMrijatHv6LanaszX60Z9u4mIiIiIiIiI/DGPD08/R119fnrT9y2ne4D0pu9b
+TvcA6U3ft5zuAdKbvm853QOkN33fcroHSG/6vuV0D5De9H3L6R4gven7li/w8fZ82OqAZ+end/X3
+LwcCAAAAAAAAAAAAAAAAAAAAAAB3BDC9AAwvAMMLwPACMLwADC8AwwvA8G4PoNpugKvvt3ofAAAA
+AAAAAAAAAAAAAAAAAADYCYACoAAoAAqAAqAAKAC6D4DVgL6+Pw979v9nPTt/9QMCAAAAAAAAAAAA
+AAAAAAAAAMBOAHRtARheAIYXgOEFYHgBGF4AhheA4W0H8P76oo0FYHgBGF4AhheA4QVgeAEYXgCG
+F4DiQFf/PgAAAAAAAAAAAAAAAAAAAAAA+M/sPmB62x8YAAAAAAAAAAAAAAAAAAAAgFEA0h949f12
+/34Aws8HIPyBdv9+AMLPByD8gXb/fgDCzwcg/IF2/34Aws+/PID0Abu7el8AwgtAwCMAAAAAAAAA
+AAAAAAAAAFcCcPb/6fcDAAAAAAAAAAAAAAAAAAAAAIB7AqgCqf6+2tXft/p+7Q+8+oLdA6ffDwAA
+AAAAAAAAAAAAAAAAIAyAiIiIiIiIiGyTX15Xs16jbQk1AAAAAElFTkSuQmCC
+B64

@@ -6,6 +6,14 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-003 · 2026-10-22 · Put a looping eval batch in a script file; never inline `$var` in `wsl -- bash -lc '...'`
+- Trigger: `wsl -d Ubuntu -- bash -lc 'for c in a b c; do bash scripts/eval-wsl.sh "$c" ...; done'` from PowerShell ran the whole suite on every pass: `$c` arrived empty, `eval-wsl.sh` fell back to its `*` default, and four full-suite passes spent about $14 before it was stopped.
+- Hypothesis: wsl.exe hands the joined command line to the distribution's login shell, which expands `$c` once before `bash -lc` runs the loop.
+- Rule: write the loop to a `.sh` file and run `wsl -d Ubuntu -- bash /mnt/<path>/file.sh`; a case glob has no character classes either (one family per call).
+- Evidence: T-20261022-2
+- Scope: repo:artwright, env:windows
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-22
+
 ### L-002 · 2026-10-21 · Name the cheap mechanical jobs in the description, and name who owns their neighbours
 - Trigger: "main colours and their shares" and "show these side by side" never fired a skill (0/3 each): the model wrote PIL scripts. Adding colours and contact sheets to the hub description fixed it, and at once pulled brand-palette and website requests in (2 of 9 decoy runs) until brandwright and sitewright-direction were named as owners.
 - Hypothesis: a model only reaches for a skill for a job it believes it cannot do alone; plain image chores look easy, so the description must name them. Naming a broad noun (colours) widens the catch, so the exclusion must sit beside it.

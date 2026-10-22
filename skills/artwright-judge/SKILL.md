@@ -1,6 +1,6 @@
 ---
 name: artwright-judge
-description: "Use whenever images must be compared, ranked or checked against a brief: 'which is better', 'pick the best of these', 'rank this batch', 'does this match my prompt', 'what should I change in the prompt'. Judges two at a time in both orders, blind to file names, ties when the orders disagree; ranks batches with Bradley-Terry; splits a brief into yes/no checks (FITS, FITS WITH FIXES, DOES NOT FIT); returns the next prompt and settings per model. Writes artwright/verdict.json for calling plugins. Not for brand palettes or on-brand scoring (brandwright) or video takes (cinewright-qc). Also 'refresh artwright-judge'."
+description: "Use whenever images must be compared, ranked or checked against a brief: 'which is better', 'pick the best of these', 'rank this batch', 'does this match my prompt', 'what should I change in the prompt', 'rewrite my prompt as a style or artist'. Judges pairs blind in both orders, ties when they disagree; ranks batches (Bradley-Terry); splits a brief into yes/no checks (FITS, FITS WITH FIXES, DOES NOT FIT); returns the next prompt and settings per model. Writes artwright/verdict.json for calling plugins. Not for brand palettes or on-brand scoring (brandwright) or video takes (cinewright-qc). Also 'refresh artwright-judge'."
 ---
 
 # artwright-judge
@@ -26,7 +26,10 @@ from two candidates to four or more degrades models about seven times as much as
 
 - one pair per call, each pair judged twice in fresh calls, once per order;
 - labels are neutral (1 and 2); file names, the model, the seed, the user's guess and other votes are never shown;
-- a split between the two orders is a tie, flagged for a human, never a coin toss.
+- a split between the two orders is a tie, flagged for a human, never a coin toss;
+- orders that agree show the judge is consistent, not that the call is wide. When no craft defect separates two
+  finished works (both intact, both skilled), the pick is taste: say it is close, name the taste axis (calm
+  against drama, say) and never call one "objectively" or "universally" better.
 
 ## A batch
 
@@ -77,8 +80,8 @@ A living artist's name becomes traits, with one line saying so.
 
 Fill `verdict.json` (items, ranking, fit, fixes, abstained, notes), set `status: final`, then
 `aw.py verdict validate <folder>`; it must print `valid: true` before you report. Reply with the winner or
-the fit verdict first, the decisive criteria, ties shown to the user with both images, and the next prompt. The
-user's own preference is shown only after the blind verdict. Cache each verdict:
+the fit verdict first, the decisive criteria each tied to the region that shows it, ties shown to the user
+with both images, and the next prompt. The user's own preference is shown only after the blind verdict. Cache each verdict:
 `aw.py cache put <img> --model <judge model> --verdict '<json>'`.
 
 ## Calibration

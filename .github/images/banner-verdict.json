@@ -1,0 +1,67 @@
+{
+ "artwright": "1",
+ "kind": "pairwise",
+ "brief": "wide cinematic painting of an artist's studio and critic's workbench at golden hour: two framed paintings of the same mountain landscape propped side by side on twin easels for comparison, a brass jeweller's loupe and a painter's palette of mixed oil colours on the bench, a round paper colour wheel, a glazed celadon ceramic vase, a small glowing monitor showing a pixel-art dragon sprite, charcoal figure sketches pinned to the wall, a clay sculpture half under a cloth, warm window light, deep blue-green shadows, painterly oil texture, rich detail, no readable text, no letters, no logos",
+ "rubric": {
+  "id": "artwright-judge",
+  "version": "1"
+ },
+ "judge": {
+  "model": "claude-opus-5-5",
+  "prompt_version": "1"
+ },
+ "created": "2026-10-22T12:36:33",
+ "status": "final",
+ "items": [],
+ "ranking": [
+  {
+   "file": "banner-seed202.jpg",
+   "rank": 1,
+   "strength": 5.422,
+   "wins": 3,
+   "losses": 0,
+   "ties": 0,
+   "close_to_next": false
+  },
+  {
+   "file": "banner-seed404.jpg",
+   "rank": 2,
+   "strength": 1.0,
+   "wins": 1,
+   "losses": 1,
+   "ties": 1,
+   "close_to_next": true
+  },
+  {
+   "file": "banner-seed303.jpg",
+   "rank": 3,
+   "strength": 1.0,
+   "wins": 1,
+   "losses": 1,
+   "ties": 1,
+   "close_to_next": false
+  },
+  {
+   "file": "banner-seed101.jpg",
+   "rank": 4,
+   "strength": 0.184,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "close_to_next": null
+  }
+ ],
+ "fit": [],
+ "fixes": [],
+ "abstained": [
+  {
+   "files": [
+    "banner-seed303.jpg",
+    "banner-seed404.jpg"
+   ],
+   "reason": "orders disagree: show a human"
+  }
+ ],
+ "notes": "Round robin of four seeds, each pair judged blind in both orders in separate calls. Seed 202 won all three of its pairs in both orders. 303 v 404 flipped between orders and is shown as a tie. Brief misses common to all four: no sculpture under a cloth.",
+ "updated": "2026-10-22T12:36:33"
+}

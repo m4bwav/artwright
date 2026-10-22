@@ -1293,7 +1293,7 @@ def resolve(pid, wd):
         return {"status": "waiting", "need_order": "2" if "1" in by else "1"}
     w1, w2 = by["1"][0], by["2"][0]
     if w1 == w2:
-        return {"status": "decided", "winner": w1, "flipped": False}
+        return {"status": "tie" if w1 is None else "decided", "winner": w1, "flipped": False}
     extra = [w for w in (by["1"][1:] + by["2"][1:]) if w]
     if extra and extra[0] in (w1, w2):
         return {"status": "decided", "winner": extra[0], "flipped": True, "tiebreak": True}

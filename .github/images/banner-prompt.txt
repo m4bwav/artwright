@@ -1,0 +1,4 @@
+wide cinematic painting of an artist's studio and critic's workbench at golden hour: two framed paintings of the same mountain landscape propped side by side on twin easels for comparison, a brass jeweller's loupe and a painter's palette of mixed oil colours on the bench, a round paper colour wheel, a glazed celadon ceramic vase, a small glowing monitor showing a pixel-art dragon sprite, charcoal figure sketches pinned to the wall, a clay sculpture half under a cloth, warm window light, deep blue-green shadows, painterly oil texture, rich detail, no readable text, no letters, no logos
+
+Model: Z-Image Turbo (z_image_turbo_bf16), 9 steps, cfg 1.0, res_multistep/simple, 1536x640, workflow banner-workflow.api.json.
+Seeds 101, 202, 303, 404 (contact-sheet.jpg). Chosen: seed 202, ranked first by artwright-judge itself (round robin in both orders, 3 wins and no losses; banner-verdict.json). Rendered 2026-10-22.
