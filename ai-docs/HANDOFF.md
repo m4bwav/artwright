@@ -1,38 +1,42 @@
 # artwright handoff
 
-Updated 2026-10-21 (end of the Step 1 session).
+Updated 2026-10-21 (end of the Step 2 session).
 
 ## State
 
-- Step 1 (creation pass) is done. No repository, no code, no skills yet: by design, until Mark answers the forks.
-- Research: eight reports in [research/2026-10-21-creation-pass/](research/2026-10-21-creation-pass/index.md),
-  synthesis [research/2026-10-21-creation-pass.md](research/2026-10-21-creation-pass.md) (layout, rubric, gold
-  answers, eval plan, size budget, forks), 22 `R-` entries in [../RESEARCH.md](../RESEARCH.md).
-- Rulings R1–R8: [decisions/2026-10-21-step1-rulings.md](decisions/2026-10-21-step1-rulings.md).
-- Name `artwright` is free on GitHub, PyPI and npm (checked 2026-10-21).
+- Public repository https://github.com/m4bwav/artwright. main at the PR #2 merge (2a9c1b3) plus the end-of-session
+  records PR. Installed as artwright@mark-local 0.1.0; not released or tagged.
+- Four skills (hub, judge, pixel, curate), `aw.py` (stdlib, Pillow optional, 14 commands), knowledge files with
+  verified flags, 34 offline unit tests, structure and budget checks, CI on 3 OSes x Python 3.9 and 3.14.
+- Evals: cheap tier 14/14 (42/42 runs, T-20261021-4). Paid tier (18 outcome and guard cases) written, not run.
+  No A/B baseline yet.
+- Evergreen unit registered (moderate, 60 days, due 2026-12-20; volatile claims: law.md 45 d, model profiles 60 d,
+  market golds 180 d). ai-docs registered with everlast (mode repo, sync pr).
+- ARTWRIGHT_HOME is the vault sidecar's `studio/` on the owner's PC (private note in the sidecar).
 
-## Mark's answers (2026-10-21)
+## Waiting for Mark
 
-All four forks as recommended: no aesthetic model in v1; he labels 30–50 pairs in Step 3; one-line hand-offs in
-comfyui-gen and polywright in Step 3; living-artist names rewritten into traits. See
-[decisions/2026-10-21-forks-mark.md](decisions/2026-10-21-forks-mark.md).
+- PR #3, the release workflow (assigned, `needs-review`): publish workflows wait for him.
+- Tag v0.1.0 only on his go-ahead, after PR #3.
+- MiniMax H3 licence: its Community License form names USA/EU/UK/South Korea; whether local use needs approval is
+  open (R-20261021-27). Flagged to him.
 
-## Next
+## Next (Step 3)
 
-Step 2: build the four skills and `aw.py` to the synthesis, with unit tests and the cheap eval
-tier; create the public repository m4bwav/artwright with SECURITY.md and private vulnerability reporting; push
-through pull requests; install as artwright@mark-local; register the evergreen units and ai-docs with everlast.
-Prompt: [next-session-prompt.md](next-session-prompt.md).
+Banner, paid evals and the A/B, Mark's 30–50 calibration pairs, the two hand-off PRs (comfyui-gen, polywright),
+wiki, then a release when he says go. Prompt: [next-session-prompt.md](next-session-prompt.md).
 
-## Things learned that the build must not forget
+## Things learned that the next session must not forget
 
-- The Met v1 search is retired (410); use v1.1. AIC needs an `AIC-User-Agent` header. Getty SPARQL refuses scripts.
-- The oldest-painting gold changed in January 2026; re-check golds by 2027-04-19.
-- `claude plugin eval` does not attach `@path` images; use `context.add_dirs` with Read. Bash cases need WSL2 or Linux.
-- Pin the Python 3.9 Linux CI job to ubuntu-24.04.
-- Open questions are listed in RESEARCH.md; unverified non-Western rows must ship as `verified: false`.
+- Shell eval cases: WSL2 + pinned 2.1.281 + `--scaffold` (`scripts/eval-wsl.sh`); graders name `tool: Bash`;
+  regenerate scaffolds with `python evals/fixtures/make_fixtures.py --emit-scaffold` after changing fixtures (L-001).
+- Descriptions: a broad trigger noun needs its neighbours' owners named beside it; re-run decoys after any
+  description edit (L-002). The descriptions budget is at ~594 of 600 tokens: trim before adding.
+- `Path.write_text(newline=)` does not exist on Python 3.9; write through `open()`.
+- The eval sandbox has no sibling plugins, so decoys there are stricter than real use.
+- Golds to re-check by 2027-04-19; Basquiat and Clemente as neo-expressionists still unverified by a fetched source.
 
 ## Read first
 
-1. [next-session-prompt.md](next-session-prompt.md).
-2. The synthesis, then the decisions folder and [log.md](log.md).
+1. [next-session-prompt.md](next-session-prompt.md), then [log.md](log.md) (last entry).
+2. [decisions/2026-10-21-step2-build.md](decisions/2026-10-21-step2-build.md), the synthesis section 6 (eval plan).
