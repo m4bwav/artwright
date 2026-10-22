@@ -16,10 +16,8 @@ Updated 2026-10-21 (end of the Step 2 session).
 
 ## Waiting for Mark
 
-- PR #3, the release workflow (assigned, `needs-review`): publish workflows wait for him.
-- Tag v0.1.0 only on his go-ahead, after PR #3.
-- MiniMax H3 licence: its Community License form names USA/EU/UK/South Korea; whether local use needs approval is
-  open (R-20261021-27). Flagged to him.
+- Tagging a release: only on his go-ahead. He merged PR #3 (the release workflow) on 2026-10-22.
+- MiniMax H3 licence: closed for him (2026-10-22: he is in the USA and accepts local use); do not raise it again.
 
 ## Next (Step 3)
 

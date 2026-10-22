@@ -59,3 +59,8 @@ comfyui-gen and polywright in Step 3, living-artist names rewritten into traits.
   `studio/`.
 - Rulings B1–B10 in `decisions/2026-10-21-step2-build.md`.
 ## [2026-10-21] index | rebuilt (7 entries)
+
+## 2026-10-22: Mark's answers to the Step 2 questions
+
+Mark merged PR #3 (release workflow). On the MiniMax H3 licence territory question he is in the USA and accepts
+local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; tagging still waits for his go.
