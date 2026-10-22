@@ -1,0 +1,71 @@
+{
+  "evergreen": "1.0",
+  "name": "artwright",
+  "kind": "plugin",
+  "main": "README.md",
+  "files": {
+    "research": "RESEARCH.md",
+    "changelog": "CHANGELOG.md",
+    "learnings": "LEARNINGS.md",
+    "tests": "TESTS.md"
+  },
+  "protocol": "plugin",
+  "source": null,
+  "topic": "An artist's eye for agents: judging and comparing images pairwise in both orders, style and movement with trait evidence, critique of all visual art (pixel and 2D/3D digital especially), art theory, and art facts held to historywright's standard",
+  "tier": "moderate",
+  "interval_days": 60,
+  "last_checked": "2026-10-21",
+  "next_due": "2026-12-20",
+  "verify_at_use": false,
+  "volatile_claims": [
+    {
+      "claim": "law.md status table (Andersen, Getty appeal, Thaler, Allen, USCO, EU AI Act Art. 50, Steam)",
+      "checked": "2026-10-21",
+      "recheck_days": 45
+    },
+    {
+      "claim": "artwright-judge model profiles (Z-Image, FLUX.2, Qwen-Image, MiniMax H3, Wan, closed models)",
+      "checked": "2026-10-21",
+      "recheck_days": 60
+    },
+    {
+      "claim": "market.md gold answers (Ming vase, oldest painting, Salvator Mundi)",
+      "checked": "2026-10-21",
+      "recheck_days": 180
+    }
+  ],
+  "contradiction": null,
+  "events": [],
+  "streak": {
+    "quiet": 0,
+    "pinned_min": 0,
+    "pinned_max": 0,
+    "vau_quiet": 0
+  },
+  "history": [
+    {
+      "date": "2026-10-21",
+      "m": null,
+      "interval_after": 60,
+      "note": "created (Step 2 build); creation pass 2026-10-21; 60 days per the synthesis"
+    }
+  ],
+  "counts": {
+    "learnings": 0,
+    "changes": 0,
+    "research": 0,
+    "tests": 0
+  },
+  "consolidate_every": 25,
+  "tests": {
+    "last_run": null,
+    "harness": null,
+    "env": null,
+    "cases": 0,
+    "passed": 0,
+    "failed": 0,
+    "failing": [],
+    "last_failure": null,
+    "research_after_days": null
+  }
+}

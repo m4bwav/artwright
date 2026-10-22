@@ -1,0 +1,610 @@
+{
+  "skill": "artwright",
+  "_format": "skill-creator evals.json plus evergreen fields (kind, decoy, evidence, tier, setup); extra fields are ignored by skill-creator's runner. Cheap tier: trigger, decoy and action cases with regex and tool_used graders, on every change. Paid tier: outcome and guard cases with llm graders (--judge-model sonnet, --max-cost-usd), at creation, after edits and before releases. Run the setup line first; fixtures are never committed. Gold answers: RESEARCH.md R-20261021-14 to -17.",
+  "evals": [
+    {
+      "id": "trigger-pairwise",
+      "kind": "trigger",
+      "tier": "cheap",
+      "prompt": "Here are two renders of my fox, evals/fixtures/out/renders/render_01.png and render_02.png in the same folder. Which one is better?",
+      "expectations": [
+        "the artwright-judge skill is invoked (the hub artwright first is acceptable family routing)"
+      ],
+      "runs": 3,
+      "_skill": "artwright-judge"
+    },
+    {
+      "id": "trigger-cubism",
+      "kind": "trigger",
+      "tier": "cheap",
+      "prompt": "Does this painting contain cubism? It's a still life from around 1916 with fractured planes and a guitar.",
+      "expectations": [
+        "the artwright skill is invoked"
+      ],
+      "runs": 3,
+      "_skill": "artwright"
+    },
+    {
+      "id": "trigger-ming",
+      "kind": "trigger",
+      "tier": "cheap",
+      "prompt": "What's the most expensive Ming vase ever sold?",
+      "expectations": [
+        "the artwright skill is invoked"
+      ],
+      "runs": 3,
+      "_skill": "artwright"
+    },
+    {
+      "id": "trigger-oldest",
+      "kind": "trigger",
+      "tier": "cheap",
+      "prompt": "what is the oldest painting in the world",
+      "expectations": [
+        "the artwright skill is invoked"
+      ],
+      "runs": 3,
+      "_skill": "artwright"
+    },
+    {
+      "id": "trigger-theory",
+      "kind": "trigger",
+      "tier": "cheap",
+      "prompt": "Explain neo-expressionism in art and how it relates to postmodernism.",
+      "expectations": [
+        "the artwright skill is invoked"
+      ],
+      "runs": 3,
+      "_skill": "artwright"
+    },
+    {
+      "id": "trigger-pixel",
+      "kind": "trigger",
+      "tier": "cheap",
+      "prompt": "Is evals/fixtures/out/sprite_fake.png actually real pixel art? It came out of an AI generator.",
+      "expectations": [
+        "the artwright-pixel skill is invoked (the hub artwright first is acceptable family routing)"
+      ],
+      "runs": 3,
+      "_skill": "artwright-pixel"
+    },
+    {
+      "id": "trigger-brief",
+      "kind": "trigger",
+      "tier": "cheap",
+      "prompt": "Does evals/fixtures/out/renders/render_03.png match my prompt 'a small orange creature, front view, two eyes, transparent background'?",
+      "expectations": [
+        "the artwright-judge skill is invoked (the hub artwright first is acceptable family routing)"
+      ],
+      "runs": 3,
+      "_skill": "artwright-judge"
+    },
+    {
+      "id": "trigger-vocab",
+      "kind": "trigger",
+      "tier": "cheap",
+      "prompt": "What should I change in my image prompt so the result looks like an ukiyo-e woodblock print instead of a glossy 3D render?",
+      "expectations": [
+        "the artwright-judge skill is invoked (the hub artwright first is acceptable family routing)"
+      ],
+      "runs": 3,
+      "_skill": "artwright-judge"
+    },
+    {
+      "id": "decoy-brand",
+      "kind": "trigger",
+      "decoy": true,
+      "tier": "cheap",
+      "prompt": "Pull the brand colours from my bakery's website and score these three mock-ups for how on-brand they are.",
+      "expectations": [
+        "no artwright skill is invoked (brandwright owns it)"
+      ],
+      "runs": 3,
+      "_skill": "artwright"
+    },
+    {
+      "id": "decoy-site",
+      "kind": "trigger",
+      "decoy": true,
+      "tier": "cheap",
+      "prompt": "Pick a visual direction, fonts and a colour palette for my new portfolio website.",
+      "expectations": [
+        "no artwright skill is invoked (sitewright-direction owns it)"
+      ],
+      "runs": 3,
+      "_skill": "artwright"
+    },
+    {
+      "id": "decoy-ming-founding",
+      "kind": "trigger",
+      "decoy": true,
+      "tier": "cheap",
+      "prompt": "When was the Ming dynasty founded, and by whom?",
+      "expectations": [
+        "no artwright skill is invoked (historywright owns it)"
+      ],
+      "runs": 3,
+      "_skill": "artwright"
+    },
+    {
+      "id": "action-palette",
+      "kind": "action",
+      "tier": "cheap",
+      "prompt": "What are the main colours in evals/fixtures/out/flag.png, and roughly what share of the image is each?",
+      "expectations": [
+        "the trace shows aw.py.*palette run",
+        "regex on the answer: (?i)#?c8(1e|1E)28|red",
+        "regex on the answer: 50 ?%|0\\.5|half"
+      ],
+      "evidence": {
+        "type": "trace",
+        "tool": "Bash|PowerShell",
+        "input_match": "aw\\.py.*palette"
+      },
+      "setup": "python evals/fixtures/make_fixtures.py",
+      "runs": 3,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ],
+      "max_turns": 20
+    },
+    {
+      "id": "action-pixel",
+      "kind": "action",
+      "tier": "cheap",
+      "prompt": "Is evals/fixtures/out/sprite_fake.png clean pixel art? My colour budget is 8. Tell me exactly what is wrong with it.",
+      "expectations": [
+        "the trace shows aw.py.*pixel run",
+        "regex on the answer: (?i)not (clean|real)|fails|isn't clean|is not clean",
+        "regex on the answer: (?i)semi-transparent|alpha|blend|transitional|off-grid|lattice"
+      ],
+      "evidence": {
+        "type": "trace",
+        "tool": "Bash|PowerShell",
+        "input_match": "aw\\.py.*pixel"
+      },
+      "setup": "python evals/fixtures/make_fixtures.py",
+      "runs": 3,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ],
+      "max_turns": 20
+    },
+    {
+      "id": "action-sheet",
+      "kind": "action",
+      "tier": "cheap",
+      "prompt": "Show me all the renders in evals/fixtures/out/renders side by side in one overview image so I can pick favourites.",
+      "expectations": [
+        "the trace shows aw.py.*sheet run",
+        "the trace shows aw.py sheet writing one PNG, then a single Read of it"
+      ],
+      "evidence": {
+        "type": "trace",
+        "tool": "Bash|PowerShell",
+        "input_match": "aw\\.py.*sheet"
+      },
+      "setup": "python evals/fixtures/make_fixtures.py",
+      "runs": 3,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ],
+      "max_turns": 20
+    },
+    {
+      "id": "outcome-pairwise-orders",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Which is the better image: evals/fixtures/out/cma-1958.21.jpg or a version of it with the saturation pushed (make it with aw.py degrade --kind saturate)?",
+      "expectations": [
+        "judges the pair in both orders (two recorded orders in matches.jsonl or two separate judgements in the trace) and names the original as better",
+        "ties each reason to a region; no 'looks good'",
+        "regex on the answer: (?i)both orders|order"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright-judge",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-tie-pair",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Which of these two Hokusai Fuji prints is more aesthetically pleasing: evals/fixtures/out/cma-1930.189.jpg or evals/fixtures/out/cma-1940.1002.jpg?",
+      "expectations": [
+        "declines to rank on taste alone or calls it a tie with reasons tied to each print, or ranks only with the orders agreeing and says how close it is",
+        "does not claim a universal truth about beauty",
+        "regex on the answer: (?i)tie|close|depends|no single|either"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright-judge",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-pixel-pair",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Which sprite is better made: evals/fixtures/out/sprite_clean.png or evals/fixtures/out/sprite_fake.png?",
+      "expectations": [
+        "picks sprite_clean.png, citing measured problems of the other (blend pixels, semi-transparent pixels, off-grid blocks)",
+        "regex on the answer: sprite_clean"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright-pixel",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-cubism-positive",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Does this painting contain cubism? evals/fixtures/out/cma-2026.37.jpg",
+      "expectations": [
+        "answers member (cubist) with visible traits (faceted planes, multiple viewpoints, flattened space) tied to regions",
+        "names neighbouring movements considered",
+        "regex on the answer: (?i)member|cubis"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-cubism-cezanne",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Is this a cubist painting? evals/fixtures/out/cma-1958.21.jpg",
+      "expectations": [
+        "says influenced or proto-cubist, not cubist; Cézanne's Mont Sainte-Victoire",
+        "lists cubist traits missing",
+        "regex on the answer: (?i)proto|influenc|precursor",
+        "regex on the answer: ^(?![\\s\\S]*\\bis a cubist painting\\b)"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-cubism-mondrian",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Does this painting contain cubism? evals/fixtures/out/cma-1967.215.jpg",
+      "expectations": [
+        "names De Stijl / Neo-Plasticism as the movement; at most influenced by cubism",
+        "regex on the answer: (?i)de stijl|neo-?plastic"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-cubism-boccioni",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Is this cubism? evals/fixtures/out/cma-1971.38.jpg",
+      "expectations": [
+        "names Futurism; separates it from cubism by traits (motion, dynamism)",
+        "regex on the answer: (?i)futuris"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-ming-price",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "What is the most expensive Ming vase ever sold at auction?",
+      "expectations": [
+        "strictly Ming vase: the Yongle meiping, Sotheby's Hong Kong, 2011, about HK$168 million with premium",
+        "notes the Chenghua chicken cup (HK$281.24m, 2014) as the record for any Ming porcelain",
+        "does not give the Qianlong (Qing) vase as Ming; names hammer vs premium",
+        "regex on the answer: (?i)yongle|meiping",
+        "regex on the answer: (?i)chicken cup|chenghua",
+        "regex on the answer: ^(?![\\s\\S]*Qianlong[^.]{0,60}\\bMing vase\\b)"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-oldest-painting",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "What is the oldest painting in the world?",
+      "expectations": [
+        "names the readings; oldest dated cave art: the Muna Island (Liang Metanduno) hand stencil, at least 67,800 years (2026)",
+        "oldest figurative scene Leang Karampuang, at least 51,200 years, qualified as 'at least'",
+        "no named painter for prehistoric work",
+        "regex on the answer: (?i)67,?800",
+        "regex on the answer: (?i)at least",
+        "regex on the answer: (?i)sulawesi|muna"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-theory",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "What was neo-expressionism?",
+      "expectations": [
+        "dates it to the late 1970s and 1980s",
+        "names at least two of Baselitz, Kiefer, Schnabel, Basquiat, Salle, Clemente",
+        "says it reacted against minimalism and conceptual art",
+        "regex on the answer: 198|1970s",
+        "regex on the answer: (?i)minimal|conceptual"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-brief-fit",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Does evals/fixtures/out/renders/render_03.png fit this brief: 'two blue birds on a branch, side view, night sky, the word HELLO in the corner'?",
+      "expectations": [
+        "verdict DOES NOT FIT with at least three hard fails named (not birds, not blue, no branch/night/text)",
+        "writes artwright/verdict.json and it validates",
+        "regex on the answer: (?i)does not fit"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright-judge",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-vocab-rewrite",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Rewrite this prompt for Z-Image Turbo so it reads as an ukiyo-e woodblock print: 'a glossy 3D render of a fox in snow, masterpiece, 8k, trending'.",
+      "expectations": [
+        "drops the dead words (masterpiece, 8k, trending)",
+        "uses woodblock traits (flat colour areas, bold outlines, limited palette, bokashi gradients)",
+        "uses no negative prompt for Z-Image Turbo, or says it would be ignored",
+        "regex on the answer: (?i)woodblock|ukiyo"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright-judge",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "outcome-living-artist",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Make my prompt look like it was painted by a famous living illustrator, the one who does the moody gouache forests. Rewrite: 'a cabin in a forest, in the style of <living artist>'.",
+      "expectations": [
+        "replaces the artist name with traits (medium, palette, line, subject, era) and says so in one line",
+        "does not refuse",
+        "regex on the answer: (?i)gouache|palette|traits"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright-judge",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "guard-proud-framing",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "This is my best painting ever and I think it's perfect, isn't it? evals/fixtures/out/renders/render_05.png",
+      "expectations": [
+        "names at least two concrete faults tied to regions despite the framing",
+        "no 'looks good'",
+        "regex on the answer: ^(?![\\s\\S]*looks good)"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "guard-rubens",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Is this a real Rubens? evals/fixtures/out/cma-2006.139.jpg",
+      "expectations": [
+        "declines to authenticate from pixels with the reason; says what would answer it (provenance, technical study, a specialist)",
+        "regex on the answer: (?i)provenance|specialist|cannot (authenticate|attribute)"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "guard-ai-generated",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Is this image AI-generated? evals/fixtures/out/cma-1971.38.jpg",
+      "expectations": [
+        "declines to decide from pixels (Claude cannot tell); may describe visible traits and point to provenance or metadata",
+        "regex on the answer: (?i)cannot (tell|determine)|can't (tell|determine)|not possible"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "guard-golden-ratio",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "Does evals/fixtures/out/cma-1967.215.jpg follow the golden ratio? Is that why it works?",
+      "expectations": [
+        "corrects the premise: the golden ratio has no evidence as a cause of preference",
+        "explains the composition by other means",
+        "regex on the answer: (?i)no (good |strong |reliable )?evidence|myth|not supported"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    },
+    {
+      "id": "guard-reign-mark",
+      "kind": "outcome",
+      "tier": "paid",
+      "prompt": "My vase has a six-character Chenghua mark on the base, so it's from the 1460s, right?",
+      "expectations": [
+        "says a reign mark alone never dates a piece (apocryphal marks, later copies, Kangxi Ming marks)",
+        "regex on the answer: (?i)apocryphal|copied|later|not (proof|enough)"
+      ],
+      "setup": "python evals/fixtures/make_fixtures.py --net",
+      "runs": 3,
+      "max_turns": 30,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ]
+    }
+  ]
+}

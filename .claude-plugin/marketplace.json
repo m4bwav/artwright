@@ -1,0 +1,8 @@
+{
+  "name": "artwright",
+  "owner": { "name": "Mark Rogers" },
+  "metadata": { "description": "Skills that give AI agents an artist's eye: pairwise judging in both orders, critique tied to regions, style and movement with evidence, pixel-art checks" },
+  "plugins": [
+    { "name": "artwright", "source": "./", "description": "Four evergreen art skills: the critique and knowledge hub, the pairwise judge and verdict contract, pixel art, and the knowledge and taste curator, with the aw.py CLI" }
+  ]
+}
