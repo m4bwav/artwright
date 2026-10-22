@@ -6,9 +6,14 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
-- unreleased: C-20261021-1 to C-20261021-2 (0.1.0 waits for the owner's go-ahead).
+- unreleased: C-20261021-1 to C-20261021-3 (0.1.0 waits for the owner's go-ahead).
 
 ## Changes
+
+### C-20261021-3 · 2026-10-21 · Descriptions catch colours and contact sheets and name brandwright and sitewright; shell evals scaffolded
+- because: T-20261021-2, T-20261021-3, L-001, L-002
+- files: skills/artwright/SKILL.md (description; Image handling), skills/artwright-judge/SKILL.md (description), skills/artwright-curate/SKILL.md (description, shortened for the budget), evals/cases/action-*/ (case.yaml, fixture.sh, graders), evals/fixtures/make_fixtures.py (--emit-scaffold), tests/check_skills.py (.sh files checked; base64 fixtures exempt from the token check)
+- The hub now names colour questions and contact sheets and says to answer them from aw.py; the hub and judge name the siblings that own brand palettes and website direction; the action cases unpack their fixtures in the run's workspace.
 
 ### C-20261021-2 · 2026-10-21 · Step 2 build: four skills, aw.py, knowledge files, tests, evals, CI
 - because: user request (kickoff Step 2); R-20261021-1 to -30; ai-docs/decisions/2026-10-21-step2-build.md

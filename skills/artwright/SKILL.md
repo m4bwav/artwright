@@ -1,6 +1,6 @@
 ---
 name: artwright
-description: "Use whenever art needs an artist's eye: critique or analyse a painting, drawing, print, sculpture, ceramic, illustration or 3D render ('critique my painting'); style or movement ('is this cubist', 'what style is this'); art theory ('what is postmodernism', 'neo-expressionism'); art facts ('most expensive Ming vase', 'oldest painting'). Cold read, then evidence tied to regions, numbers from aw.py, facts through historywright. Comparing or ranking images and fit to a brief: artwright-judge. Pixel and sprite art: artwright-pixel. Also 'refresh artwright'."
+description: "Use whenever art or an image needs an artist's eye: critique a painting, drawing, print, sculpture, ceramic, illustration or 3D render; style or movement ('is this cubist'); art theory ('what is postmodernism'); art facts ('most expensive Ming vase', 'oldest painting'); an image's main colours; many images side by side on one contact sheet. aw.py measures, claims tie to regions, facts go through historywright. Ranking or brief fit: artwright-judge. Pixel art: artwright-pixel. Not brand palettes (brandwright) or website direction (sitewright-direction). Also 'refresh artwright'."
 ---
 
 # artwright
@@ -31,9 +31,12 @@ contradiction, say so in one line and refresh after the task. Then route:
 - `aw.py info <img>` first: size and token cost. Never Read an image larger than 1568 px on its long edge; fit it:
   `aw.py fit <img> -o <out.png> --long 1024` (about 1,300 tokens).
 - Detail goes by crop (`--crop x,y,w,h` or `--cell 3x3:4`), never by sending the whole image larger.
-- Several images: one contact sheet (`aw.py sheet ... -o sheet.png`), never one Read per image.
-- Numbers before pixels: `aw.py stats <img>` (value, contrast, colourfulness, edges, symmetry, balance) and
-  `aw.py palette <img>`. They describe; none is a beauty score ([references/evidence.md](references/evidence.md)).
+- Several images, or "show them side by side": one contact sheet (`aw.py sheet <files or folder> -o sheet.png`),
+  then one Read of it. Never one Read per image, never a hand-written PIL or ImageMagick script.
+- Colours ("main colours", "palette", "how much of it is red"): `aw.py palette <img>` gives the colours and their
+  shares; answer from its JSON, not by eye or a one-off script.
+- Numbers before pixels: `aw.py stats <img>` (value, contrast, colourfulness, edges, symmetry, balance). They
+  describe; none is a beauty score ([references/evidence.md](references/evidence.md)).
 - An unchanged file with the same rubric is never judged twice: `aw.py cache get <img>` first.
 
 ## Critique of one work

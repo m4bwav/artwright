@@ -1,6 +1,6 @@
 ---
 name: artwright-judge
-description: "Use whenever images must be compared, ranked or checked against a brief: 'which is better', 'pick the best of these', 'rank this batch', 'does this match my prompt', 'what should I change in the prompt'. Judges two at a time in both orders, blind to file names, ties when the orders disagree; ranks batches with Bradley-Terry; splits a brief into yes/no checks (FITS, FITS WITH FIXES, DOES NOT FIT); returns the next prompt and settings per model. Writes artwright/verdict.json for calling plugins. Single-work critique: artwright. Video takes: cinewright-qc. Also 'refresh artwright-judge'."
+description: "Use whenever images must be compared, ranked or checked against a brief: 'which is better', 'pick the best of these', 'rank this batch', 'does this match my prompt', 'what should I change in the prompt'. Judges two at a time in both orders, blind to file names, ties when the orders disagree; ranks batches with Bradley-Terry; splits a brief into yes/no checks (FITS, FITS WITH FIXES, DOES NOT FIT); returns the next prompt and settings per model. Writes artwright/verdict.json for calling plugins. Not for brand palettes or on-brand scoring (brandwright) or video takes (cinewright-qc). Also 'refresh artwright-judge'."
 ---
 
 # artwright-judge

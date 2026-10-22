@@ -40,6 +40,28 @@ def sprite(seed):
     return img
 
 
+def emit_scaffold():
+    """Writes fixture.sh into each action case: the synthetic PNGs as base64, unpacked into the run's workspace."""
+    import base64
+    lines = ["#!/usr/bin/env bash",
+             "# Scaffold (runs only with `claude plugin eval --scaffold`). Written by evals/fixtures/make_fixtures.py",
+             "# --emit-scaffold; synthetic images drawn in code, never committed as files.",
+             "set -euo pipefail",
+             "mkdir -p evals/fixtures/out/renders"]
+    for p in sorted(OUT.rglob("*.png")):
+        rel = p.relative_to(OUT).as_posix()
+        b64 = base64.b64encode(p.read_bytes()).decode()
+        lines.append("base64 -d > evals/fixtures/out/%s <<'B64'" % rel)
+        lines += [b64[i:i + 76] for i in range(0, len(b64), 76)]
+        lines.append("B64")
+    body = "\n".join(lines) + "\n"
+    for case in sorted((ROOT / "evals" / "cases").glob("action-*")):
+        with open(case / "fixture.sh", "w", encoding="utf-8", newline="\n") as f:
+            f.write(body)
+        (case / "case.yaml").write_bytes(('schema_version: "1.1"\nname: %s\ncontext:\n  scaffold_script: fixture.sh\n'
+                                          % case.name).encode())
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     flag = aw.Img(90, 60)
@@ -55,6 +77,8 @@ def main():
     rd.mkdir(exist_ok=True)
     for i in range(6):
         aw.save_png(aw.resize_nearest(sprite(10 + i), 128, 128), rd / ("render_%02d.png" % (i + 1)))
+    if "--emit-scaffold" in sys.argv:
+        emit_scaffold()
     if "--net" in sys.argv:
         import test_aw
         for acc in test_aw.FIXTURES:
