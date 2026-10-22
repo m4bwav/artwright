@@ -88,3 +88,18 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
   notes/2026-10-22-github-wiki.md). It lists the double-tie bug as known until this PR merges.
 - Rulings C1-C8 in decisions/2026-10-22-step3-rulings.md.
 ## [2026-10-22] index | rebuilt (9 entries)
+
+## 2026-10-22: Step 4 session: calibration result, A/B, wiki fix, release PR
+
+- The owner labelled all 40 calibration pairs. Judge accuracy against his picks 0.825 (target 0.8, passes);
+  both-orders agreement 0.775 (does not). By kind, judge vs owner: degraded 0.88, pixel 1.00, his seed pairs 0.75,
+  ties 0.80. Five of seven misses are the judge's own ties; he preferred the saturated image on 3 of 4 saturate
+  pairs (a taste note in the private studio's taste.md, no public rubric change). Ruling D1.
+- A/B (T-20261022-5, $10.25; day total $44.24): with 17/20, without 12/20, +25 points inside a 27-point margin;
+  the tool says CUT, the paired 5-0 says keep (D5). action-palette's with arm tried to edit the repo's
+  LEARNINGS.md from its run folder (open finding).
+- Wiki: the both-orders tie known issue replaced by the fixed behaviour (Errors-and-Edge-Cases,
+  How-Images-Are-Judged); live check 10 pages, 0 failures.
+- Release: PR #7 (0.1.1 bump, CHANGELOG release line, exit codes in README and AGENTS.md) passed CI; the merge
+  was refused by the session's permission classifier, so it is assigned to the owner (D4). No tag yet.
+## [2026-10-22] index | rebuilt (10 entries)

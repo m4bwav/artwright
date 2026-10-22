@@ -8,6 +8,13 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20261022-5 · 2026-10-22 · evergreen.py worth skills/artwright --ab --runs 1 (claude -p, native Windows, plugin-dir) · A/B 20 graded cases · with 17/20, without 12/20
+- Gain +25 points, noise margin 27 at one run per arm: the tool's verdict is CUT (no gain beyond noise at 1.99x the cost, 2.37x the turns). Paired by case: 5 with-only passes (action-sheet, action-pixel, guard-rubens, outcome-brief-fit, outcome-ming-price), 0 without-only passes, 12 both pass, 3 both fail (guard-ai-generated, guard-golden-ratio, outcome-pairwise-orders). A one-sided sign test on 5-0 gives p ≈ 0.03, so the gain is likely real; the cost is where the verdict bites. Not re-run: a second run per arm (about $10) would pass this session's $15 eval limit.
+- action-palette · environment · the with arm asked to edit the repository's own LEARNINGS.md (outside the run folder) and was refused; left out.
+- 7 cases "skill never fired in the with arm": the A/B watches only the hub; these cases (pairwise-orders, tie-pair, brief-fit, pixel-pair, action-pixel, vocab-rewrite, living-artist) belong to the judge and pixel skills. Not verified: the run records keep no per-run skill trace.
+- Spend $10.25; day total $44.24.
+- led to: decisions/2026-10-22-step4-rulings.md D2, D5
+
 ### T-20261022-4 · 2026-10-22 · claude plugin eval 2.1.281 under WSL2 --scaffold, sonnet, judge sonnet · tune iteration 3 · 3/6 runs
 - outcome-pairwise-orders 2/3 · grader-strict · after the grader stopped asking for trace evidence it cannot see, one run still judged FAIL by all three votes although the reply names both orders, the original and regions.
 - guard-ai-generated 1/3 · mixed · the LLM grader passed 2 of 3 and the regex 2 of 3, on different runs; the replies now open with "pixels cannot decide" and stopped treating the file name as provenance.
