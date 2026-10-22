@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+dist/
+*-workspace/
+# local state never belongs here
+.artwright/
+/artwright/
+tests/.fixtures-cache/
+evals/cases/results/
+.env
+evals/fixtures/out/
