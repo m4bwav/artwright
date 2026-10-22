@@ -1,62 +1,57 @@
-# Kickoff: artwright Step 4 (calibration result, A/B, release)
+# Kickoff: artwright Step 5 (release 0.1.1, wiki release pass, loose ends)
 
-Written 2026-10-22 at the end of Step 3. Paste this into a fresh session started in the artwright folder (the
-m4bwav/artwright clone). Step 3 is mostly done: the paid evals ran and were tuned, the banner and wiki are live, the
-two hand-off PRs wait for Mark, and his calibration labelling is in progress.
+Written 2026-10-22 at the end of Step 4. Paste this into a fresh session started in the artwright folder (the
+m4bwav/artwright clone). Step 4 is done except the release: calibration imported and reported, the A/B ran once,
+the wiki's tie issue is fixed, and PR #7 (the 0.1.1 bump) passed CI but waits for Mark's merge.
 
 ## Read first
 
 1. `ai-docs/HANDOFF.md`, then the last entry of `ai-docs/log.md`.
-2. `ai-docs/decisions/2026-10-22-step3-rulings.md` (C1–C8) and `TESTS.md` (T-20261022-1 to -4).
+2. `ai-docs/decisions/2026-10-22-step4-rulings.md` (D1–D5) and `TESTS.md` (T-20261022-5).
 3. `LEARNINGS.md` (L-001 harness, L-002 descriptions, L-003 eval loops in a script file).
-4. The owner's rules: the vault user PROFILE ("Code and repos"); the vault sidecar note
-   `projects/artwright/private/notes/2026-10-21-private-setup.md`. The calibration folder is the sidecar's
-   `studio/calibration/` (ARTWRIGHT_HOME is the sidecar's `studio/`).
+4. `ai-docs/notes/2026-10-22-github-wiki.md` ("Updating the wiki later" and "At the first release").
+5. The owner's rules: the vault user PROFILE ("Code and repos"); the vault sidecar note
+   `projects/artwright/private/notes/2026-10-21-private-setup.md`.
 
-## Step 4
+## Step 5
 
-1. **Calibration result.** Read the labelling page's picks: ArtifactData `list` on
-   https://claude.ai/artifact/TFZxKLEmSr41WXP1Gszs23, collection `picks`, `query.limit` 100, with `out_dir` set to a
-   scratch folder. If fewer than 40, tell Mark how many remain and stop for him. Then
-   `python <studio>/calibration/import_picks.py <out_dir>/picks` writes the labels and prints the agreement.
-   Report both numbers: the judge's both-orders agreement (0.775 on this set) and its accuracy against his picks,
-   against the 0.8 target, broken down by pair kind (degraded, pixel, his seed pairs, ties) from the manifest.
-   If below target, record what the disagreements share (one ruling in `ai-docs/decisions/`), and note the
-   taste lessons in `studio/taste.md` through artwright-curate; do not change public rubric files on taste
-   alone.
-2. **A/B, only if Mark agreed.** `python evals/fixtures/make_fixtures.py --net`, then
-   `python <evergreen>/scripts/evergreen.py worth . --ab --runs 1` (about $10; Step 3 spent $33.99 of its $40).
-   Record a T- entry with the gain and the noise margin.
-3. **Wiki follow-up.** The tie fix merged, so update the wiki's known-issues line (the note
-   `ai-docs/notes/2026-10-22-github-wiki.md` says where), and fix any doc mismatches still listed there.
-4. **Release, only when Mark says go.** Packaged files changed since 0.1.0 was installed: bump to 0.1.1 in the
-   manifest, write the CHANGELOG release line, tag `v0.1.1`, check the release zip on the release page, then
-   reinstall artwright@mark-local.
+1. **Release.** If PR #7 is merged (`gh pr view 7`), and Mark has said go: `git pull`, tag `v0.1.1` on that merge
+   commit, push the tag, watch the release workflow, check `artwright-0.1.1.zip` on the release page (skills,
+   README, LICENSE, SECURITY.md; no ai-docs, no evals), then reinstall artwright@mark-local and confirm 0.1.1
+   loads. If PR #7 is still open, ask Mark to merge it (or to allow the merge) and stop for him.
+2. **Wiki release pass.** Add a Versions-and-Upgrading page, change "not yet released" on Home, FAQ, Development
+   and the footer to 0.1.1 at the tag's commit; run the gates listed in the wiki note, push, `wikiwright.py live`.
+3. **Open finding (D5).** In the A/B, action-palette's with arm asked to edit the repository's own LEARNINGS.md
+   from its run folder. Find the instruction in the skills that sends it there (the Maintenance sections name
+   LEARNINGS.md by relative path) and make it write learnings only when working in the artwright repository.
+   Through a PR; re-run the decoys if a description changes (L-002).
+4. **Optional A/B top-up.** Only if Mark agrees: `worth skills/artwright --ab --runs 2 --append` on the cases that
+   differed or both failed (about $6), and an A/B pointed at `skills/artwright-judge` and `skills/artwright-pixel`
+   once they have value cases. Record a T- entry.
 
-Limits: no release tag without Mark's go-ahead. No new image models or torch. Calibration images must be CC0 or
-the owner's own renders. Estimate in files, lines, size and agent hours. Eval spend: say the estimate and stop
-before about $15 this session.
+Limits: no release tag without Mark's go-ahead. No new image models or torch. Estimate in files, lines, size and
+agent hours. Eval spend: say the estimate and stop before about $10 this session (Step 4 spent $10.25).
 
 ## Rules
 
 - No AI attribution in commits, PRs or files. Commit with `git -c user.email=156112+m4bwav@users.noreply.github.com`.
 - Every change through a pull request; merge your own once CI passes, except release or publish workflow changes,
   public API changes (the verdict contract) and other repositories' shared files; those wait for Mark (assign
-  m4bwav, label needs-review).
+  m4bwav, label needs-review). If the merge is refused by a permission check, assign and label and say so.
 - Public repository: no absolute paths from this machine, no names, no keys in any file, ai-docs included. The
-  calibration manifest and his picks stay in the private studio folder.
+  calibration manifest, his picks and taste.md stay in the private studio folder.
 - Image generation: split batches across both ComfyUI hosts (comfyui-gen). Kill processes only by PID. Never
   index or walk AppData.
 - The Bash tool's hook refuses heredocs holding a doubled backslash: use a scratch .py file or the Edit tool.
-- Shell eval cases run only under WSL2 (L-001); eval loops go in a script file (L-003); re-run the decoys after
-  any description edit (L-002). The LLM grader sees only the last message.
+- `worth --ab` takes one skill folder, not the plugin root. Shell eval cases run only under WSL2 (L-001); eval
+  loops go in a script file (L-003).
 
 ## When to stop and ask
 
-- Before spending more than about $15 on evals, paying for or signing up to anything, or installing a large
+- Before spending more than about $10 on evals, paying for or signing up to anything, or installing a large
   dependency.
-- Before tagging or publishing.
-- At the end of Step 4: report the calibration numbers, the A/B, the wiki fix and the release state.
+- Before tagging or publishing, and when PR #7 is still open.
+- At the end of Step 5: report the release state, the wiki pass, the LEARNINGS fix and any A/B.
 
 Decide small design rulings yourself, record each in `ai-docs/decisions/`, and flag it in one line.
 

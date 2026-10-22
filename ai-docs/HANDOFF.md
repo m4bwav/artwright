@@ -1,44 +1,44 @@
 # artwright handoff
 
-Updated 2026-10-22 (end of the Step 3 session).
+Updated 2026-10-22 (end of the Step 4 session).
 
 ## State
 
 - Public repository https://github.com/m4bwav/artwright; installed as artwright@mark-local 0.1.0; not released.
-- Evals: cheap tier 14/14; paid tier run and tuned (T-20261022-1 to -4): 28 of 32 cases pass every run;
-  pairwise-orders 2/3, ai-generated 1/3, brief-fit 2/3, tie-pair 2/3. Spend so far $33.99. No A/B yet.
-- Calibration: the judge's both-orders agreement on the 40-pair set is 0.775 (target 0.8). The owner's labelling
-  page is https://claude.ai/artifact/TFZxKLEmSr41WXP1Gszs23 (picks in its `picks` collection, 9 of 40 done when
-  the session ended). Set, manifest, judge records and `import_picks.py` are in
-  `ARTWRIGHT_HOME/calibration/` (the vault sidecar's `studio/`; images git-ignored there).
-- Banner in the README (picked by the judge); wiki live, 10 pages.
-- Hand-off PRs wait for the owner: m4bwav/comfyui-gen#82, m4bwav/polywright#24.
+- PR #7 (0.1.1 bump, CHANGELOG release line, exit codes in README and AGENTS.md) passed CI and waits for the
+  owner (the session's permission classifier refused the merge). After it merges: tag `v0.1.1`, check the zip on
+  the release page, reinstall artwright@mark-local.
+- Calibration done: 40 of 40 labelled; judge accuracy vs owner 0.825 (passes 0.8), both-orders agreement 0.775
+  (does not). Taste notes in the private studio's `taste.md`; ruling D1.
+- A/B done once (T-20261022-5): with 17/20, without 12/20, +25 points inside the 27-point margin; tool verdict CUT,
+  paired 5-0 says keep (D5). Eval spend for the day $44.24.
+- Wiki: tie known issue replaced by the fixed behaviour; still says 0.1.0 "not yet released" (footer, Home, FAQ,
+  Development) until the tag.
+- Hand-off PRs still wait for the owner: m4bwav/comfyui-gen#82, m4bwav/polywright#24.
 
 ## Waiting for Mark
 
-- The rest of his 40 picks; then import and report agreement against 0.8.
-- The A/B (`evergreen.py worth --ab`, about $10): it would pass the session's $40 eval cap, so it needs his go.
-- The two hand-off PRs; a release tag (only on his go-ahead).
+- Merge PR #7, then the tag (or tell the next session to merge and tag).
+- The two hand-off PRs.
 
 ## Next
 
-Import his picks, report agreement; run the A/B if he agrees; refresh the wiki's known-issues line now the tie fix
-is merged; then a release when he says go. Prompt: [next-session-prompt.md](next-session-prompt.md).
+Release 0.1.1 once PR #7 is merged; then the wiki's release pass (Versions page, "not yet released" lines). Open
+finding: the with arm of action-palette tried to edit the repo's LEARNINGS.md; find the instruction. Optional
+A/B top-up (`--runs 3` on the 8 differing cases, about $6). Prompt: [next-session-prompt.md](next-session-prompt.md).
 
 ## Things learned that the next session must not forget
 
-- Eval loops go in a `.sh` file run as `wsl -d Ubuntu -- bash /mnt/...`; `$var` inside `wsl -- bash -lc '...'` is
-  expanded away and the runner then ran the whole suite (L-003; the runner now refuses an empty glob). A case glob
-  has no character classes.
-- The LLM grader sees only the last message: never ask it to confirm a file or a trace.
-- Image cases: `make_fixtures.py --net --emit-scaffold`; scaffolds curl the museum images and check their hashes;
-  `worth --ab` copies `evals/fixtures/out` via each case's `files`.
-- Artifact pages: relative paths to published files did not render as `<img>` in the viewer; embed data URIs.
-- Descriptions at ~596 of 600 tokens: trim before adding; re-run decoys after any description edit (L-002).
-- Don't edit a shell script while bash is executing it (it reads by offset).
-- Shell eval cases: WSL2 + pinned 2.1.281 + `--scaffold` (L-001).
+- `evergreen.py worth --ab` takes one skill folder (`skills/artwright`), not the plugin root; it tracks only that
+  skill's firing, so cases owned by judge and pixel show "never fired".
+- The A/B run records keep no per-run skill trace; the run folders are under the system temp folder (do not walk
+  AppData; read only the exact `aggregate-result.json` path the run prints).
+- Eval loops go in a `.sh` file run as `wsl -d Ubuntu -- bash /mnt/...` (L-003). The LLM grader sees only the last
+  message.
+- Artifact pages: embed images as data URIs. Descriptions at ~596 of 600 tokens: trim before adding (L-002).
+- `gh pr merge` can be refused by the auto-mode classifier even with the owner's go-ahead; assign and label then.
 
 ## Read first
 
 1. [next-session-prompt.md](next-session-prompt.md), then [log.md](log.md) (last entry).
-2. [decisions/2026-10-22-step3-rulings.md](decisions/2026-10-22-step3-rulings.md), `TESTS.md` (T-20261022-*).
+2. [decisions/2026-10-22-step4-rulings.md](decisions/2026-10-22-step4-rulings.md), `TESTS.md` (T-20261022-5).
