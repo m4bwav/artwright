@@ -10,3 +10,4 @@ tests/.fixtures-cache/
 evals/cases/results/
 .env
 evals/fixtures/out/
+evals/results/

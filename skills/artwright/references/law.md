@@ -1,0 +1,26 @@
+# AI art law status
+
+A dated status table of the cases and rules that bear on AI images, for the living-artist rule, copyright reminders and disclosure notes.
+
+Checked 2026-10-21 · Back to [SKILL.md](../SKILL.md)
+
+**Not legal advice.** This is a dated summary of public records for orientation. Say the "as of" date when you use a row, and send anyone with a real decision to a lawyer in their jurisdiction. Refresh every 60–90 days; a row past its next-check date is stale and must be re-read before use.
+
+| Matter | Status as of 2026-10-21 | Source | verified | Next check |
+|---|---|---|---|---|
+| Andersen v. Stability AI (N.D. Cal. 3:23-cv-00201, artists' class action vs Stability, Midjourney, DeviantArt, Runway) | In discovery; no merits ruling since the August 2024 order let core claims proceed. Summary-judgment hearing moved from 2026-11-04 to 2027-02-17 (order of 2026-02-02), then the schedule was extended about three more months on 2026-09-28. Tracker: summary judgment "won't get resolved until the end of 2027 at the earliest". Nothing yet decides whether training or style imitation infringes. | https://chatgptiseatingtheworld.com/category/andersen-v-stability-ai/ (docket tracker; CourtListener refused) | yes (secondary tracker) | 2027-01-19 |
+| Getty Images v. Stability AI (UK) | High Court (2025-11-04) mostly for Stability: secondary infringement failed because the model is not an "infringing copy"; trade mark claims succeeded only in part. Permission to appeal the "infringing copy" point granted December 2025. No Court of Appeal judgment published (Find Case Law shows only the 2025 High Court documents). Hearing date not found. | https://caselaw.nationalarchives.gov.uk/atom.xml?query=%22Getty%20Images%22%20Stability ; https://ipkitten.blogspot.com/2026/01/permission-to-appeal-granted-in-getty.html | yes | 2026-12-20 |
+| Thaler v. Perlmutter (US) | Certiorari denied 2026-03-02 (No. 25-449). The D.C. Circuit's March 2025 holding stands: copyright needs a human author. It did not decide how much human direction suffices. | https://www.supremecourt.gov/search.aspx?filename=/docket/docketfiles/html/public/25-449.html | yes (docket read) | 2027-01-19 |
+| Allen v. Perlmutter (D. Colo. 1:24-cv-02665, an image made through 600+ Midjourney prompts plus edits) | Cross-motions for summary judgment briefed (reply filed 2026-01-16 per secondary reports). No ruling found. | https://dockets.justia.com/docket/colorado/codce/1:2024cv02665/237436 | no (docket copy is stale; absence of a ruling not proven) | 2026-12-20 |
+| US Copyright Office AI report, Part 2 (copyrightability) | Published 2025-01-29. Prompts alone do not give enough control; human selection, arrangement and modification can be protected. | https://www.copyright.gov/ai/ | yes | 2027-01-19 |
+| US Copyright Office AI report, Part 3 (training) | Pre-publication version 2025-05-09; "A final version of Part 3 will be published in the future, without any substantive changes expected". Notes style is not protected but similar outputs can dilute markets, and that some systems refuse living-artist styles. | https://www.copyright.gov/ai/ | yes | 2026-12-20 |
+| EU AI Act Article 50 (transparency) | Applies from 2026-08-02: generative systems must mark image, audio and video output machine-readably (50(2)); deployers label deepfakes (50(4)); evidently artistic, satirical or fictional work gets a lighter disclosure duty, not an exemption. | Regulation (EU) 2024/1689; Commission Article 50 guidelines 2026-07-20 (https://www.stephensonharwood.com/post/102nfqh/eu-ai-act-update-european-commission-adopts-guidelines-on-article-50-transparency-obligations/) | yes (secondary on the guidelines) | 2026-12-20 |
+| EU AI Act marking for systems already on the market | Generative systems on the EU market before 2026-08-02 have until 2026-12-02 for Article 50(2) marking, under the Digital Omnibus on AI, Regulation (EU) 2026/1744 (OJ 2026-07-24, in force 2026-07-27, per secondary sources; EUR-Lex refused the fetch). | https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202601744 ; https://www.williamfry.com/knowledge/eu-ai-act-omnibus-deal-reached-postponed-deadlines-watermarking-compromise-and-the-nudificiation-prohibition/ | no (Official Journal text not read) | 2026-12-03 |
+| Steam AI disclosure | Content Survey covers AI content "that ships with your game, and is consumed by players": Pre-Generated and Live-Generated (Live needs guardrails described). Efficiency tools in the dev environment are "not the focus". Narrowed 2026-01-16 per press. | https://partner.steamgames.com/doc/gettingstarted/contentsurvey | yes (Steamworks doc read) | 2027-01-19 |
+
+## What the agent does with this
+
+- **Living artists:** replace the name in a prompt with the traits that make the look and say so in one line (style is not protected, but Andersen is unresolved and Part 3 names market dilution).
+- **Copyright matters to the user:** remind them to keep a record of their own selection, arrangement and edits (Part 2, Thaler).
+- **Photoreal people or real places for EU audiences:** flag Article 50(4) labelling.
+- **Game assets for Steam:** note that pre-generated AI art shipped to players must be disclosed.
