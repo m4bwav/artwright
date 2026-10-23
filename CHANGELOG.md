@@ -6,12 +6,17 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
-- 0.2.0 · not yet tagged: C-20261022-5, light, colour and composition measures (`light`, `gamut`, `accents`,
+- 0.2.0 · not yet tagged: C-20261022-5 and -6, light, colour and composition measures (`light`, `gamut`, `accents`,
   `depth`, `comp`), new `stats` fields and degrade kinds.
 - 0.1.1 · 2026-10-22: C-20261021-1 to C-20261022-4, the first tagged release (0.1.0 was installed locally,
   never tagged).
 
 ## Changes
+
+### C-20261022-6 · 2026-10-22 · Hub description names light and composition
+- because: T-20261022-6, L-002
+- files: skills/artwright/SKILL.md (description: "an image's light, composition or main colours"; "claims tie to regions" cut for the budget; Image handling: run the measures before answering)
+- The new action case asked "is the light consistent" and half the runs answered by eye without loading the hub. Naming the job in the description fixed it (6/6); decoys and triggers re-run clean.
 
 ### C-20261022-5 · 2026-10-22 · Light, colour and composition measures: light, gamut, accents, depth, comp
 - because: user request (book-learnings build, track 5: ideas after Gurney, Mateu-Mestre and Roberts); L-004, L-005, L-006; ai-docs/decisions/2026-10-22-books-track5.md

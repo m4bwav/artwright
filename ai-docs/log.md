@@ -112,5 +112,6 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 - Calibrated flag rates on 48 AI stills and 7 museum works; five thresholds from the notes changed (L-004). The
   museum mat trim (L-006) and two degrade definitions (L-005) were found only on real images.
 - Skipped: armature and vanishing point, intervals, flat fills, `--mask` (built as `--box`). Reasons in E4.
-- Tests 35 to 47, all pass (one network test skipped offline); eval action-light added (results in TESTS.md).
+- Tests 35 to 47, all pass (one network test skipped offline). Eval action-light 6/6 once the hub description
+  named light and composition (T-20261022-6, $6.39); decoys 9/9, triggers 24/24.
 ## [2026-10-22] index | rebuilt (11 entries)

@@ -42,9 +42,9 @@ Write an entry the moment a real signal happens: a user correction, the same err
 - Trigger: "main colours and their shares" and "show these side by side" never fired a skill (0/3 each): the model wrote PIL scripts. Adding colours and contact sheets to the hub description fixed it, and at once pulled brand-palette and website requests in (2 of 9 decoy runs) until brandwright and sitewright-direction were named as owners.
 - Hypothesis: a model only reaches for a skill for a job it believes it cannot do alone; plain image chores look easy, so the description must name them. Naming a broad noun (colours) widens the catch, so the exclusion must sit beside it.
 - Rule: when a description adds a broad trigger noun, add the sibling that owns its neighbours in the same edit, and re-run the decoys.
-- Evidence: T-20261021-3, C-20261021-3
+- Evidence: T-20261021-3, C-20261021-3; again T-20261022-6 ("is the light consistent" answered by eye until the description named light)
 - Scope: skill
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-21
+- Status: active · helpful 2 · harmful 0 · last_confirmed 2026-10-22
 
 ### L-001 · 2026-10-21 · Shell eval cases need WSL2, a scaffold and `tool: Bash`
 - Trigger: the action cases failed three ways in one session: native Windows refused the Bash grant (no sandbox backend); under WSL2 each run started in an empty workspace, so the fixture paths did not exist; and the `tool_used` grader with `tool: Bash|PowerShell` counted 0 calls although Bash ran.

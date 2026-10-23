@@ -1,6 +1,6 @@
 ---
 name: artwright
-description: "Use whenever art or an image needs an artist's eye: critique a painting, drawing, print, sculpture, ceramic, illustration or 3D render; style or movement ('is this cubist'); art theory ('what is postmodernism'); art facts ('most expensive Ming vase', 'oldest painting'); 'is this AI-made'; an image's main colours; many images side by side on one contact sheet. aw.py measures, claims tie to regions, facts go through historywright. Ranking or brief fit: artwright-judge. Pixel art: artwright-pixel. Not brand palettes (brandwright) or website direction (sitewright-direction). Also 'refresh artwright'."
+description: "Use whenever art or an image needs an artist's eye: critique a painting, drawing, print, sculpture, ceramic, illustration or 3D render; style or movement ('is this cubist'); art theory ('what is postmodernism'); art facts ('most expensive Ming vase', 'oldest painting'); 'is this AI-made'; an image's light, composition or main colours; many images side by side on one contact sheet. aw.py measures; facts go through historywright. Ranking or brief fit: artwright-judge. Pixel art: artwright-pixel. Not brand palettes (brandwright) or website direction (sitewright-direction). Also 'refresh artwright'."
 ---
 
 # artwright
@@ -38,8 +38,9 @@ contradiction, say so in one line and refresh after the task. Then route:
 - Numbers before pixels: `aw.py stats <img>` (value, contrast, colourfulness, edges, symmetry, balance). They
   describe; none is a beauty score ([references/evidence.md](references/evidence.md)).
 - Light, colour and composition ("is the light consistent", "where does the eye go", "why does it look flat"):
-  `aw.py light`, `gamut`, `accents`, `depth` or `comp` (`--subject x,y,w,h` when the subject is known). A flag
-  says where to look; confirm it on the image before it becomes a finding ([references/cli.md](references/cli.md)).
+  run `aw.py light`, `gamut`, `accents`, `depth` or `comp` (`--subject x,y,w,h` when the subject is known) before
+  answering, not by eye alone. A flag says where to look; confirm it on the image before it becomes a finding
+  ([references/cli.md](references/cli.md)).
 - An unchanged file with the same rubric is never judged twice: `aw.py cache get <img>` first.
 
 ## Critique of one work
