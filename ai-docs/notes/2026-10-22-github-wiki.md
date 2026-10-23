@@ -107,3 +107,6 @@ the footer, and drop the double-tie known issue once the fix (`resolve()` return
   package on PYTHONPATH that raises ImportError works for every call.
 
 Related: see also [../HANDOFF.md](../HANDOFF.md), [../log.md](../log.md).
+## Since 0.3.0 (2026-10-23)
+
+Use `2026-10-23-wiki-verify.py` and its three outputs (`.out.txt` is the Linux run with Pillow that the pages show, `.nopillow.out.txt`, `.win39.out.txt`). The 2026-10-22 script copied only aw.py, so every command fails on 0.2.0 and later (aw_measure.py), and it had been edited after its output was saved; replay an old version against its own saved output to catch that. Pages that name the version or commit are now 0.3.0 at 2c13c08: Home, FAQ, Development, Errors-and-Edge-Cases, Versions-and-Upgrading, _Footer.
