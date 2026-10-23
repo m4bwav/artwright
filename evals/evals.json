@@ -166,6 +166,35 @@
       ]
     },
     {
+      "id": "action-light",
+      "kind": "action",
+      "tier": "cheap",
+      "prompt": "Is the light consistent in evals/fixtures/out/street.png? It is meant to be a sunny afternoon street.",
+      "expectations": [
+        "the trace shows aw.py.*light run",
+        "names the shadows as too warm for daylight (no cool fill from the sky)"
+      ],
+      "evidence": {
+        "type": "trace",
+        "tool": "Bash|PowerShell",
+        "input_match": "aw\\.py.*light"
+      },
+      "setup": "python evals/fixtures/make_fixtures.py",
+      "runs": 3,
+      "_skill": "artwright",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "WebFetch",
+        "WebSearch",
+        "Edit"
+      ],
+      "max_turns": 20,
+      "files": [
+        "evals/fixtures/out"
+      ]
+    },
+    {
       "id": "action-pixel",
       "kind": "action",
       "tier": "cheap",

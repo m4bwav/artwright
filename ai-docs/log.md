@@ -103,3 +103,14 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 - Release: PR #7 (0.1.1 bump, CHANGELOG release line, exit codes in README and AGENTS.md) passed CI; the merge
   was refused by the session's permission classifier, so it is assigned to the owner (D4). No tag yet.
 ## [2026-10-22] index | rebuilt (10 entries)
+
+## 2026-10-22: Books track 5: light, colour and composition measures (0.2.0, untagged)
+
+- Built `light`, `gamut`, `accents`, `depth` and `comp` in a new `aw_measure.py`, plus `stats` fields (middle
+  share, bimodality, clipping, highlight tint, chroma per cell, b* mean and spread) and seven degrade kinds. Rulings
+  E1-E6 in decisions/2026-10-22-books-track5.md.
+- Calibrated flag rates on 48 AI stills and 7 museum works; five thresholds from the notes changed (L-004). The
+  museum mat trim (L-006) and two degrade definitions (L-005) were found only on real images.
+- Skipped: armature and vanishing point, intervals, flat fills, `--mask` (built as `--box`). Reasons in E4.
+- Tests 35 to 47, all pass (one network test skipped offline); eval action-light added (results in TESTS.md).
+## [2026-10-22] index | rebuilt (11 entries)

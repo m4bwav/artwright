@@ -86,6 +86,12 @@ def main():
         for x in range(90):
             flag.put(x, y, (200, 30, 40) if x < 45 else ((240, 240, 240) if y < 30 else (30, 60, 160)))
     aw.save_png(flag, OUT / "flag.png")
+    street = aw.Img(128, 96)  # sunlit left, shadowed right, the shadows as warm as the light: no sky fill
+    for y in range(96):
+        for x in range(128):
+            t = ((x * 7 + y * 13) % 11) - 5
+            street.put(x, y, aw.lab_rgb(74 + t, 9, 32) if x < 64 else aw.lab_rgb(34 + t, 10, 34))
+    aw.save_png(street, OUT / "street.png")
     clean = aw.resize_nearest(sprite(4), 64, 64)
     aw.save_png(clean, OUT / "sprite_clean.png")
     fake = aw.resize_box(aw.resize_nearest(sprite(4), 97, 97), 64, 64)  # off-grid resample: blends and mixels

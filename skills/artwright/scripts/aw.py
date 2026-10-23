@@ -10,6 +10,10 @@ Commands (details: ../references/cli.md):
   fit IMG -o OUT [--long N | --tokens N] [--crop x,y,w,h | --cell RxC:i] [--pixel]
   sheet IMG|DIR... -o OUT [--cols N] [--cell PX]       contact sheet labelled A, B, C; map in the JSON
   stats IMG [--notan DIR]          value, contrast, colourfulness, edges, symmetry, balance, fractal dimension
+  light IMG [--box x,y,w,h]        light and shadow families: value gap, temperature shift, chroma ratio
+  gamut IMG [--overlay OUT]        hue sectors, gamut shape and area, colour cast
+  accents IMG | depth IMG [--depth MAP [--far-bright]]  off-hue accents and where they sit; atmospheric recession
+  comp IMG [--subject x,y,w,h] [--out DIR]  value masses, focal margin, border pull, tangents, horizon, hot spots
   palette IMG [-k N] [--against PAL]                    median-cut colours; delta-E 2000 to a palette
   pixel IMG... [--budget N] [--palette PAL] [--scale S] [--tile] [--frames] [--preview OUT]
   hash IMG... | dedupe IMG|DIR... [--threshold N]       64-bit aHash and dHash, Hamming groups
@@ -37,7 +41,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.1.1"
+VERSION = "0.2.0"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -765,7 +769,8 @@ def cmd_stats(a):
     myb, syb = mean_sd(yb)
     M = math.sqrt(srg ** 2 + syb ** 2) + 0.3 * math.sqrt(mrg ** 2 + myb ** 2)
     level = min(HS_LEVELS, key=lambda t: abs(M - t[0]))[1]
-    lstar = [lab(c)[0] for c in rgb]
+    labs = [lab(c) for c in rgb]
+    lstar = [p[0] for p in labs]
     sats, warm, cool, hot = [], 0, 0, 0
     for r, g, b in rgb:
         hh, ss, vv = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
@@ -790,16 +795,7 @@ def cmd_stats(a):
     cx = sum(wt[i] * (i % w) for i in range(n)) / tw / max(1, w - 1)
     cy = sum(wt[i] * (i // w) for i in range(n)) / tw / max(1, h - 1)
     imbalance = min(100.0, 200 * math.hypot(cx - 0.5, cy - 0.5))
-    # focal region: the cell of an 8x8 grid with the highest local contrast
-    best, focal = -1, None
-    for gy in range(8):
-        for gx in range(8):
-            cell = [lum[y * w + x] for y in range(gy * h // 8, (gy + 1) * h // 8)
-                    for x in range(gx * w // 8, (gx + 1) * w // 8)]
-            if cell:
-                v = mean_sd(cell)[1]
-                if v > best:
-                    best, focal = v, ((gx + 0.5) / 8, (gy + 0.5) / 8)
+    focal = focal_cell(lum, w, h)
     thirds = min(math.hypot(focal[0] - tx, focal[1] - ty) for tx in (1 / 3, 2 / 3) for ty in (1 / 3, 2 / 3))
     # box-counting fractal dimension of the edge map
     pts, fd = [], None
@@ -816,13 +812,48 @@ def cmd_stats(a):
         mx = sum(p[0] for p in pts) / len(pts)
         my = sum(p[1] for p in pts) / len(pts)
         fd = sum((p[0] - mx) * (p[1] - my) for p in pts) / sum((p[0] - mx) ** 2 for p in pts)
+    # value structure in L*: the middle band, the two-family valley, clipping and the highlight tint
+    lh = [0] * 20
+    for v in lstar:
+        lh[max(0, min(19, int(v / 5)))] += 1
+    sm3 = [(lh[max(0, i - 1)] + lh[i] + lh[min(19, i + 1)]) / 3 for i in range(20)]
+    pk = sorted((i for i in range(20) if sm3[i] >= (sm3[i - 1] if i else 0) and sm3[i] >= (sm3[i + 1] if i < 19 else 0)),
+                key=lambda i: -sm3[i])
+    bim = 0.0
+    if pk:
+        p2 = [j for j in pk if abs(j - pk[0]) >= 3]
+        if p2:
+            lo_, hi_ = sorted((pk[0], p2[0]))
+            bim = 1 - min(sm3[lo_:hi_ + 1]) / (min(sm3[pk[0]], sm3[p2[0]]) or 1)
+    top_ = sorted(labs, key=lambda p: -p[0])[:max(1, n // 200)]
+    ha, hb = sum(p[1] for p in top_) / len(top_), sum(p[2] for p in top_) / len(top_)
+    # saturation hierarchy: median chroma per cell of an 8x8 grid
+    cc = []
+    for gy in range(8):
+        for gx in range(8):
+            v = [chroma(labs[y * w + x]) for y in range(gy * h // 8, (gy + 1) * h // 8) for x in range(gx * w // 8, (gx + 1) * w // 8)]
+            cc.append(med(v) if v else 0.0)
+    cpk = max(range(64), key=lambda i: cc[i])
+    cpc = ((cpk % 8 + 0.5) / 8, (cpk // 8 + 0.5) / 8)
+    cm_, csd = mean_sd(cc)
+    bvals = [p[2] for p in labs]
     res = {"file": a.image, "size": [img.w, img.h], "measured_at": [w, h],
            "value": {"mean": round(m, 3), "key": "low" if m < 0.35 else ("high" if m > 0.65 else "middle"),
-                     "histogram_10": hist, "groups_estimate": peaks},
+                     "histogram_10": hist, "groups_estimate": peaks,
+                     "middle_share": round(sum(1 for v in lstar if 35 <= v <= 65) / n, 3), "bimodality": round(bim, 3),
+                     "clip_black": round(sum(1 for v in lstar if v < 3) / n, 4),
+                     "clip_white": round(sum(1 for v in lstar if v > 97) / n, 4),
+                     "highlight_tint": {"C": round(math.hypot(ha, hb), 1), "hue": hue_name(hue_of(ha, hb))},
+                     "note": "groups_estimate counts tones, not masses: comp counts masses"},
+           "chroma_cells": {"mean": round(cm_, 2), "spread": round(csd / cm_, 3) if cm_ else 0.0,
+                            "peak_cell": list(cpc), "peak_focal_distance": round(math.hypot(cpc[0] - focal[0], cpc[1] - focal[1]), 3)},
            "rms_contrast": round(mean_sd(lstar)[1], 2),
            "colourfulness": {"M": round(M, 1), "level": level, "method": "Hasler-Suesstrunk 2003, signed rg/yb, nearest Table 2 anchor"},
            "saturation": {"mean": round(sum(sats) / n, 3), "share_hot": round(hot / n, 3)},
-           "temperature": {"warm_share": round(warm / max(1, warm + cool), 3), "chromatic_share": round((warm + cool) / n, 3)},
+           "temperature": {"warm_share": round(warm / max(1, warm + cool), 3), "chromatic_share": round((warm + cool) / n, 3),
+                           "b_mean": round(mean_sd(bvals)[0], 2), "b_sd": round(mean_sd(bvals)[1], 2),
+                           "note": "warm_share buckets HSV hue (yellow-green counts as warm); judge temperature "
+                                   "relatively with light (lights against shadows)"},
            "edge_density": round(edens, 3),
            "mirror_symmetry": {"left_right": round(sym_lr, 3), "top_bottom": round(sym_tb, 3)},
            "balance": {"centre_of_mass": [round(cx, 3), round(cy, 3)], "imbalance_pct": round(imbalance, 1),
@@ -834,10 +865,10 @@ def cmd_stats(a):
     if a.notan:
         d = Path(a.notan)
         srt = sorted(lum)
-        med, t1, t2 = srt[n // 2], srt[n // 3], srt[2 * n // 3]
+        mid, t1, t2 = srt[n // 2], srt[n // 3], srt[2 * n // 3]
         res["notan"] = {
             "grey": save_png(gray_img(lum, w, h), d / "grey.png"),
-            "two_value": save_png(gray_img([1.0 if v > med else 0.0 for v in lum], w, h), d / "notan2.png"),
+            "two_value": save_png(gray_img([1.0 if v > mid else 0.0 for v in lum], w, h), d / "notan2.png"),
             "three_value": save_png(gray_img([1.0 if v > t2 else (0.5 if v > t1 else 0.0) for v in lum], w, h),
                                     d / "notan3.png")}
     return out(res)
@@ -1561,6 +1592,9 @@ def cmd_verdict(a):
 
 # ----- degrade
 
+LAB_KINDS = ("warm-shadows", "glow-shadows", "uniform-sat", "midgrey", "haze-off")
+DEGRADE_KINDS = ("saturate", "crush", "crop", "jpeg", "orphans", "mixels", "blur") + LAB_KINDS + ("hotspot", "tangent")
+
 def cmd_degrade(a):
     img = load(a.image)
     rnd = random.Random(a.seed)
@@ -1612,6 +1646,46 @@ def cmd_degrade(a):
                             acc[c] += p[c]
                         n += 1
                 o.put(x, y, tuple(v // n for v in acc))
+    elif k in LAB_KINDS:
+        px = [lab(c) for c in zip(d[0::4], d[1::4], d[2::4])]
+        if k in ("warm-shadows", "glow-shadows"):
+            t, li, _ = light_split(px)
+            la, lb = sum(p[1] for p in li) / len(li), sum(p[2] for p in li) / len(li)
+        if k == "uniform-sat":
+            mc = med([chroma(p) for p in px])
+        if k == "haze-off":
+            far, near = px[:h // 3 * w], px[(h - h // 3) * w:]
+            fm, fs = mean_sd([p[0] for p in far])
+            gl = max(1.3, mean_sd([p[0] for p in near])[1] / (fs or 1))
+            gc = max(1.3, med([chroma(p) for p in near]) / (med([chroma(p) for p in far]) or 1))
+        for i, (L, A, B) in enumerate(px):
+            if k == "warm-shadows" and L <= t:
+                A, B = la, lb
+            elif k == "glow-shadows" and L <= t:
+                A, B = A * 3, B * 3
+            elif k == "uniform-sat" and chroma((L, A, B)) > 1:
+                f = mc / chroma((L, A, B))
+                A, B = A * f, B * f
+            elif k == "midgrey":
+                L = 50 + (L - 50) * 0.35
+            elif k == "haze-off" and i < h // 3 * w:
+                L, A, B = fm + (L - fm) * gl, A * gc, B * gc
+            d[i * 4:i * 4 + 3] = bytes(lab_rgb(L, A, B))
+    elif k == "hotspot":
+        side, sz = rnd.randrange(4), max(3, min(w, h) // 25)
+        u = rnd.randrange(min(w, h) // 5, min(w, h) * 4 // 5)
+        x, y = [(u, min(w, h) // 25), (u, h - min(w, h) // 25 - sz), (min(w, h) // 25, u), (w - min(w, h) // 25 - sz, u)][side]
+        for yy in range(y, y + sz):
+            for xx in range(x, x + sz):
+                o.put(xx, yy, (255, 255, 255))
+    elif k == "tangent":
+        side, ink = rnd.randrange(4), (255, 255, 255) if sum(d[0::4]) < 128 * w * h else (0, 0, 0)
+        th, ins = max(2, min(w, h) // 120), max(2, min(w, h) // 80)
+        span = range(w // 4, w * 3 // 4) if side < 2 else range(h // 4, h * 3 // 4)
+        for t_ in span:
+            for k_ in range(ins, ins + th):
+                x, y = [(t_, k_), (t_, h - 1 - k_), (k_, t_), (w - 1 - k_, t_)][side]
+                o.put(x, y, ink)
     else:
         raise Fail("unknown kind")
     save_png(o, a.out)
@@ -1647,6 +1721,16 @@ def build():
     p.add_argument("image")
     p.add_argument("--edge", type=int, default=256)
     p.add_argument("--notan")
+    for name in ("light", "gamut", "accents", "depth", "comp"):
+        p = sp.add_parser(name)
+        p.add_argument("image")
+        p.add_argument("--edge", type=int, default=256)
+    sp.choices["light"].add_argument("--box", help="x,y,w,h fractions: one surface")
+    sp.choices["gamut"].add_argument("--overlay", help="PNG of the a*b* plane with the hull")
+    sp.choices["depth"].add_argument("--depth", help="depth map image (bright = near, as Depth Anything writes)")
+    sp.choices["depth"].add_argument("--far-bright", action="store_true", help="the map is bright far (a Mist pass)")
+    sp.choices["comp"].add_argument("--subject", help="x,y,w,h fractions: the intended subject")
+    sp.choices["comp"].add_argument("--out", help="folder for masses3.png and masses4.png")
     p = sp.add_parser("palette")
     p.add_argument("image")
     p.add_argument("-k", type=int, default=8)
@@ -1697,7 +1781,7 @@ def build():
     p = sp.add_parser("degrade")
     p.add_argument("image")
     p.add_argument("-o", "--out", required=True)
-    p.add_argument("--kind", required=True, choices=["saturate", "crush", "crop", "jpeg", "orphans", "mixels", "blur"])
+    p.add_argument("--kind", required=True, choices=DEGRADE_KINDS)
     p.add_argument("--seed", type=int, default=1)
     return ap
 
@@ -1715,6 +1799,11 @@ def main(argv=None):
         return out({"ok": False, "error": str(e)}, 1)
     except (OSError, ValueError, zlib.error, struct.error) as e:
         return out({"ok": False, "error": "%s: %s" % (type(e).__name__, e)}, 1)
+
+
+# light, colour and composition measures live in aw_measure.py (kept apart so each file stays under 100 KB)
+sys.modules.setdefault("aw", sys.modules[__name__])
+from aw_measure import *  # noqa: E402,F401,F403
 
 
 if __name__ == "__main__":
