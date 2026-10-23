@@ -28,6 +28,7 @@ import argparse
 import colorsys
 import datetime
 import hashlib
+import itertools
 import json
 import math
 import os
@@ -41,7 +42,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -1367,7 +1368,7 @@ def cmd_rank(a):
             files[p[k]["sha256"]] = p[k]["file"]
     ids = sorted(files)
     games, rec, ties = [], {i: [0, 0, 0] for i in ids}, []
-    met = set()
+    met, beat = set(), {}
     for p in pairs:
         r = resolve(p["pair"], wd)
         A, B = p["a"]["sha256"], p["b"]["sha256"]
@@ -1383,6 +1384,7 @@ def cmd_rank(a):
             win = A if r["winner"] == "a" else B
             lose = B if win == A else A
             games.append((win, lose, 1.0))
+            beat[(win, lose)] = True
             rec[win][0] += 1
             rec[lose][1] += 1
     st = bradley_terry(ids, games)
@@ -1396,8 +1398,21 @@ def cmd_rank(a):
             overlap = (st[i] / st[nxt] < 1.5) or not direct
         rows.append({"rank": k + 1, "file": files[i], "sha256": i, "strength": round(st[i], 3),
                      "wins": rec[i][0], "losses": rec[i][1], "ties": rec[i][2], "close_to_next": overlap})
+    # A beat B, B beat C, C beat A: no order among the three holds, whatever the strengths say (Huyen, AI Engineering)
+    pos = {i: k for k, i in enumerate(order)}
+    cycles = []
+    for x, y, z in itertools.combinations(order, 3):
+        for c in ((x, y, z), (x, z, y)):
+            if beat.get((c[0], c[1])) and beat.get((c[1], c[2])) and beat.get((c[2], c[0])):
+                cycles.append(c)
+    for c in cycles:
+        for k in range(min(pos[i] for i in c), max(pos[i] for i in c)):
+            rows[k]["close_to_next"] = True
     res = {"ranking": rows, "games": len(games), "abstained": ties,
-           "note": "close_to_next: strengths within 1.5x or never compared directly; do not claim an order there"}
+           "cycles": [{"files": [files[i] for i in c], "ranks": sorted(pos[i] + 1 for i in c)} for c in cycles[:20]],
+           "cycle_count": len(cycles), "top_in_cycle": any(pos[i] == 0 for c in cycles for i in c),
+           "note": "close_to_next: strengths within 1.5x, never compared directly, or inside a cycle (A beat B, B beat"
+                   " C, C beat A); do not claim an order there. top_in_cycle: the winner is close, say so"}
     if a.next:
         sug, used = [], set()
         for k, i in enumerate(order):
@@ -1435,7 +1450,13 @@ def rel_to(f, base):
 # ----- cache and calibration
 
 def cache_key(a, sha):
-    return "|".join([sha, a.rubric, str(a.rubric_version), a.model or "-", str(a.prompt_version)])
+    """Sampling settings are part of the judge; added only when given, so keys written without them still match."""
+    parts = [sha, a.rubric, str(a.rubric_version), a.model or "-", str(a.prompt_version)]
+    if a.temperature is not None:
+        parts.append("t=%g" % a.temperature)
+    if a.seed is not None:
+        parts.append("s=%d" % a.seed)
+    return "|".join(parts)
 
 
 def cmd_cache(a):
@@ -1454,7 +1475,8 @@ def cmd_cache(a):
         except ValueError:
             verdict = {"text": a.verdict}
         row = {"key": key, "sha256": sha, "file": a.args[0], "rubric": a.rubric, "rubric_version": a.rubric_version,
-               "model": a.model, "prompt_version": a.prompt_version, "verdict": verdict, "at": now()}
+               "model": a.model, "prompt_version": a.prompt_version, "temperature": a.temperature, "seed": a.seed,
+               "verdict": verdict, "at": now()}
         jl_add(store, row)
         return out({"stored": key, "store": str(store)})
     if a.action == "stats":
@@ -1466,7 +1488,7 @@ def cmd_cache(a):
             raise Fail("cache label A B a|b|tie  (the human's pick)")
         fa, fb, pick = a.args
         row = {"a": {"file": fa, "sha256": sha256(fa)}, "b": {"file": fb, "sha256": sha256(fb)}, "pick": pick,
-               "by": "human", "note": a.note, "at": now()}
+               "by": "human", "shown_first": a.shown_first, "note": a.note, "at": now()}
         jl_add(labels, row)
         return out({"stored": str(labels), "labels": len(jl_read(labels))})
     if a.action == "agreement":
@@ -1498,8 +1520,11 @@ def agreement(works, labels_path):
                 if r["status"] != "waiting":
                     win = None if r["status"] == "tie" else p[r["winner"]]["sha256"]
                     resolved[frozenset((p["a"]["sha256"], p["b"]["sha256"]))] = win
-    hit = right = 0
+    hit = right = first_n = first_d = 0
     for l in jl_read(labels_path):
+        if l.get("shown_first") in ("a", "b") and l["pick"] != "tie":
+            first_d += 1
+            first_n += l["pick"] == l["shown_first"]
         k = frozenset((l["a"]["sha256"], l["b"]["sha256"]))
         if k in resolved:
             hit += 1
@@ -1509,13 +1534,14 @@ def agreement(works, labels_path):
             "both_orders_agreement": round(agree / both, 3) if both else None, "target": 0.8,
             "labelled_pairs_judged": hit, "accuracy_vs_labels": round(right / hit, 3) if hit else None,
             "requery_disagreement": round(noise_d / noise_n, 3) if noise_n else None,
+            "labels_with_order": first_d, "labels_first_shown_share": round(first_n / first_d, 3) if first_d else None,
             "note": "recompute whenever the judge model changes; below 0.8 both-orders agreement, show ties to a human"}
 
 
 # ----- verdict contract
 
 def new_verdict(kind, brief, wd):
-    return {"artwright": "1", "kind": kind, "brief": brief, "rubric": {"id": "artwright-judge", "version": "1"},
+    return {"artwright": "1", "kind": kind, "brief": brief, "rubric": {"id": "artwright-judge", "version": "2"},
             "judge": {"model": None, "prompt_version": "1"}, "created": now(), "status": "draft",
             "items": [], "ranking": [], "fit": [], "fixes": [], "abstained": [], "notes": ""}
 
@@ -1766,9 +1792,12 @@ def build():
     p.add_argument("action", choices=["get", "put", "stats", "label", "agreement"])
     p.add_argument("args", nargs="*")
     p.add_argument("--rubric", default="artwright-judge")
-    p.add_argument("--rubric-version", default="1")
+    p.add_argument("--rubric-version", default="2")
     p.add_argument("--model")
     p.add_argument("--prompt-version", default="1")
+    p.add_argument("--temperature", type=float)
+    p.add_argument("--seed", type=int)
+    p.add_argument("--shown-first", choices=["a", "b"])
     p.add_argument("--verdict")
     p.add_argument("--note")
     p.add_argument("--work", default="artwright")

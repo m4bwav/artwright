@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: action-rank-cycle
+context:
+  scaffold_script: fixture.sh

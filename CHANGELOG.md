@@ -6,12 +6,24 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.3.0 · not yet tagged: C-20261022-7 and -8, craft light logic and composition rows, AI-look rows
+  17-29, rubric 2, rank cycles, winner must fit the brief, cache sampling key, label side order.
 - 0.2.0 · not yet tagged: C-20261022-5 and -6, light, colour and composition measures (`light`, `gamut`, `accents`,
   `depth`, `comp`), new `stats` fields and degrade kinds.
 - 0.1.1 · 2026-10-22: C-20261021-1 to C-20261022-4, the first tagged release (0.1.0 was installed locally,
   never tagged).
 
 ## Changes
+
+### C-20261022-8 · 2026-10-22 · Judge: rubric 2, winner must fit, rank cycles, cache sampling key, label side order (0.3.0)
+- because: user request (book-learnings build, track 6: ideas after Huyen, *AI Engineering*); R-20261022-3; ai-docs/decisions/2026-10-22-books-track6.md F3-F7; T-20261022-7
+- files: skills/artwright-judge/references/rubric.md (version 2: brief-fit look words, ordered composition checks, light logic criterion, two light directions as an integrity failure, winner check, cycles abstain), skills/artwright-judge/SKILL.md (batch steps 5-6, brief-fit step 1, measures before light and composition fixes, cache sampling flags), skills/artwright-judge/references/verdict-contract.md (example rubric 2), skills/artwright-curate/SKILL.md (labels shown in random order, `--shown-first`), skills/artwright/scripts/aw.py (`rank` cycles, `cycle_count`, `top_in_cycle`; `cache` `--temperature`, `--seed`, `--shown-first`, rubric default 2; `labels_first_shown_share`; version 0.3.0), skills/artwright/references/cli.md (rank and cache rows), tests/test_aw.py (cycle, no cycle, label order, sampling key), evals (action-rank-cycle, action-winner-fit, judged fixtures), .claude-plugin/plugin.json (0.3.0)
+- A batch winner is now checked against the brief before it is reported, a three-way loop among the leaders makes the win close, and the cache keeps verdicts from different sampling settings apart.
+
+### C-20261022-7 · 2026-10-22 · Craft: light logic, atmosphere, composition rows, eye path rewritten; AI-look rows 17-29
+- because: user request (book-learnings build, track 6: ideas after Gurney, Mateu-Mestre, Roberts, Garvey-Williams and Chen); R-20261022-1, R-20261022-2; ai-docs/decisions/2026-10-22-books-track6.md F1, F2
+- files: skills/artwright/references/craft.md (Composition: where the eye goes, armature, edge hierarchy, frame edges, way in and back, hot spots, intervals and clusters, mergers, horizon and camera height, ground contact, silhouette, shape grouping, depth devices, open or closed, questions for a vision model; Value: posterise test, gradients; new Light logic and Atmosphere and distance sections; Colour: relative temperature, gamut, accent, too much colour, no flat colour), skills/artwright-judge/references/ai-look.md (measure first; row 7 rim rules; rows 17-29)
+- The eye-path row said lines carry the eye; Gurney's eye-tracking pages say the eye jumps to faces and figures, so the row now says where a viewer looks first. Each new row cites the `comp`, `light` or `depth` flag that points at it.
 
 ### C-20261022-6 · 2026-10-22 · Hub description names light and composition
 - because: T-20261022-6, L-002

@@ -24,7 +24,7 @@ then "after a batch, call artwright-judge on <folder> with the brief". When done
   "artwright": "1",
   "kind": "pairwise",
   "brief": "red fox in snow at dusk, side view, no text",
-  "rubric": {"id": "artwright-judge", "version": "1"},
+  "rubric": {"id": "artwright-judge", "version": "2"},
   "judge": {"model": "claude-opus-5-5", "prompt_version": "1"},
   "created": "2026-10-21T21:00:00",
   "updated": "2026-10-21T21:20:00",

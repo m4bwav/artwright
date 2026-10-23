@@ -6,6 +6,14 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-007 · 2026-10-22 · Read the failing replies before fixing a skill: the grader may be the fault
+- Trigger: action-winner-fit failed 3 of 6 after a skill edit. With `--keep-temp`, two "failures" read "None of the six renders fit the brief"; the regex wanted "none of the X". The real miss was a run that never loaded the skill.
+- Hypothesis: a regex written before any reply exists encodes one phrasing; models vary the wording more than the verdict. `claude plugin eval` keeps no final messages, so a failure count alone cannot tell a wording miss from a wrong answer.
+- Rule: rerun a failing case with `--keep-temp`, read `out/trace.jsonl` (tool calls and the last assistant text), and test any widened regex against the real right answers and a real wrong one before committing it.
+- Evidence: TESTS.md T-20261022-7
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-22
+
 ### L-006 · 2026-10-22 · Trim a museum photograph's mat before any border measure
 - Trigger: `comp` flagged tangents, border pull and a blocked entrance on four of seven Cleveland images; every one was the paper, mat or grey backdrop round the work, not the art.
 - Hypothesis: collection photographs frame the object with a uniform margin; a border measure reads that margin's edge as a contour on the frame. AI stills have dark vignettes and plain skies that look the same to a loose test.

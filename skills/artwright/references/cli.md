@@ -24,9 +24,9 @@ Back to [SKILL.md](../SKILL.md).
 | `dedupe IMG|DIR... [--threshold 6]` | groups by dHash Hamming distance; `keep` lists one file per group |
 | `compare prepare A B [--work DIR] [--cell 768]` | writes the pair in both orders, labelled 1 and 2; returns the pair id |
 | `compare record PAIR ORDER PICK [--work DIR] [--confidence C] [--criteria ...] [--judge M]` | records one judged order (`PICK` is 1, 2 or tie) and returns the resolved result |
-| `rank [--work DIR] [--next N] [--write]` | Bradley–Terry with ties; `close_to_next` flags; `--next` suggests Swiss pairs; `--write` updates `verdict.json` |
-| `cache get|put IMG [--model M] [--rubric R] [--rubric-version V] [--prompt-version P] [--verdict JSON]` | verdict store in `ARTWRIGHT_HOME/verdicts.jsonl` |
-| `cache stats` · `cache label A B a|b|tie [--note]` · `cache agreement [WORK...]` | store counts; a human calibration label; agreement metrics |
+| `rank [--work DIR] [--next N] [--write]` | Bradley–Terry with ties; `close_to_next` flags; `cycles`, `cycle_count` and `top_in_cycle` list loops among decided pairs (members are marked close); `--next` suggests Swiss pairs; `--write` updates `verdict.json` |
+| `cache get|put IMG [--model M] [--rubric R] [--rubric-version V] [--prompt-version P] [--temperature T] [--seed N] [--verdict JSON]` | verdict store in `ARTWRIGHT_HOME/verdicts.jsonl`; rubric version defaults to 2; temperature and seed join the key only when given |
+| `cache stats` · `cache label A B a|b|tie [--shown-first a|b] [--note]` · `cache agreement [WORK...]` | store counts; a human calibration label with the side shown first; agreement metrics, with `labels_first_shown_share` |
 | `verdict init DIR [IMG...] [--kind K] [--brief B]` · `verdict validate DIR` | the `artwright/verdict.json` contract |
 | `degrade IMG -o OUT --kind K [--seed N]` | deterministic degradations for test pairs: saturate, crush, crop, jpeg, orphans, mixels, blur; for the measures below: warm-shadows (shadows take the lights' colour), glow-shadows (shadow chroma tripled), uniform-sat (every pixel at the median chroma), midgrey (L* pressed toward 50), haze-off (far third at least 1.3 times crisper and more saturated), hotspot (a white patch near a border), tangent (a line kissing a border) |
 

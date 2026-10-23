@@ -1,6 +1,21 @@
 # artwright handoff
 
-Updated 2026-10-22 (books track 5 session; the Step 4 notes below still hold).
+Updated 2026-10-22 (books track 6 session; the track 5 and Step 4 notes below still hold).
+
+## Books track 6 (2026-10-22)
+
+- craft.md light logic, atmosphere and composition rows (eye path rewritten), ai-look rows 17-29, rubric 2,
+  judge winner must pass brief fit, `rank` cycles, cache sampling key, `cache label --shown-first`. Version 0.3.0
+  in the manifest and aw.py, untagged. Rulings F1-F8 in
+  [decisions/2026-10-22-books-track6.md](decisions/2026-10-22-books-track6.md).
+- Rubric 2 changes cache keys: verdicts cached under rubric 1 no longer match. Recompute the calibration
+  agreement under rubric 2 at the next calibration (the 0.825 was rubric 1).
+- action-winner-fit is 5/6: about one run in five never loads the judge (trigger flake). The descriptions are at
+  the budget; a fix means trimming another phrase first (L-002).
+- No round-robin judged batch exists yet, so the cycle rule has had no real test (the calibration set is
+  disjoint pairs).
+- `claude plugin eval --keep-temp` keeps each run's `out/trace.jsonl`; read it before blaming the skill (L-007).
+- Tags still wait for the owner: `v0.1.1` on 8ee7740, then 0.2.0 and 0.3.0 as he decides.
 
 ## Books track 5 (2026-10-22)
 
