@@ -688,6 +688,60 @@
         "WebSearch",
         "Edit"
       ]
+    },
+    {
+      "id": "action-rank-cycle",
+      "kind": "action",
+      "tier": "cheap",
+      "prompt": "My six renders in evals/fixtures/out/renders were already judged pair by pair; the judging records are in evals/fixtures/out/judged-cycle. Which render won, and how sure can I be?",
+      "expectations": [
+        "the trace shows aw.py rank run on the work folder",
+        "names the loop among the top three (render_03 beat render_01, which beat render_02, which beat render_03) and calls the win close"
+      ],
+      "evidence": {
+        "type": "trace",
+        "tool": "Bash|PowerShell",
+        "input_match": "aw\\.py\"?\\s+rank"
+      },
+      "setup": "python evals/fixtures/make_fixtures.py",
+      "runs": 3,
+      "_skill": "artwright-judge",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "Edit"
+      ],
+      "max_turns": 25,
+      "files": [
+        "evals/fixtures/out"
+      ]
+    },
+    {
+      "id": "action-winner-fit",
+      "kind": "action",
+      "tier": "cheap",
+      "prompt": "These renders were judged pair by pair for the brief 'two blue birds on a branch, night sky'. The judging records are in evals/fixtures/out/judged-clear and the images in evals/fixtures/out/renders. Which one should I use?",
+      "expectations": [
+        "the trace shows aw.py rank run on the work folder",
+        "checks the top-ranked render against the brief and says it does not fit (none of the renders shows blue birds)"
+      ],
+      "evidence": {
+        "type": "trace",
+        "tool": "Bash|PowerShell",
+        "input_match": "aw\\.py\"?\\s+rank"
+      },
+      "setup": "python evals/fixtures/make_fixtures.py",
+      "runs": 3,
+      "_skill": "artwright-judge",
+      "tools": [
+        "Bash",
+        "PowerShell",
+        "Edit"
+      ],
+      "max_turns": 25,
+      "files": [
+        "evals/fixtures/out"
+      ]
     }
   ]
 }

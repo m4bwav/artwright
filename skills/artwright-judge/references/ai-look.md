@@ -2,9 +2,11 @@
 
 Common defaults of generation models that make an image read as generic, each with a fix that depends on the target model.
 
-Checked 2026-10-21 · Back to [SKILL.md](../SKILL.md)
+Checked 2026-10-22 · Back to [SKILL.md](../SKILL.md)
 
-Verification: the tells and fixes come from practitioner reports and the research pass, `verified: no` unless a line cites an R- entry.
+Verification: the tells and fixes come from practitioner reports and the research pass, `verified: no` unless a line cites an R- entry. Rows 17 to 29 apply light and composition teaching read in Gurney, Roberts and Mateu-Mestre (R-20261022-1, -2; the craft rows are in [craft.md](../../artwright/references/craft.md)); that a model does them by default is practitioner observation.
+
+**Measure first.** Where a row names a flag, run the command (`aw.py light`, `depth` or `comp`, see "Light, colour and composition flags" in [cli.md](../../artwright/references/cli.md)) and open the region it points to. A flag is a place to look, never the finding.
 
 **These tells describe an image. They never prove it is AI-made.** Painters, photographers and 3D artists produce every one of them. Anthropic's docs say Claude cannot tell whether an image is AI-generated (R-20261021-11), so never give an "AI-made" verdict. Name the tell, point to where it is, and offer the fix only when it conflicts with the brief. A brief may ask for any of these on purpose.
 
@@ -20,7 +22,7 @@ Fix channels: **P** prompt wording · **N** negative prompt (only where CFG > 1:
 | 4 | Dead-centre subject | hero in the exact middle, symmetrical framing by default | P: "in the lower left third", "wide negative space to the right"; C: depth or pose map with the placement |
 | 5 | Perfect symmetry | mirrored faces, buildings, arrangements | P: "candid", "three-quarter view", "slightly off-axis"; R: an asymmetric layout reference |
 | 6 | Bokeh everywhere | shallow depth of field on every shot, melted backgrounds | P: "deep focus", "f/8, everything sharp", "wide lens" |
-| 7 | Rim light everywhere | bright edge outline on every subject with no source | P: name one motivated source ("window at left, no backlight"); I: edge pass |
+| 7 | Rim light everywhere | bright edge outline on every subject with no source; a real rim needs a light behind and a dark ground, takes a lighter local colour and varies in width | P: name one motivated source ("window at left, no backlight"); I: edge pass |
 | 8 | Teal-and-orange grade | warm skin, cyan shadows, regardless of scene | P: name the grade ("overcast neutral", "Kodak Portra 400"); N: "teal and orange" |
 | 9 | Generic epic light | god rays, haze and sunset in every scene | P: specific weather and hour ("flat noon overcast"); N: "volumetric light, god rays" |
 | 10 | One narrow style | every output glossy semi-real "concept art" | P: name medium and technique from [vocabulary.md](vocabulary.md); R: a style reference; M: a model with that range |
@@ -30,5 +32,18 @@ Fix channels: **P** prompt wording · **N** negative prompt (only where CFG > 1:
 | 14 | Warped objects and physics | bent cutlery, melting furniture, impossible reflections | I: object region; P: fewer objects; C: depth map |
 | 15 | Glamour faces | same young idealised face, model-perfect proportions | P: age, build, specific features, "ordinary person"; R: a character reference |
 | 16 | Drift between shots (sets) | faces, costumes, props change across a series | R: one fixed character and set reference per shot; P: "same coat, same scar"; video: name what must stay fixed |
+| 17 | Glowing shadows | shadows as saturated as the lights or more (`glowing_shadows`), or as warm as the sunlight in daylight (`warm_shadows`) | P: "shadows filled with cool skylight, less saturated than the lit side"; S: lower CFG; grade the shadows down after |
+| 18 | No air | the distance as sharp, dark and saturated as the foreground (`no_recession`) | P: "distant hills pale, blue-grey and soft"; S: lower CFG; C: a depth map |
+| 19 | Beams without cause | sunbeams with no screen, no dust, or with the viewer facing away from the sun | P: name the screen and the dust ("light through a barn's slats, dusty air"), or drop the beams; N: "god rays" |
+| 20 | Wrong dapples | round sun spots on a slope, or dapples with no canopy above | P: name the canopy; I: the ground |
+| 21 | White highlights and starbursts | pure white specular hits on every surface, star flares around lamps | P: "highlights tinted by the warm lamp", "no lens flare"; N: "lens flare, starburst" |
+| 22 | Mirror water | perfect reflections on rippled water, or reflections brighter than the object | P: "rippled reflections, darker than the boats"; I: the water |
+| 23 | Even texture | the same detail in light, half-tone and shadow | P: "texture lost in shadow"; I: shadow areas |
+| 24 | Colouring-book edges | every edge equally crisp, nothing lost (`uniform_sharpness`); or a subject with one hard edge all round, pasted on | P: "soft lost edges in shadow, sharp only on the face"; S: depth of field; I: edge pass |
+| 25 | Scattered hot spots | small bright or saturated spots everywhere competing with the subject, worst near the border (`hot_spot_near_border`, `edge_pull`) | P: "one bright area on the subject, the rest subdued"; I: the spots |
+| 26 | Mid-grey mush | no dominant light or dark mass (`mid_dominant`, `fragmented`) | P: "large shadow masses, a single light source"; C: a value sketch as the control image |
+| 27 | Horizon at half | the horizon cutting the frame in two (`horizon_split`), or through a head (`horizon_through_head`) | P: "horizon on the lower third", or a camera height that moves it |
+| 28 | Background beats subject | a bright patch or sharp detail behind out-contrasting the subject (`competing_focal`, `focal_off_subject`, `weak_figure_ground`) | P: "background darker and softer than the subject"; I: the background |
+| 29 | Toy soldiers and eye-level default | figures evenly spaced and sized in rows; every shot from standing eye height whatever the mood | P: "clustered group, one figure apart", a named camera height ("low angle from knee height"); C: a pose map |
 
 Describe each tell with evidence ("highlights blown on the left cheek and sky") and judge it against the brief. A deliberately glossy commercial brief may want 1, 2 and 6.

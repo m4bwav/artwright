@@ -268,6 +268,38 @@ class CompareRank(unittest.TestCase):
         v = json.loads((self.work / "verdict.json").read_text(encoding="utf-8"))
         self.assertEqual(len(v["ranking"]), 2)
 
+    def test_cycle_is_close(self):
+        # r1 beats everyone but r3, which r2 beats: 1.65x the runner-up and met directly, yet inside a cycle
+        fs = self.files + [save(blocks(40, 40, 3, 40 + i), "cyc-%d.png" % i) for i in range(3)]
+        r1, r2, r3, r4, r5, r6 = fs
+        for w, l in ((r1, r2), (r2, r3), (r3, r1), (r1, r4), (r1, r5), (r1, r6)):
+            self.match(w, l, "1", "2")
+        code, r = run("rank", "--work", self.work)
+        self.assertEqual(r["cycle_count"], 1)
+        self.assertTrue(r["top_in_cycle"])
+        self.assertEqual(sorted(r["cycles"][0]["files"]), sorted([r1, r2, r3]))
+        self.assertEqual(r["ranking"][0]["file"], r1)
+        self.assertTrue(r["ranking"][0]["close_to_next"])
+
+    def test_no_cycle_in_order(self):
+        A, B, C = self.files
+        self.match(A, B, "1", "2")
+        self.match(B, C, "1", "2")
+        self.match(A, C, "1", "2")
+        code, r = run("rank", "--work", self.work)
+        self.assertEqual(r["cycle_count"], 0)
+        self.assertFalse(r["top_in_cycle"])
+
+    def test_label_order_share(self):
+        A, B, C = self.files
+        self.match(A, B, "1", "2")
+        run("cache", "label", A, B, "a", "--shown-first", "a")
+        run("cache", "label", A, C, "a", "--shown-first", "b")
+        run("cache", "label", B, C, "tie", "--shown-first", "a")
+        code, r = run("cache", "agreement", self.work)
+        self.assertGreaterEqual(r["labels_with_order"], 2)
+        self.assertIsNotNone(r["labels_first_shown_share"])
+
     def test_bt_strengths(self):
         p = aw.bradley_terry(["x", "y"], [("x", "y", 1.0)] * 3)
         self.assertGreater(p["x"], p["y"])
@@ -301,6 +333,16 @@ class CacheVerdict(unittest.TestCase):
         code, r = run("cache", "get", f, "--model", "m1")
         self.assertTrue(r["hit"])
         code, r = run("cache", "get", f, "--model", "m2")
+        self.assertFalse(r["hit"])
+
+    def test_cache_sampling_key(self):
+        f = save(blocks(20, 20, 2, 98), "cache-t.png")
+        run("cache", "put", f, "--model", "m1", "--temperature", "0", "--verdict", '{"winner": "A"}')
+        code, r = run("cache", "get", f, "--model", "m1", "--temperature", "1")
+        self.assertFalse(r["hit"])
+        code, r = run("cache", "get", f, "--model", "m1", "--temperature", "0")
+        self.assertTrue(r["hit"])
+        code, r = run("cache", "get", f, "--model", "m1", "--temperature", "0", "--seed", "7")
         self.assertFalse(r["hit"])
 
     def test_verdict_contract(self):

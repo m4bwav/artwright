@@ -42,7 +42,10 @@ from two candidates to four or more degrades models about seven times as much as
    call with the rubric (cold read, per-criterion notes tied to regions, then the pick). Record:
    `aw.py compare record <pair> 1 <1|2|tie> --work W --confidence medium --criteria read value`, same for order 2.
 5. Rank: `aw.py rank --work W --write` fits Bradley–Terry with ties and writes the ranking into
-   `verdict.json`. Rows marked `close_to_next` are not ordered with confidence; say so.
+   `verdict.json`. Rows marked `close_to_next` are not ordered with confidence; say so. `cycles` lists loops
+   (A beat B, B beat C, C beat A); when `top_in_cycle` is true the winner is close, whatever its strength.
+6. Winner check: run the brief-fit steps below on the top image before reporting it. Winning a batch is not
+   fitting the brief; if it is DOES NOT FIT, check the next ones, and say plainly when none fits.
 
 Cost: a 16-image round robin in both orders is about 624k image tokens. Keep pair images at the default cell
 (768 px) and use Swiss rounds for large batches.
@@ -50,7 +53,9 @@ Cost: a 16-image round robin in both orders is about 624k image tokens. Keep pai
 ## Fit to a brief
 
 1. Split the brief into atomic yes/no checks: subjects, count, attributes, relations, camera and framing, light,
-   style (by named traits), mood, text, forbidden items. Write them before looking.
+   style (by named traits), mood, text, forbidden items. A word naming a look ("golden hour", "overcast",
+   "moonlit", "low angle", "horizon low") becomes the traits that show it, each its own check
+   ([references/rubric.md](references/rubric.md), criterion 1). Write them before looking.
 2. Cold read the image, then answer each check with the region that decides it.
 3. Verdict: `FITS`, `FITS WITH FIXES` or `DOES NOT FIT`; hard fails (wrong subject, wrong count, forbidden item,
    broken text the brief asked for) listed separately.
@@ -69,7 +74,9 @@ Each fix is classed by channel, cheapest first:
 | `inpaint` | one local defect in an otherwise good image |
 | `model` | the model cannot do it (text, a style, a count) |
 
-Use the model's profile ([references/models/README.md](references/models/README.md)): Z-Image Turbo and FLUX.2
+Before naming a light or composition fix, run `aw.py light` and `aw.py comp` on the image; their flags point at
+the AI-look rows that apply (rows 17 to 29). Use the model's profile
+([references/models/README.md](references/models/README.md)): Z-Image Turbo and FLUX.2
 ignore negatives; Qwen-Image honours them. Write a revised prompt per target model plus a one-line diff
 (`+ "low sun from the left" / - "dramatic lighting"`). Vocabulary that works both ways:
 [references/vocabulary.md](references/vocabulary.md); the "AI look" and its fixes:
@@ -82,7 +89,8 @@ Fill `verdict.json` (items, ranking, fit, fixes, abstained, notes), set `status:
 `aw.py verdict validate <folder>`; it must print `valid: true` before you report. Reply with the winner or
 the fit verdict first, the decisive criteria each tied to the region that shows it, ties shown to the user
 with both images, and the next prompt. The user's own preference is shown only after the blind verdict. Cache each verdict:
-`aw.py cache put <img> --model <judge model> --verdict '<json>'`.
+`aw.py cache put <img> --model <judge model> --verdict '<json>'`, adding `--temperature` and `--seed` when the
+judge's sampling is set: a different temperature is a different judge.
 
 ## Calibration
 

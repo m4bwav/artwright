@@ -45,6 +45,9 @@ Files: the hub's references (movements, theory, traditions, evidence, craft, cer
 - `verdicts.jsonl`: every judged image (written by `aw.py cache put`); doubles as the calibration log.
 - `taste.md`: the user's stated likes and dislikes, each with a date and the image or project it came from.
 - `calibration/labels.jsonl`: the user's own picks on pairs (`aw.py cache label A B a|b|tie --note "why"`).
+  Show each pair with a coin-flip deciding which image comes first and record it (`--shown-first a|b`):
+  `cache agreement` then reports how often the user picked the first-shown image, the same side bias it checks
+  in the judge.
   Ask one pair at a time, plainly ("which of these two?"), with both images side by side.
 - `keywords/<model>.md`: prompt words that did or did not work on a model in real runs, with the run and date.
 - `palettes/`: Lospec palettes fetched on request.
