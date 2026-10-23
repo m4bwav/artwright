@@ -8,6 +8,13 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20261022-7 · 2026-10-22 · claude plugin eval 2.1.281 under WSL2 --scaffold, sonnet · books track 6 · action-rank-cycle 3/3, action-winner-fit 5/6 (final run)
+- action-rank-cycle (new) 3/3: every run loaded the judge, ran `aw.py rank` and named the loop among the top three.
+- action-winner-fit (new) 2/3, then 3/6 after the skill said to rank an existing folder with aw.py, then 5/6 once the regex accepted "none of the six renders fit" (read from kept traces; two of the 3/6 misses were correct replies). The remaining miss is a trigger flake: the run never loaded the judge and answered by eye in 7 turns (it still said the renders do not match). One earlier run tallied the records by hand and recommended render_01 for the birds brief, the failure the case exists to catch. About 3 of 15 runs across the batches skipped the skill; the descriptions are at the budget, so no wording was added.
+- No baseline arm (`--ablation none`, as for the other action cases).
+- Spend about $5.30.
+- led to: C-20261022-8, L-007
+
 ### T-20261022-6 · 2026-10-22 · claude plugin eval 2.1.281 under WSL2 --scaffold, sonnet · books track 5 · action-light 6/6, actions 3 others 8/9, decoys 9/9, triggers 24/24
 - action-light (new): 1/3 on the first run, then 3/6 after the body line said "run aw.py before answering, not by eye alone". The failing runs ended in 2 or 3 turns: the hub never loaded, and the model judged the picture by eye. After the hub description named light and composition (and dropped "claims tie to regions" to stay in the budget), 6/6.
 - action-palette 3/3, action-sheet 3/3, action-pixel 2/3 (one run ran 16 turns without aw.py; it passed 12/12 in T-20261022-2, so a flake, not this change).

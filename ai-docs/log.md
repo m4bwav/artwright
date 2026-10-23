@@ -115,3 +115,19 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 - Tests 35 to 47, all pass (one network test skipped offline). Eval action-light 6/6 once the hub description
   named light and composition (T-20261022-6, $6.39); decoys 9/9, triggers 24/24.
 ## [2026-10-22] index | rebuilt (11 entries)
+
+## 2026-10-22: Books track 6: craft text, AI-look tells, rubric 2, judge changes (0.3.0, untagged)
+
+- craft.md: light logic and atmosphere sections, eighteen composition rows, the eye-path row rewritten after
+  Gurney's eye-tracking pages, colour rows (relative temperature, gamut, accent, too much colour), questions for a
+  vision model. Each row cites its book and page and the `light`, `depth` or `comp` flag that points at it.
+- ai-look.md rows 17-29 with their flags; rim-light rules on row 7.
+- Rubric 2: look words expand into traits, ordered composition checks, light logic as its own criterion, two light
+  directions as an integrity failure, the batch winner must pass brief fit, cycles abstain.
+- aw.py: `rank` lists three-way loops and marks their span close (`top_in_cycle`); `cache` keys on temperature
+  and seed when given; `cache label --shown-first` and `labels_first_shown_share`. Tests 48-51.
+- Real data: the calibration set is 40 disjoint pairs (no triads, 0 cycles); agreement unchanged (0.775, 0.825);
+  the owner picked the first-shown image 15 of 31 times (0.48).
+- Evals: action-rank-cycle 3/3, action-winner-fit 5/6 (T-20261022-7). Rulings F1-F8 in
+  decisions/2026-10-22-books-track6.md; skipped items in F8.
+## [2026-10-22] index | rebuilt (12 entries)

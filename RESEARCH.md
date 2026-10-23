@@ -301,3 +301,24 @@ Four tracks; every refresh runs at least one query on each, scoped to the period
 - Sources: https://collection.sciencemuseumgroup.org.uk/objects/co418180, https://aziatischekeramiek.nl/en/learn/7579-reign-marks-on-chinese-ceramics, https://openaccess-api.clevelandart.org/api/artworks/1957.61
 - Magnitude: n/a (initial)
 - Applied: skills/artwright/references/ceramics.md
+
+### R-20261022-1 · 2009 / 2010 · Gurney, *Imaginative Realism* and *Color and Light* (read 2026-10-22)
+- Summary: a working painter's teaching on daylight as three light systems, the light and shadow families, shadow colour from what the shadow can see, form and cast shadows, texture at the terminator, tinted highlights and rims, backlit thin things, coronas versus camera starbursts, atmospheric perspective in order, gamut and accent, and (IR) silhouette, shape grouping, edge marriage against the pasted-on look, clustering and flagging, and eye-tracking studies showing the eye jumps to faces and figures rather than following lines (IR pp. 168-171, the books' only experimental report). Read as page images; cited by page.
+- Track: subject
+- Sources: James Gurney, *Imaginative Realism* (Andrews McMeel, 2009); *Color and Light* (Andrews McMeel, 2010)
+- Magnitude: 0.4 (moves light, colour and several composition rows from `verified: no` to `book`; rewrites the eye-path row)
+- Applied: skills/artwright/references/craft.md (Composition, Value, Light logic, Atmosphere and distance, Colour); skills/artwright-judge/references/ai-look.md rows 7, 17-29; skills/artwright-judge/references/rubric.md (criteria 1-5)
+
+### R-20261022-2 · 2007-2014 · Composition books: Mateu-Mestre, Roberts, Garvey-Williams, Chen (read 2026-10-22)
+- Summary: armature or flow structure, edge hierarchy, frame edges and corners, a way in and a way back, hot spots, intervals, mergers, horizon and camera height as feeling, compression and release, open and closed frames, visual-weight factors (culture-bound), posterising to three and four values as the test of a design, gradients leading the eye.
+- Track: subject
+- Sources: Marcos Mateu-Mestre, *Framed Ink* (Design Studio Press, 2010) and *Framed Ink 2*; Ian Roberts, *Mastering Composition* (North Light, 2007); Richard Garvey-Williams, *Mastering Composition* (Ammonite, 2014); Mark Chen, *Mastering Composition for Photographers* (epub)
+- Magnitude: 0.3
+- Applied: skills/artwright/references/craft.md (Composition, Value, questions for a vision model); skills/artwright-judge/references/ai-look.md rows 24-29; rubric criterion 2
+
+### R-20261022-3 · 2025 · Huyen, *AI Engineering*: judge biases and ranking limits (read 2026-10-22)
+- Summary: a pairwise ranking orders candidates but does not say any is good enough; preference judgements can be intransitive (A over B, B over C, C over A), which breaks the ordering a Bradley-Terry fit implies; sampling settings are part of a judge's identity, so cached verdicts must key on them; human labellers show position bias as models do.
+- Track: subject
+- Sources: Chip Huyen, *AI Engineering* (O'Reilly, 2025), chapters on evaluation and AI as a judge
+- Magnitude: 0.3
+- Applied: skills/artwright-judge/SKILL.md (batch steps 5-6, cache line); rubric (Procedure 4, Abstain); aw.py `rank` cycles, `cache` key and `--shown-first`; skills/artwright-curate/SKILL.md (labels)
