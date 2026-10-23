@@ -6,12 +6,12 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
-- 0.3.0 · not yet tagged: C-20261022-7 and -8, craft light logic and composition rows, AI-look rows
+- 0.3.0 · 2026-10-23, the first tagged release (owner's go-ahead 2026-10-23): C-20261022-7 and -8, craft light logic and composition rows, AI-look rows
   17-29, rubric 2, rank cycles, winner must fit the brief, cache sampling key, label side order.
-- 0.2.0 · not yet tagged: C-20261022-5 and -6, light, colour and composition measures (`light`, `gamut`, `accents`,
+- 0.2.0 · never tagged, shipped inside 0.3.0: C-20261022-5 and -6, light, colour and composition measures (`light`, `gamut`, `accents`,
   `depth`, `comp`), new `stats` fields and degrade kinds.
-- 0.1.1 · 2026-10-22: C-20261021-1 to C-20261022-4, the first tagged release (0.1.0 was installed locally,
-  never tagged).
+- 0.1.1 · never tagged (planned for 8ee7740 on 2026-10-22), shipped inside 0.3.0: C-20261021-1 to C-20261022-4
+  (0.1.0 was installed locally, never tagged).
 
 ## Changes
 
