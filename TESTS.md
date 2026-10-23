@@ -8,6 +8,13 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20261022-6 · 2026-10-22 · claude plugin eval 2.1.281 under WSL2 --scaffold, sonnet · books track 5 · action-light 6/6, actions 3 others 8/9, decoys 9/9, triggers 24/24
+- action-light (new): 1/3 on the first run, then 3/6 after the body line said "run aw.py before answering, not by eye alone". The failing runs ended in 2 or 3 turns: the hub never loaded, and the model judged the picture by eye. After the hub description named light and composition (and dropped "claims tie to regions" to stay in the budget), 6/6.
+- action-palette 3/3, action-sheet 3/3, action-pixel 2/3 (one run ran 16 turns without aw.py; it passed 12/12 in T-20261022-2, so a flake, not this change).
+- Decoys 9/9 and triggers 8/8 (24/24) on the new description.
+- Spend $6.39.
+- led to: C-20261022-6; L-002 confirmed
+
 ### T-20261022-5 · 2026-10-22 · evergreen.py worth skills/artwright --ab --runs 1 (claude -p, native Windows, plugin-dir) · A/B 20 graded cases · with 17/20, without 12/20
 - Gain +25 points, noise margin 27 at one run per arm: the tool's verdict is CUT (no gain beyond noise at 1.99x the cost, 2.37x the turns). Paired by case: 5 with-only passes (action-sheet, action-pixel, guard-rubens, outcome-brief-fit, outcome-ming-price), 0 without-only passes, 12 both pass, 3 both fail (guard-ai-generated, guard-golden-ratio, outcome-pairwise-orders). A one-sided sign test on 5-0 gives p ≈ 0.03, so the gain is likely real; the cost is where the verdict bites. Not re-run: a second run per arm (about $10) would pass this session's $15 eval limit.
 - action-palette · environment · the with arm asked to edit the repository's own LEARNINGS.md (outside the run folder) and was refused; left out.

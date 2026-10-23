@@ -2,7 +2,7 @@
 
 Run from the repository root: python scripts/budget.py   (red fails; yellow is reported)
 Bands (synthesis section 3, ai-docs/research/2026-10-21-creation-pass.md): install green under 500 KB, yellow to
-1 MB; aw.py green under 60 KB, yellow to 100 KB; knowledge files green under 200 KB, yellow to 300 KB;
+1 MB; aw.py and aw_measure.py each green under 60 KB, yellow to 100 KB; knowledge files green under 200 KB, yellow to 300 KB;
 vocabulary.md red above 40 KB; descriptions green under 600 tokens in all, yellow to 900.
 """
 
@@ -28,8 +28,9 @@ def main():
     rows = []
     inst = sum(size(ROOT / p) for p in INSTALLED if (ROOT / p).exists())
     rows.append(("install size", "%d KB" % (inst // 1024), band(inst, 500 * 1024, 1024 * 1024)))
-    aw = size(ROOT / "skills" / "artwright" / "scripts" / "aw.py")
-    rows.append(("aw.py", "%d KB" % (aw // 1024), band(aw, 60 * 1024, 100 * 1024)))
+    for script in ("aw.py", "aw_measure.py"):
+        aw = size(ROOT / "skills" / "artwright" / "scripts" / script)
+        rows.append((script, "%d KB" % (aw // 1024), band(aw, 60 * 1024, 100 * 1024)))
     know = sum(size(f) for f in (ROOT / "skills").glob("*/references/**/*.md"))
     rows.append(("knowledge files", "%d KB" % (know // 1024), band(know, 200 * 1024, 300 * 1024)))
     voc = ROOT / "skills" / "artwright-judge" / "references" / "vocabulary.md"

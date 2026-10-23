@@ -1,6 +1,6 @@
 ---
 name: artwright
-description: "Use whenever art or an image needs an artist's eye: critique a painting, drawing, print, sculpture, ceramic, illustration or 3D render; style or movement ('is this cubist'); art theory ('what is postmodernism'); art facts ('most expensive Ming vase', 'oldest painting'); 'is this AI-made'; an image's main colours; many images side by side on one contact sheet. aw.py measures, claims tie to regions, facts go through historywright. Ranking or brief fit: artwright-judge. Pixel art: artwright-pixel. Not brand palettes (brandwright) or website direction (sitewright-direction). Also 'refresh artwright'."
+description: "Use whenever art or an image needs an artist's eye: critique a painting, drawing, print, sculpture, ceramic, illustration or 3D render; style or movement ('is this cubist'); art theory ('what is postmodernism'); art facts ('most expensive Ming vase', 'oldest painting'); 'is this AI-made'; an image's light, composition or main colours; many images side by side on one contact sheet. aw.py measures; facts go through historywright. Ranking or brief fit: artwright-judge. Pixel art: artwright-pixel. Not brand palettes (brandwright) or website direction (sitewright-direction). Also 'refresh artwright'."
 ---
 
 # artwright
@@ -37,6 +37,10 @@ contradiction, say so in one line and refresh after the task. Then route:
   shares; answer from its JSON, not by eye or a one-off script.
 - Numbers before pixels: `aw.py stats <img>` (value, contrast, colourfulness, edges, symmetry, balance). They
   describe; none is a beauty score ([references/evidence.md](references/evidence.md)).
+- Light, colour and composition ("is the light consistent", "where does the eye go", "why does it look flat"):
+  run `aw.py light`, `gamut`, `accents`, `depth` or `comp` (`--subject x,y,w,h` when the subject is known) before
+  answering, not by eye alone. A flag says where to look; confirm it on the image before it becomes a finding
+  ([references/cli.md](references/cli.md)).
 - An unchanged file with the same rubric is never judged twice: `aw.py cache get <img>` first.
 
 ## Critique of one work
@@ -44,7 +48,8 @@ contradiction, say so in one line and refresh after the task. Then route:
 1. **Cold read, before the brief or the user's framing.** What the image shows, the three things the eye goes to
    first, the medium as it appears. Missing the subject is the first finding.
 2. **Formal analysis** with [references/craft.md](references/craft.md): the greyscale read (`aw.py stats --notan`),
-   value groups, focal point, eye path, balance, colour and temperature, line, edges, space, rendering integrity.
+   value groups, focal point, eye path, balance, colour and temperature, light logic (`aw.py light`), air
+   (`aw.py depth`), line, edges, space, rendering integrity. `aw.py comp` gives masses, focal margin, border pull.
 3. **Critic pass.** Each claim names a region ("upper left, the sky band", "the right hand") and a reason. Drop
    any claim that cannot point at something. No "looks good", no "feels", no "somewhat".
 4. **Verdict:** the top two or three issues, most important first, one concrete fix each; then what works and

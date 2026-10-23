@@ -6,10 +6,22 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.2.0 · not yet tagged: C-20261022-5 and -6, light, colour and composition measures (`light`, `gamut`, `accents`,
+  `depth`, `comp`), new `stats` fields and degrade kinds.
 - 0.1.1 · 2026-10-22: C-20261021-1 to C-20261022-4, the first tagged release (0.1.0 was installed locally,
   never tagged).
 
 ## Changes
+
+### C-20261022-6 · 2026-10-22 · Hub description names light and composition
+- because: T-20261022-6, L-002
+- files: skills/artwright/SKILL.md (description: "an image's light, composition or main colours"; "claims tie to regions" cut for the budget; Image handling: run the measures before answering)
+- The new action case asked "is the light consistent" and half the runs answered by eye without loading the hub. Naming the job in the description fixed it (6/6); decoys and triggers re-run clean.
+
+### C-20261022-5 · 2026-10-22 · Light, colour and composition measures: light, gamut, accents, depth, comp
+- because: user request (book-learnings build, track 5: ideas after Gurney, Mateu-Mestre and Roberts); L-004, L-005, L-006; ai-docs/decisions/2026-10-22-books-track5.md
+- files: skills/artwright/scripts/aw_measure.py (new: the five commands and their helpers), skills/artwright/scripts/aw.py (stats: middle share, bimodality, clipping, highlight tint, chroma per cell, b* mean and spread; degrade kinds warm-shadows, glow-shadows, uniform-sat, midgrey, haze-off, hotspot, tangent; parsers; version 0.2.0), skills/artwright/references/cli.md (rows; Light, colour and composition flags), skills/artwright/references/evidence.md (stats edge is 256 px), skills/artwright/SKILL.md (Image handling; Critique step 2), tests/test_aw.py (Measures, test_stats_value_structure), evals (action-light, street.png fixture), scripts/budget.py and AGENTS.md (both scripts under 100 KB), .claude-plugin/plugin.json (0.2.0)
+- Five commands describe light logic, gamut shape, accents, atmospheric recession and composition (value masses, focal margin, border pull, tangents, horizon, hot spots, figure and ground). Their flags are pointers with thresholds set from flag rates on real images, not grades.
 
 ### C-20261022-4 · 2026-10-22 · 0.1.1: exit codes in the README and AGENTS.md
 - because: the wiki pass's mismatch list (ai-docs/notes/2026-10-22-github-wiki.md, item 1)

@@ -349,7 +349,7 @@ class StatsInfoMisc(unittest.TestCase):
 
     def test_degrade_kinds_deterministic(self):
         p = save(blocks(48, 48, 4, 8), "deg.png")
-        for k in ("saturate", "crush", "crop", "jpeg", "orphans", "mixels", "blur"):
+        for k in aw.DEGRADE_KINDS:
             o1, o2 = TMP / ("deg_%s_1.png" % k), TMP / ("deg_%s_2.png" % k)
             run("degrade", p, "-o", o1, "--kind", k, "--seed", "3")
             run("degrade", p, "-o", o2, "--kind", k, "--seed", "3")
@@ -365,6 +365,184 @@ class StatsInfoMisc(unittest.TestCase):
     def test_label_font_complete(self):
         for ch in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789":
             self.assertEqual(len(aw.FONT[ch]), 14, ch)
+
+    def test_stats_value_structure(self):
+        code, two = run("stats", save(paint(64, 64, lambda x, y: (20, 20, 20) if x < 32 else (235, 235, 235)), "two.png"))
+        code, ramp = run("stats", save(gradient(64, 64), "ramp.png"))
+        self.assertGreater(two["value"]["bimodality"], 0.9)
+        self.assertLess(ramp["value"]["bimodality"], 0.5)
+        self.assertGreater(ramp["value"]["middle_share"], 0.25)
+        code, r = run("stats", save(paint(64, 64, lambda x, y: (0, 0, 0) if x < 16 else (255, 255, 255)), "clip.png"))
+        self.assertAlmostEqual(r["value"]["clip_black"], 0.25, 2)
+        self.assertGreater(r["value"]["clip_white"], 0.7)
+
+
+def paint(w, h, fn):
+    img = aw.Img(w, h)
+    for y in range(h):
+        for x in range(w):
+            img.put(x, y, fn(x, y))
+    return img
+
+
+def lit_scene(x, y):
+    """Warm sunlit left half, cool shadow right half, with a little texture so the families have spread."""
+    t = ((x * 7 + y * 13) % 11) - 5
+    return aw.lab_rgb(75 + t, 8, 30) if x < 48 else aw.lab_rgb(32 + t, -2, -14)
+
+
+def landscape(x, y, h=96):
+    """Far third pale and soft, near third dark and contrasty: atmospheric perspective."""
+    t = ((x * 5 + y * 3) % 9) - 4
+    if y < h // 3:
+        return aw.lab_rgb(70 + t * 0.6, -2, -6)
+    if y < 2 * h // 3:
+        return aw.lab_rgb(55 + t * 2, -10, 12)
+    return aw.lab_rgb(40 + t * 4, -22, 26)
+
+
+def degrade(img, name, kind, seed=1):
+    src, dst = save(img, name + ".png"), TMP / ("%s_%s.png" % (name, kind))
+    run("degrade", src, "-o", dst, "--kind", kind, "--seed", str(seed))
+    return src, dst
+
+
+class Measures(unittest.TestCase):
+    def test_lab_roundtrip(self):
+        for c in ((255, 0, 0), (12, 200, 90), (128, 128, 128), (250, 240, 10)):
+            self.assertEqual(aw.lab_rgb(*aw.lab(c)), c)
+
+    def test_light_warm_light_cool_shadow(self):
+        src, warm = degrade(paint(96, 64, lit_scene), "lit", "warm-shadows")
+        code, r = run("light", src)
+        self.assertEqual(code, 0)
+        self.assertGreater(r["temp_shift_b"], 30)
+        self.assertGreater(r["value_gap_steps"], 3)
+        self.assertEqual(r["flags"], [])
+        code, r = run("light", warm)
+        self.assertLess(abs(r["temp_shift_b"]), 2)
+        self.assertIn("warm_shadows", r["flags"])
+        code, r = run("light", degrade(paint(96, 64, lit_scene), "lit2", "glow-shadows")[1])
+        self.assertGreater(r["chroma_ratio"], 1.15)
+        self.assertIn("glowing_shadows", r["flags"])
+        code, r = run("light", src, "--box", "0.3,0,0.4,1")
+        self.assertEqual(r["proxy"], "box")
+        self.assertGreater(r["temp_shift_b"], 30)
+        self.assertFalse(run("light", src, "--box", "1,2,3")[1]["ok"])
+
+    def test_gamut_shapes(self):
+        code, r = run("gamut", save(paint(48, 48, lambda x, y: aw.lab_rgb(30 + x, 20, 40)), "mono.png"),
+                      "--overlay", TMP / "hull.png")
+        self.assertEqual(r["shape"], "mono")
+        self.assertTrue(Path(r["overlay"]).is_file())
+        code, r = run("gamut", save(paint(48, 48, lambda x, y: aw.lab_rgb(60, 30, 60) if x < 24
+                                         else aw.lab_rgb(45, 10, -50)), "comp.png"))
+        self.assertEqual(r["shape"], "complementary")
+        code, r = run("gamut", save(noise(48, 48, [(255, 0, 0), (0, 200, 0), (0, 0, 255), (255, 220, 0), (255, 0, 255),
+                                                   (0, 220, 220), (255, 128, 0), (128, 0, 255), (0, 128, 255),
+                                                   (255, 100, 150)]), "salad.png"))
+        self.assertEqual(r["shape"], "full")
+        self.assertIn("fruit_salad", r["flags"])
+        code, r = run("gamut", save(gradient(32, 32), "grey.png"))
+        self.assertEqual(r["shape"], "neutral")
+
+    def test_uniform_sat_flattens_chroma(self):
+        src, flat = degrade(paint(64, 64, lambda x, y: aw.lab_rgb(55, x - 10, 20 + y // 2)), "sat", "uniform-sat")
+        self.assertLess(run("stats", flat)[1]["chroma_cells"]["spread"],
+                        run("stats", src)[1]["chroma_cells"]["spread"] / 3)
+
+    def test_accents(self):
+        def scene(ax, ay):
+            def f(x, y):
+                if abs(x - ax) < 3 and abs(y - ay) < 3:
+                    return aw.lab_rgb(50, 70, 50)
+                return aw.lab_rgb(50 + ((x // 8 + y // 8) % 2) * 30 * (abs(x - 20) < 9 and abs(y - 20) < 9), -30, 25)
+            return f
+        code, near = run("accents", save(paint(64, 64, scene(22, 22)), "acc_near.png"))
+        code, far = run("accents", save(paint(64, 64, scene(58, 58)), "acc_far.png"))
+        self.assertEqual(near["dominant_hue"], "green")
+        self.assertEqual(near["accents"][0]["hue"], "red")
+        self.assertNotIn("competing_accent", near["flags"])
+        self.assertIn("competing_accent", far["flags"])
+        code, r = run("accents", save(paint(32, 32, lambda x, y: aw.lab_rgb(40 + x, -30, 25)), "acc_none.png"))
+        self.assertEqual(r["accents"], [])
+
+    def test_depth_recession(self):
+        src, flat = degrade(paint(96, 96, landscape), "land", "haze-off")
+        code, r = run("depth", src)
+        self.assertEqual(r["flags"], [])
+        self.assertLess(r["far"]["contrast"], r["near"]["contrast"])
+        code, r = run("depth", flat)
+        self.assertIn("no_recession", r["flags"])
+        dm = save(paint(96, 96, lambda x, y: (y * 2, y * 2, y * 2)), "depthmap.png")
+        code, r = run("depth", src, "--depth", dm)
+        self.assertEqual((r["proxy"].startswith("depth map"), r["flags"]), (True, []))
+        code, r = run("depth", src, "--depth", dm, "--far-bright")
+        self.assertIn("no_recession", r["flags"])
+
+    def test_comp_masses(self):
+        bands = paint(96, 96, lambda x, y: (30, 30, 30) if y < 32 else ((130, 130, 130) if y < 64 else (230, 230, 230)))
+        src, grey = degrade(bands, "bands", "midgrey")
+        code, r = run("comp", src, "--out", TMP / "masses")
+        self.assertEqual(code, 0)
+        self.assertEqual((r["masses"]["3"]["masses_over_1pct"], r["flags"].count("fragmented")), (3, 0))
+        self.assertTrue(Path(r["masses"]["4"]["map"]).is_file())
+        self.assertIn("horizon", r)
+        code, r = run("comp", save(blocks(96, 96, 12, 4), "busy.png"))
+        self.assertIn("fragmented", r["flags"])
+        code, r = run("comp", grey)
+        self.assertNotIn("mid_dominant", run("comp", src)[1]["flags"])
+        flat = paint(96, 96, lambda x, y: (120 + (x + y) % 3, 120, 120) if 14 < y < 82 else ((40, 40, 40) if y < 50 else (220, 220, 220)))
+        self.assertIn("mid_dominant", run("comp", save(flat, "mid.png"))[1]["flags"])
+
+    def test_comp_focal(self):
+        def discs(*cs):
+            return lambda x, y: (240, 230, 200) if any((x - cx) ** 2 + (y - cy) ** 2 < 36 for cx, cy in cs) else (40, 50, 60)
+        code, one = run("comp", save(paint(128, 96, discs((40, 40))), "disc1.png"))
+        code, two = run("comp", save(paint(128, 96, discs((32, 24), (96, 72))), "disc2.png"))
+        self.assertNotIn("competing_focal", one["flags"])
+        self.assertIn("competing_focal", two["flags"])
+        code, r = run("comp", save(paint(128, 96, discs((40, 40))), "disc1.png"), "--subject", "0.6,0.5,0.3,0.4")
+        self.assertIn("focal_off_subject", r["flags"])
+        self.assertIn("weak_figure_ground", r["flags"])
+        code, r = run("comp", TMP / "disc1.png", "--subject", "0.2,0.3,0.2,0.3")
+        self.assertNotIn("focal_off_subject", r["flags"])
+
+    def test_comp_border(self):
+        def calm(x, y):
+            return (90 + y // 2, 100 + y // 3, 120) if (x - 64) ** 2 + (y - 48) ** 2 > 200 else (230, 200, 150)
+        src, tan = degrade(paint(128, 96, calm), "calm", "tangent", 2)
+        _, hot = degrade(paint(128, 96, calm), "calm2", "hotspot", 3)
+        code, r = run("comp", src)
+        for f in ("frame_tangent", "hot_spot_near_border", "edge_pull", "blocked_entrance"):
+            self.assertNotIn(f, r["flags"])
+        self.assertIn("frame_tangent", run("comp", tan)[1]["flags"])
+        self.assertIn("hot_spot_near_border", run("comp", hot)[1]["flags"])
+        striped = paint(128, 96, lambda x, y: ((255, 255, 255) if (y // 2) % 2 else (0, 0, 0)) if x < 8 else calm(x, y))
+        self.assertIn("edge_pull", run("comp", save(striped, "pull.png"))[1]["flags"])
+        barred = paint(128, 96, lambda x, y: (10, 10, 10) if y > 86 else calm(x, y))
+        self.assertIn("blocked_entrance", run("comp", save(barred, "bar.png"))[1]["flags"])
+
+    def test_comp_horizon_and_sharpness(self):
+        def sea(at):
+            return lambda x, y: (150, 180, 220) if y < at else (30 + (x * 7 + y * 3) % 40, 60, 90)
+        code, r = run("comp", save(paint(128, 96, sea(48)), "sea_mid.png"))
+        self.assertEqual(r["horizon"]["band"], "middle")
+        self.assertIn("horizon_split", r["flags"])
+        code, r = run("comp", save(paint(128, 96, sea(68)), "sea_low.png"))
+        self.assertEqual((r["horizon"]["band"], "horizon_split" in r["flags"]), ("lower third", False))
+        self.assertIn("uniform_sharpness", run("comp", save(noise(96, 96, PAL4), "sharp.png"))[1]["flags"])
+        self.assertNotIn("uniform_sharpness", run("comp", TMP / "disc1.png")[1]["flags"])
+
+    def test_comp_trims_a_mat(self):
+        def matted(x, y):
+            return (235, 232, 225) if min(x, y, 127 - x, 95 - y) < 8 else (x * 2, y * 2, 90)
+        code, r = run("comp", save(paint(128, 96, matted), "mat.png"))
+        self.assertIsNotNone(r["margin_trimmed"])
+        self.assertNotIn("frame_tangent", r["flags"])
+        code, r = run("comp", save(paint(128, 96, lambda x, y: (5, 5, 5) if min(x, y, 127 - x, 95 - y) < 8
+                                         else (x * 2, y * 2, 90)), "black_mat.png"))
+        self.assertIsNone(r["margin_trimmed"])
 
 
 # Museum fixtures (ruling R5): fetched by accession number, checked against a pinned hash, cached git-ignored.

@@ -6,6 +6,30 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-006 · 2026-10-22 · Trim a museum photograph's mat before any border measure
+- Trigger: `comp` flagged tangents, border pull and a blocked entrance on four of seven Cleveland images; every one was the paper, mat or grey backdrop round the work, not the art.
+- Hypothesis: collection photographs frame the object with a uniform margin; a border measure reads that margin's edge as a contour on the frame. AI stills have dark vignettes and plain skies that look the same to a loose test.
+- Rule: trim only when all four sides have a uniform band that ends before an eighth of the side and three of them are light; report what was trimmed (`margin_trimmed`).
+- Evidence: ai-docs/decisions/2026-10-22-books-track5.md E3
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-22
+
+### L-005 · 2026-10-22 · A degrade kind must force its direction, never match a target
+- Trigger: on six real images, `haze-off` lowered the far band's contrast on four. It matched the far band to the near one, and there the far band was already crisper. `tangent` drew a black line that vanished on a dark poster. The synthetic tests passed.
+- Hypothesis: a degradation defined as "make A equal B" moves either way depending on where the image starts; only "push A past B" is a broken input on every image.
+- Rule: define each kind as a push with a floor (at least 1.3 times; ink opposite the mean). Check it on real images as well as the drawn fixture.
+- Evidence: ai-docs/decisions/2026-10-22-books-track5.md E5
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-22
+
+### L-004 · 2026-10-22 · Set a new flag's threshold from how often it fires on real images
+- Trigger: thresholds taken from the book notes flagged `competing_focal` on 32 of 48 AI stills, `frame_tangent` on 31 and `blocked_entrance` on all seven museum works.
+- Hypothesis: a sketch's threshold is a guess about one picture; a pointer that fires on most pictures carries no information, whatever its theory.
+- Rule: before shipping a flag, run it over a mixed real set (museum works and AI stills) and set the threshold so it fires on a minority. Publish the rate beside the rule, labelled uncalibrated until owner labels exist.
+- Evidence: ai-docs/decisions/2026-10-22-books-track5.md E2
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-22
+
 ### L-003 · 2026-10-22 · Put a looping eval batch in a script file; never inline `$var` in `wsl -- bash -lc '...'`
 - Trigger: `wsl -d Ubuntu -- bash -lc 'for c in a b c; do bash scripts/eval-wsl.sh "$c" ...; done'` from PowerShell ran the whole suite on every pass: `$c` arrived empty, `eval-wsl.sh` fell back to its `*` default, and four full-suite passes spent about $14 before it was stopped.
 - Hypothesis: wsl.exe hands the joined command line to the distribution's login shell, which expands `$c` once before `bash -lc` runs the loop.
@@ -18,9 +42,9 @@ Write an entry the moment a real signal happens: a user correction, the same err
 - Trigger: "main colours and their shares" and "show these side by side" never fired a skill (0/3 each): the model wrote PIL scripts. Adding colours and contact sheets to the hub description fixed it, and at once pulled brand-palette and website requests in (2 of 9 decoy runs) until brandwright and sitewright-direction were named as owners.
 - Hypothesis: a model only reaches for a skill for a job it believes it cannot do alone; plain image chores look easy, so the description must name them. Naming a broad noun (colours) widens the catch, so the exclusion must sit beside it.
 - Rule: when a description adds a broad trigger noun, add the sibling that owns its neighbours in the same edit, and re-run the decoys.
-- Evidence: T-20261021-3, C-20261021-3
+- Evidence: T-20261021-3, C-20261021-3; again T-20261022-6 ("is the light consistent" answered by eye until the description named light)
 - Scope: skill
-- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-21
+- Status: active · helpful 2 · harmful 0 · last_confirmed 2026-10-22
 
 ### L-001 · 2026-10-21 · Shell eval cases need WSL2, a scaffold and `tool: Bash`
 - Trigger: the action cases failed three ways in one session: native Windows refused the Bash grant (no sandbox backend); under WSL2 each run started in an empty workspace, so the fixture paths did not exist; and the `tool_used` grader with `tool: Bash|PowerShell` counted 0 calls although Bash ran.

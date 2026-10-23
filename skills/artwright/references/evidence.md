@@ -36,7 +36,7 @@ Each row gives the study, the effect, how well it has held up, and what the agen
 
 ## Image statistics
 
-`aw.py stats` reports numbers that describe an image so a critique can point at evidence. None is a beauty score, none has a "good" value, and most change with image size, so stats run at a fixed long edge (1024 px). Names follow the Aesthetics Toolbox (Redies, Bartho et al., Behavior Research Methods 2025, MIT) where it has the measure, so numbers can be compared with the literature (verified: yes, its `QIP_machine_script.py` and documentation page, read 2026-10-21).
+`aw.py stats` reports numbers that describe an image so a critique can point at evidence. None is a beauty score, none has a "good" value, and most change with image size, so stats run at a fixed long edge (256 px by default). Names follow the Aesthetics Toolbox (Redies, Bartho et al., Behavior Research Methods 2025, MIT) where it has the measure, so numbers can be compared with the literature (verified: yes, its `QIP_machine_script.py` and documentation page, read 2026-10-21).
 
 - **Value histogram and key**: the spread of lightness; key says whether most values sit low, middle or high, and whether shadows or highlights clip.
 - **RMS contrast**: the standard deviation of L\* in CIELAB (toolbox range about 0-50). Higher means a wider spread of light and dark, not a better picture.
