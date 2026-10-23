@@ -42,7 +42,8 @@ from two candidates to four or more degrades models about seven times as much as
    call with the rubric (cold read, per-criterion notes tied to regions, then the pick). Record:
    `aw.py compare record <pair> 1 <1|2|tie> --work W --confidence medium --criteria read value`, same for order 2.
 5. Rank: `aw.py rank --work W --write` fits Bradley–Terry with ties and writes the ranking into
-   `verdict.json`. Rows marked `close_to_next` are not ordered with confidence; say so. `cycles` lists loops
+   `verdict.json`; on a work folder judged earlier (`pairs.jsonl`, `matches.jsonl`), run it too, never tally the
+   records by hand. Rows marked `close_to_next` are not ordered with confidence; say so. `cycles` lists loops
    (A beat B, B beat C, C beat A); when `top_in_cycle` is true the winner is close, whatever its strength.
 6. Winner check: run the brief-fit steps below on the top image before reporting it. Winning a batch is not
    fitting the brief; if it is DOES NOT FIT, check the next ones, and say plainly when none fits.
