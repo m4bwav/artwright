@@ -15,7 +15,7 @@ Updated 2026-10-22 (books track 6 session; the track 5 and Step 4 notes below st
 - No round-robin judged batch exists yet, so the cycle rule has had no real test (the calibration set is
   disjoint pairs).
 - `claude plugin eval --keep-temp` keeps each run's `out/trace.jsonl`; read it before blaming the skill (L-007).
-- Tags still wait for the owner: `v0.1.1` on 8ee7740, then 0.2.0 and 0.3.0 as he decides.
+- Released 2026-10-23 as `v0.3.0` on main, the first tag (owner's go-ahead); 0.1.1 and 0.2.0 were never tagged and ship inside it.
 
 ## Books track 5 (2026-10-22)
 

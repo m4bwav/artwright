@@ -131,3 +131,5 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 - Evals: action-rank-cycle 3/3, action-winner-fit 5/6 (T-20261022-7). Rulings F1-F8 in
   decisions/2026-10-22-books-track6.md; skipped items in F8.
 ## [2026-10-22] index | rebuilt (12 entries)
+## [2026-10-23] release | 0.3.0, the first tag
+- Owner's go-ahead (book-learnings resume, 2026-10-23) covered tagging 0.3.0. 0.1.1 and 0.2.0 were never tagged; they ship inside 0.3.0 and the CHANGELOG Releases list says so. Tag `v0.3.0` on the merge of this change; the release workflow packs the skills.
