@@ -6,9 +6,9 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
-- 0.4.2 · 2026-10-24 (owner's go-ahead 2026-10-24), tagged with 0.4.0 and 0.4.1: C-20261024-3, transparent pixels left out of `transitional_pixels`.
-- 0.4.1 · 2026-10-24, tagged with 0.4.2: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
-- 0.4.0 · 2026-10-24, tagged with 0.4.2: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
+- 0.4.2 · 2026-10-24 (owner's go-ahead 2026-10-24), carries 0.4.0 and 0.4.1: C-20261024-3, transparent pixels left out of `transitional_pixels`.
+- 0.4.1 · never tagged, shipped inside 0.4.2: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
+- 0.4.0 · never tagged, shipped inside 0.4.2: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
   check (`sprite`) with a coverage floor, transparent pixels left out of `stats` and the measures.
 - 0.3.0 · 2026-10-23, the first tagged release (owner's go-ahead 2026-10-23): C-20261022-7 and -8, craft light logic and composition rows, AI-look rows
   17-29, rubric 2, rank cycles, winner must fit the brief, cache sampling key, label side order.
