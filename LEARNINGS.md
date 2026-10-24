@@ -6,6 +6,21 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-013 · 2026-10-24 · Judges and mechanism gates miss a light no object explains; check each big shadow against the render's
+- Trigger: the sawmill loading screen candidate A passed all four mechanism gates and won the blind pairwise ranking
+  in both orders, yet the first thing the reviewer named was a long hard-edged diagonal shadow from the river up the
+  bank to the wheel. The render and the controls have no shadow there; the painting pass invented it.
+- Hypothesis: the gates only look at the parts they model (rim, hub, feed, tail), and the judge compared candidates
+  with each other on the checklist (mechanism, style, set fit), so a fault common to neither the checklist nor the
+  other candidate goes unnamed; shadows read as atmosphere, not as a fault.
+- Rule: in an illustration painted over a render, add one question to the judge's read: does every large shadow or
+  light band have a caster in the render (compare against the beauty or a shadow pass, same camera)? A dark band with
+  no caster is a fault, not mood. Ask it per candidate, not in the pairwise comparison.
+- Evidence: ArvumElectrum-anim-work/sawmill-3d/scene/judge/ (ranking A > C > B), scene/review/picks.json (Jenny's
+  note), scene/fix_shadow/ (the band and the mend); 2026-10-24.
+- Scope: artwright-judge (rubric), any judge of a painted-over-render image
+- Status: active · helpful 0 · harmful 1 · last_confirmed 2026-10-24
+
 ### L-012 · 2026-10-24 · A small native sprite gets a false grid and its shading ramps read as blends
 - Trigger: pixelwright's make eval (a 16x16 potion recovered exactly, 10x16 after crop): `aw.py pixel` found scale 7,
   26.7% alignment, 0% uniform blocks and 7.03% transitional pixels, so a pixel-perfect result failed the gate.
