@@ -44,7 +44,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.4.1"
+VERSION = "0.4.2"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -1007,12 +1007,15 @@ def downsample_dominant(img, s, ox, oy):
 
 
 def transitional_share(img, tol=24):
-    """Pixels lying between differing neighbours (blend pixels, not a hard edge). Measured on the raw image."""
+    """Pixels lying between differing neighbours (blend pixels, not a hard edge). Measured on the raw image.
+    A run touching a fully transparent pixel is skipped: its RGB is not a colour (often 0,0,0)."""
     w, h, d = img.w, img.h, img.d
     hits = total = 0
     for y in range(h):
         for x in range(1, w - 1):
             i = (y * w + x) * 4
+            if not (d[i - 1] and d[i + 3] and d[i + 7]):
+                continue
             a, c, b = d[i - 4:i - 1], d[i:i + 3], d[i + 4:i + 7]
             ab = sum(abs(p - q) for p, q in zip(a, b))
             if ab <= tol * 2:

@@ -1,6 +1,6 @@
 {
   "name": "artwright",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Evergreen art skills for AI agents: an artist's eye for judging, critique and art knowledge. Compares and ranks images two at a time in both orders, blind to file names, with ties when the orders disagree and a Bradley-Terry ranking; checks fit to a brief and returns the next prompt per model; critiques any visual art with claims tied to regions; names styles and movements with trait evidence; explains art theory; answers art facts to a historian's standard; checks pixel art (grid, palette, orphans, tiles, frames). A stdlib Python CLI (aw.py) does the numbers, contact sheets and the verdict file other plugins read.",
   "author": {
     "name": "Mark Rogers",
