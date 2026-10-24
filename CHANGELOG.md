@@ -6,8 +6,9 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
-- 0.4.1 · not tagged yet: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
-- 0.4.0 · not tagged yet: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
+- 0.4.2 · 2026-10-24 (owner's go-ahead 2026-10-24), tagged with 0.4.0 and 0.4.1: C-20261024-3, transparent pixels left out of `transitional_pixels`.
+- 0.4.1 · 2026-10-24, tagged with 0.4.2: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
+- 0.4.0 · 2026-10-24, tagged with 0.4.2: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
   check (`sprite`) with a coverage floor, transparent pixels left out of `stats` and the measures.
 - 0.3.0 · 2026-10-23, the first tagged release (owner's go-ahead 2026-10-23): C-20261022-7 and -8, craft light logic and composition rows, AI-look rows
   17-29, rubric 2, rank cycles, winner must fit the brief, cache sampling key, label side order.
@@ -17,6 +18,13 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261024-3 · 2026-10-24 · `pixel`: runs touching a fully transparent pixel are left out of `transitional_pixels` (0.4.2)
+because: user request (a pixelwright wiki-survey finding: an outlined sprite on transparent black failed without `--scale`)
+files: skills/artwright/scripts/aw.py (transitional_share; VERSION), tests/test_aw.py
+(Pixel.test_outline_on_transparent_black_is_not_a_blend), .claude-plugin/plugin.json (0.4.2)
+A fully transparent pixel's RGB is not a colour (often 0,0,0), so the outline between it and the fill read as a
+blend pixel. Such runs are now skipped; blends between opaque pixels count as before.
 
 ### C-20261024-2 · 2026-10-24 · `pixel`: at a stated `--scale 1`, transitional pixels are reported, not failed (0.4.1)
 because: L-012

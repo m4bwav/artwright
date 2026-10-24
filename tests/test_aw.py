@@ -189,6 +189,18 @@ class Pixel(unittest.TestCase):
         code, r = run("pixel", save(img, "ramp.png"), "--budget", "4")
         self.assertFalse(r["items"][0]["clean_pixel_art"])
 
+    def test_outline_on_transparent_black_is_not_a_blend(self):
+        """Fully transparent pixels carry RGB 0,0,0; an outline between them and the fill is a hard edge."""
+        img = aw.Img(12, 12)
+        for y in range(1, 11):
+            for x in range(1, 11):
+                edge = x in (1, 10) or y in (1, 10)
+                img.put(x, y, (40, 30, 60, 255) if edge else (200, 150, 90, 255))
+        code, r = run("pixel", save(img, "outlined.png"), "--budget", "4")
+        it = r["items"][0]
+        self.assertEqual(it["transitional_pixels"], 0)
+        self.assertTrue(it["clean_pixel_art"], it["problems"])
+
     def test_mixels_break_uniformity(self):
         native = up(noise(18, 18, PAL4, seed=4), 3)
         mixed = TMP / "mixed.png"
