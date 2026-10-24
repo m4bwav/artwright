@@ -1,6 +1,14 @@
 # artwright handoff
 
-Updated 2026-10-22 (books track 6 session; the track 5 and Step 4 notes below still hold).
+Updated 2026-10-24 (0.4.2 release; the books track notes below still hold).
+
+## 0.4.2 released (2026-10-24)
+
+- Tagged `v0.4.2` on main (merge e2de3c2, PR #18) with the owner's go-ahead ("release everything"); the release
+  workflow attached `artwright-0.4.2.zip`. 0.4.0 and 0.4.1 were never tagged and ship inside it.
+- 0.4.2: `transitional_share` skips a run touching a fully transparent pixel, so an outlined sprite on RGBA
+  0,0,0,0 no longer fails without `--scale` (found by pixelwright's wiki survey). Installed locally.
+- Still open: the 5 failing eval cases in evergreen.json (paid evals, not re-run).
 
 ## Books track 6 (2026-10-22)
 
