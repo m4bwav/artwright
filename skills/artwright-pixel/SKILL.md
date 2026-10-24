@@ -56,6 +56,15 @@ never a smoothed resize. Then, in this order, stopping at the first level that f
 
 Each finding cites the rule it breaks and the pixel region or coordinates. No "looks good". One highest-value fix.
 
+## Painted sprites are not pixel art
+
+A painted game sprite at native size (soft edges, brush texture, thousands of colours, a 96 px building) is not
+pixel art: `aw.py pixel` would call it broken and a fixer would posterize it. Check it with
+`aw.py sprite <candidate> --refs <the sprites it will sit beside>` instead: value mean and spread, chroma,
+colours, soft edges, texture and outline value on opaque pixels, each against the references' range. Measure
+the size it ships at; read `outside` for what to change; then look at it at 1x beside two references.
+If it was painted over a 3D render, `aw.py geomgate` first (artwright).
+
 ## Sprites, frames and tiles
 
 - Frames: `aw.py pixel f1.png f2.png ... --frames`: scale, size, palette per frame, bounding boxes and baseline

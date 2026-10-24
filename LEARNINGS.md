@@ -6,6 +6,30 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-010 · 2026-10-23 · Leave transparent pixels out of value and colour statistics
+- Trigger: `aw.py stats` on a 96x96 painted building sprite (Sawmill.png, a private game project) reported `clip_white` 0.478. That was the transparent share of the canvas: every measure composited the sprite on white first.
+- Hypothesis: flattening on a background is right for a photograph or a painting and wrong for a sprite or cut-out, whose canvas is not part of the picture; a white composite turns the background into clipped highlights, a high value key and a grey colour cast.
+- Rule: per-pixel statistics read pixels with alpha 128 and up; spatial measures (edges, symmetry, balance, composition) keep the full frame on white; every output says which in `alpha` with the transparent share.
+- Evidence: Assets/Art/Buildings/Sawmill.png in a private game project (clip_white 0.4784 before the fix, 2026-10-23); tests Alpha.test_stats_skips_transparent_pixels and test_measures_skip_transparent_pixels
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-23
+
+### L-009 · 2026-10-23 · Edge precision cannot tell brush texture from a new object; a tone-fitted residual outlier at game size can
+- Trigger: on a render-then-paint sawmill, per-region edge precision against the render failed six of eight regions on good paintings (roof 0.21, building 0.15), and a disc pasted on the roof did not stand out from the brushwork.
+- Hypothesis: painting moves and adds edges everywhere, so precision measures texture, not shape. A new object is a patch whose tone the render cannot explain: fit paint = a times render + b per region at the size the sprite ships (96 px), and the object is a 3x3 residual far above that region's median, while texture averages away at that size.
+- Rule: gate new objects on the worst 3x3 residual over the region's median residual plus 0.01 (above 5 fails) at game size; report edge precision and recall as information only.
+- Evidence: a private game project's work folder, sawmill-3d/gates/geometry_gates.py on model/renders/L1_v04_1024: the render passes itself (rim_rms 0.0006), test_squashed1024.png fails ellipse and spokes, test_roofblade.png fails regions (roof 7.48), paint/trial1 L1_beauty_d45* and L1_beauty_d60_canny70* pass, L1_beauty_d60_s2310001 fails (its wheel moved); aw.py geomgate reproduces every number (2026-10-23); edge scores in gates/r.json
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-23
+
+### L-008 · 2026-10-23 · Find a painted rim by cross-correlating the ray profile with the render's, not by the strongest edge
+- Trigger: a max-gradient search along each ray for the painted wheel rim jumped between the inner rim edge, the outer rim edge and the float tips from one angle to the next, so the fitted ellipse moved on paintings whose wheel had not.
+- Hypothesis: a rim is several parallel edges of similar strength, and painting changes which is strongest. The render's own profile along the same ray carries all of them, so the lag that best aligns the two profiles is the rim's movement whichever edge the brush emphasised.
+- Rule: along each ray from the projected centre through the projected rim, correlate the painting's gradient profile with the render's within 15% of the radius, take the best lag (8% at most), skip angles where the render shows no rim. A move bigger than the window shows as weak matches and an RMS near the window, not as its size.
+- Evidence: a private game project's work folder, sawmill-3d/gates/geometry_gates.py on model/renders/L1_v04_1024: the render passes itself (rim_rms 0.0006), test_squashed1024.png fails ellipse and spokes, test_roofblade.png fails regions (roof 7.48), paint/trial1 L1_beauty_d45* and L1_beauty_d60_canny70* pass, L1_beauty_d60_s2310001 fails (its wheel moved); aw.py geomgate reproduces every number (2026-10-23)
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-23
+
 ### L-007 · 2026-10-22 · Read the failing replies before fixing a skill: the grader may be the fault
 - Trigger: action-winner-fit failed 3 of 6 after a skill edit. With `--keep-temp`, two "failures" read "None of the six renders fit the brief"; the regex wanted "none of the X". The real miss was a run that never loaded the skill.
 - Hypothesis: a regex written before any reply exists encodes one phrasing; models vary the wording more than the verdict. `claude plugin eval` keeps no final messages, so a failure count alone cannot tell a wording miss from a wrong answer.

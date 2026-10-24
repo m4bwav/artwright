@@ -22,6 +22,8 @@ Commands (details: ../references/cli.md):
   cache get|put|stats|label|agreement ...               verdict store and calibration under ARTWRIGHT_HOME
   verdict init|validate DIR ...                         the artwright/verdict.json contract
   degrade IMG -o OUT --kind K [--seed N]                deterministic degradations for test pairs
+  geomgate RENDER_DIR PAINTED [--part P] [--contact A:B] [--out F]  a painting kept its 3D render's shapes
+  sprite CAND... --refs DIR|IMG... [--pad 0.15]        a painted sprite's style against reference sprites
 """
 
 import argparse
@@ -42,7 +44,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -598,6 +600,20 @@ def luma_list(img, bg=(255, 255, 255)):
     return [(0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0 for r, g, b in flatten(img, bg)]
 
 
+def alpha_mask(img, cut=128):
+    """Which pixels a statistic reads: alpha at `cut` or above. Transparent pixels are left out instead of being
+    read as white (a sprite on a transparent canvas otherwise reports its background as clipped highlights)."""
+    keep = [v >= cut for v in img.d[3::4]]
+    k = sum(keep)
+    if not k:
+        raise Fail("no opaque pixels (alpha %d or more)" % cut)
+    share = 1 - k / len(keep)
+    info = {"transparent_share": round(share, 4), "excluded": share > 0}
+    if share > 0:
+        info["note"] = "value and colour statistics read the opaque pixels only (alpha %d and up)" % cut
+    return keep, info
+
+
 def mean_sd(v):
     n = len(v)
     if not n:
@@ -751,7 +767,11 @@ def cmd_stats(a):
     img = load(a.image)
     s = small(img, a.edge)
     w, h = s.w, s.h
-    rgb = flatten(s)
+    keep, alpha = alpha_mask(s)
+    flat = flatten(s)
+    # spatial measures (edges, symmetry, balance, focal cell, notan) read the full grid on white
+    lum_all = [(0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0 for r, g, b in flat]
+    rgb = [c[:3] for c, k in zip(s.pixels(), keep) if k] if alpha["excluded"] else flat
     lum = [(0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0 for r, g, b in rgb]
     n = len(lum)
     m, sd = mean_sd(lum)
@@ -770,7 +790,8 @@ def cmd_stats(a):
     myb, syb = mean_sd(yb)
     M = math.sqrt(srg ** 2 + syb ** 2) + 0.3 * math.sqrt(mrg ** 2 + myb ** 2)
     level = min(HS_LEVELS, key=lambda t: abs(M - t[0]))[1]
-    labs = [lab(c) for c in rgb]
+    labs_grid = [lab(c) for c in (s.pixels() if alpha["excluded"] else flat)]
+    labs = [p for p, k in zip(labs_grid, keep) if k]
     lstar = [p[0] for p in labs]
     sats, warm, cool, hot = [], 0, 0, 0
     for r, g, b in rgb:
@@ -784,19 +805,20 @@ def cmd_stats(a):
                 warm += 1
             else:
                 cool += 1
-    mag = sobel(lum, w, h)
+    mag = sobel(lum_all, w, h)
     edges = [v > 0.4 for v in mag]
-    edens = sum(edges) / n
-    diff_lr = sum(abs(lum[y * w + x] - lum[y * w + (w - 1 - x)]) for y in range(h) for x in range(w // 2))
-    diff_tb = sum(abs(lum[y * w + x] - lum[(h - 1 - y) * w + x]) for y in range(h // 2) for x in range(w))
+    edens = sum(edges) / (w * h)
+    diff_lr = sum(abs(lum_all[y * w + x] - lum_all[y * w + (w - 1 - x)]) for y in range(h) for x in range(w // 2))
+    diff_tb = sum(abs(lum_all[y * w + x] - lum_all[(h - 1 - y) * w + x]) for y in range(h // 2) for x in range(w))
     sym_lr = 1 - diff_lr / max(1, h * (w // 2))
     sym_tb = 1 - diff_tb / max(1, w * (h // 2))
-    wt = [abs(v - m) for v in lum]
+    m_all = mean_sd(lum_all)[0]
+    wt = [abs(v - m_all) for v in lum_all]
     tw = sum(wt) or 1.0
-    cx = sum(wt[i] * (i % w) for i in range(n)) / tw / max(1, w - 1)
-    cy = sum(wt[i] * (i // w) for i in range(n)) / tw / max(1, h - 1)
+    cx = sum(wt[i] * (i % w) for i in range(w * h)) / tw / max(1, w - 1)
+    cy = sum(wt[i] * (i // w) for i in range(w * h)) / tw / max(1, h - 1)
     imbalance = min(100.0, 200 * math.hypot(cx - 0.5, cy - 0.5))
-    focal = focal_cell(lum, w, h)
+    focal = focal_cell(lum_all, w, h)
     thirds = min(math.hypot(focal[0] - tx, focal[1] - ty) for tx in (1 / 3, 2 / 3) for ty in (1 / 3, 2 / 3))
     # box-counting fractal dimension of the edge map
     pts, fd = [], None
@@ -832,13 +854,14 @@ def cmd_stats(a):
     cc = []
     for gy in range(8):
         for gx in range(8):
-            v = [chroma(labs[y * w + x]) for y in range(gy * h // 8, (gy + 1) * h // 8) for x in range(gx * w // 8, (gx + 1) * w // 8)]
-            cc.append(med(v) if v else 0.0)
-    cpk = max(range(64), key=lambda i: cc[i])
+            v = [chroma(labs_grid[y * w + x]) for y in range(gy * h // 8, (gy + 1) * h // 8)
+                 for x in range(gx * w // 8, (gx + 1) * w // 8) if keep[y * w + x]]
+            cc.append(med(v) if v else None)
+    cpk = max((i for i in range(64) if cc[i] is not None), key=lambda i: cc[i])
     cpc = ((cpk % 8 + 0.5) / 8, (cpk // 8 + 0.5) / 8)
-    cm_, csd = mean_sd(cc)
+    cm_, csd = mean_sd([c for c in cc if c is not None])
     bvals = [p[2] for p in labs]
-    res = {"file": a.image, "size": [img.w, img.h], "measured_at": [w, h],
+    res = {"file": a.image, "size": [img.w, img.h], "measured_at": [w, h], "alpha": alpha,
            "value": {"mean": round(m, 3), "key": "low" if m < 0.35 else ("high" if m > 0.65 else "middle"),
                      "histogram_10": hist, "groups_estimate": peaks,
                      "middle_share": round(sum(1 for v in lstar if 35 <= v <= 65) / n, 3), "bimodality": round(bim, 3),
@@ -868,9 +891,9 @@ def cmd_stats(a):
         srt = sorted(lum)
         mid, t1, t2 = srt[n // 2], srt[n // 3], srt[2 * n // 3]
         res["notan"] = {
-            "grey": save_png(gray_img(lum, w, h), d / "grey.png"),
-            "two_value": save_png(gray_img([1.0 if v > mid else 0.0 for v in lum], w, h), d / "notan2.png"),
-            "three_value": save_png(gray_img([1.0 if v > t2 else (0.5 if v > t1 else 0.0) for v in lum], w, h),
+            "grey": save_png(gray_img(lum_all, w, h), d / "grey.png"),
+            "two_value": save_png(gray_img([1.0 if v > mid else 0.0 for v in lum_all], w, h), d / "notan2.png"),
+            "three_value": save_png(gray_img([1.0 if v > t2 else (0.5 if v > t1 else 0.0) for v in lum_all], w, h),
                                     d / "notan3.png")}
     return out(res)
 
@@ -1812,6 +1835,20 @@ def build():
     p.add_argument("-o", "--out", required=True)
     p.add_argument("--kind", required=True, choices=DEGRADE_KINDS)
     p.add_argument("--seed", type=int, default=1)
+    p = sp.add_parser("geomgate")
+    p.add_argument("render_dir")
+    p.add_argument("painted")
+    p.add_argument("--part", help="the ring in sprite.json to check (default: the only one)")
+    p.add_argument("--spokes", type=int, default=0, help="arm count when sprite.json gives none")
+    p.add_argument("--contact", action="append", help="A:B, two ID regions that must touch (repeatable)")
+    p.add_argument("--game-px", type=int, default=96, help="long edge the sprite ships at (regions gate)")
+    p.add_argument("--no-edges", action="store_true", help="skip the edge precision and recall information")
+    p.add_argument("--out", help="also write the report to this JSON file")
+    p = sp.add_parser("sprite")
+    p.add_argument("candidates", nargs="+")
+    p.add_argument("--refs", nargs="+", required=True)
+    p.add_argument("--pad", type=float, default=0.15)
+    p.add_argument("--out")
     return ap
 
 
@@ -1833,6 +1870,7 @@ def main(argv=None):
 # light, colour and composition measures live in aw_measure.py (kept apart so each file stays under 100 KB)
 sys.modules.setdefault("aw", sys.modules[__name__])
 from aw_measure import *  # noqa: E402,F401,F403
+from aw_geom import cmd_geomgate, cmd_sprite  # noqa: E402,F401
 
 
 if __name__ == "__main__":

@@ -613,6 +613,199 @@ def museum_fixture(acc):
     return cache
 
 
+# ---------------------------------------------------------------- render-then-paint and painted sprites
+
+ID_COLOURS = {"wheel": [1, 0, 0], "roof": [0, 0, 1], "building": [0.5, 0.5, 0.5], "water": [1, 0, 1]}
+WHEEL = (60.0, 108.0, 42.0, 38.0)  # centre x, y, semi-axes x, y of the outer rim (render px)
+
+
+def srgb8(v):
+    return round((v * 12.92 if v <= 0.0031308 else 1.055 * v ** (1 / 2.4) - 0.055) * 255)
+
+
+def mill_scene(squash=1.0, blob=False, noise=0, seed=1, rim=0.94):
+    """A 192 px render: a building with a roof, water, and an eight-armed wheel; returns beauty and ID images.
+    squash shrinks the wheel's vertical axis (a painting that lost the shape); blob paints a disc on the roof."""
+    import math
+    rnd = random.Random(seed)
+    cx, cy, ax, ay = WHEEL
+    ay *= squash
+    beauty, ids = aw.Img(192, 192), aw.Img(192, 192)
+    idc = {k: tuple(srgb8(v) for v in c) for k, c in ID_COLOURS.items()}
+    for y in range(192):
+        for x in range(192):
+            col, reg = None, None
+            if 85 <= x < 186 and 20 <= y < 50:
+                col, reg = (170 - (y - 20) * 2, 70, 50), "roof"
+            elif 90 <= x < 180 and 50 <= y < 170:
+                col, reg = (150 + (x - 90) // 3, 140 + (x - 90) // 4, 120), "building"
+            elif x < 130 and y >= 148:
+                col, reg = (60, 90 + (y - 148), 150), "water"
+            u, v = (x - cx) / ax, (y - cy) / ay
+            r = math.hypot(u, v)
+            if r <= 1.0:
+                th = math.degrees(math.atan2(v, u)) % 45
+                if r >= rim or r < 0.15 or min(th, 45 - th) < 4.5:
+                    col, reg = (90, 60, 40) if r >= rim else (115, 80, 55), "wheel"
+            if blob and (x - 135) ** 2 + (y - 35) ** 2 <= 49:
+                col = (25, 25, 30)
+            if col:
+                if noise:
+                    col = tuple(max(0, min(255, c + rnd.randint(-noise, noise))) for c in col)
+                beauty.put(x, y, col + (255,))
+            if reg:
+                ids.put(x, y, idc[reg] + (255,))
+    return beauty, ids
+
+
+def mill_render(name="mill"):
+    import math
+    d = TMP / name
+    d.mkdir(exist_ok=True)
+    beauty, ids = mill_scene()
+    aw.save_png(beauty, d / "beauty.png")
+    aw.save_png(ids, d / "id.png")
+    cx, cy, ax, ay = WHEEL
+    rim = [[round(cx + ax * math.cos(2 * math.pi * k / 72), 2), round(cy + ay * math.sin(2 * math.pi * k / 72), 2)]
+           for k in range(72)]
+    (d / "sprite.json").write_text(json.dumps({"id_colours": ID_COLOURS, "render_px": [192, 192],
+                                               "rings": {"wheel": {"rim_px": rim, "centre_px": [cx, cy], "arms": 8}},
+                                               "contacts": [["wheel", "water"]]}))
+    return d
+
+
+class GeomGate(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.render = mill_render()
+
+    def gate(self, img, name, *extra):
+        code, r = run("geomgate", self.render, save(img, name), "--no-edges", *extra)
+        self.assertEqual(code, 0, r)
+        return r
+
+    def test_render_passes_itself(self):
+        r = self.gate(aw.load(self.render / "beauty.png"), "self.png")
+        self.assertTrue(r["pass"], r["failing_gates"])
+        self.assertLess(r["gates"]["ellipse"]["rim_rms"], 0.005)
+        self.assertEqual(r["part"], "wheel")
+        self.assertEqual(r["gates"]["contact"]["pairs"], {"wheel:water": True})
+
+    def test_textured_paint_passes(self):
+        r = self.gate(mill_scene(noise=12, seed=3)[0], "brushy.png")
+        self.assertTrue(r["pass"], r)
+
+    def test_squashed_wheel_fails(self):
+        r = self.gate(mill_scene(squash=0.8, noise=6)[0], "squashed.png")
+        self.assertFalse(r["gates"]["ellipse"]["pass"], r["gates"]["ellipse"])
+        self.assertFalse(r["gates"]["spokes"]["pass"], r["gates"]["spokes"])
+
+    def test_new_object_fails_its_region(self):
+        r = self.gate(mill_scene(blob=True, noise=6)[0], "blob.png")
+        self.assertFalse(r["pass"])
+        self.assertEqual(r["gates"]["regions"]["failing"], ["roof"])
+        self.assertTrue(r["gates"]["ellipse"]["pass"])
+
+    def test_contact_option_and_errors(self):
+        r = self.gate(aw.load(self.render / "beauty.png"), "self2.png", "--contact", "roof:water")
+        self.assertEqual(r["gates"]["contact"]["pairs"], {"roof:water": False})
+        self.assertFalse(r["pass"])
+        code, r = run("geomgate", self.render, self.render / "beauty.png", "--part", "gear")
+        self.assertEqual(code, 1)
+        self.assertIn("no ring", r["error"])
+        code, r = run("geomgate", TMP, self.render / "beauty.png")
+        self.assertEqual(code, 1)
+
+    def test_edges_are_information(self):
+        code, r = run("geomgate", self.render, save(mill_scene(noise=12, seed=4)[0], "edges.png"))
+        self.assertIn("scores", r["edges_info"])
+        self.assertNotIn("edges", r["gates"])
+
+    def test_ellipse_fit(self):
+        import math
+        import aw_geom
+        xs = [50 + 30 * math.cos(t / 10) * math.cos(0.3) - 12 * math.sin(t / 10) * math.sin(0.3) for t in range(63)]
+        ys = [40 + 30 * math.cos(t / 10) * math.sin(0.3) + 12 * math.sin(t / 10) * math.cos(0.3) for t in range(63)]
+        c, axes, tilt = aw_geom.fit_ellipse(xs, ys)
+        self.assertAlmostEqual(c[0], 50, 4)
+        self.assertAlmostEqual(c[1], 40, 4)
+        self.assertAlmostEqual(axes[0], 30, 4)
+        self.assertAlmostEqual(axes[1], 12, 4)
+        self.assertAlmostEqual(tilt, math.degrees(0.3), 3)
+
+
+def house_sprite(seed, flat=False, size=48):
+    """A painted-looking building on a transparent canvas: value ramp, brush noise, a darker rim, soft edge pixels."""
+    rnd = random.Random(seed)
+    img = aw.Img(size, size)
+    base = 120 + seed * 4
+    for y in range(size):
+        for x in range(size):
+            wall = 8 <= x < 40 and 20 <= y < 44
+            roof = 4 <= x < 44 and 8 <= y < 20 and abs(x - 24) <= (y - 4) * 1.4
+            if not (wall or roof):
+                continue
+            edge = (x in (8, 39) and wall) or y == 43
+            t = 0 if flat else rnd.randint(-14, 14)
+            v = (base - (y - 8) * 2 + t) if wall else (150 + t)
+            c = (v, int(v * 0.8), int(v * 0.6)) if wall else (v, 60 + t // 2, 45)
+            if edge:
+                c = tuple(int(k * 0.45) for k in c)
+            c = tuple(max(0, min(255, k)) for k in c)
+            img.put(x, y, c + (140 if edge and not flat and rnd.random() < 0.3 else 255,))
+    return img
+
+
+class Sprite(unittest.TestCase):
+    def test_style_fit(self):
+        refs = TMP / "sprite_refs"
+        refs.mkdir(exist_ok=True)
+        for s in range(1, 6):
+            aw.save_png(house_sprite(s), refs / ("ref%d.png" % s))
+        good = save(house_sprite(3), "cand_good.png")
+        flat = save(house_sprite(3, flat=True), "cand_flat.png")
+        code, r = run("sprite", good, flat, "--refs", refs)
+        self.assertEqual(code, 0, r)
+        self.assertEqual(r["references"], 5)
+        g, f = r["candidates"]
+        self.assertTrue(g["pass"], g)
+        self.assertFalse(f["pass"])
+        self.assertIn("texture", f["outside"])
+        self.assertIn("colours", f["outside"])
+        self.assertEqual(g["size"], [48, 48])
+        self.assertLess(g["measures"]["coverage"], 0.8)
+
+    def test_candidate_is_never_its_own_reference(self):
+        d = TMP / "sprite_two"
+        d.mkdir(exist_ok=True)
+        a = aw.save_png(house_sprite(1), d / "a.png")
+        aw.save_png(house_sprite(2), d / "b.png")
+        code, r = run("sprite", a, "--refs", d)
+        self.assertEqual(code, 1)
+        self.assertIn("two reference", r["error"])
+
+
+class Alpha(unittest.TestCase):
+    def test_stats_skips_transparent_pixels(self):
+        img = paint(64, 64, lambda x, y: (128, 128, 128, 255) if 16 <= x < 48 and 16 <= y < 48 else (0, 0, 0, 0))
+        code, r = run("stats", save(img, "grey_sprite.png"))
+        self.assertEqual(code, 0, r)
+        self.assertEqual(r["value"]["clip_white"], 0)
+        self.assertAlmostEqual(r["alpha"]["transparent_share"], 0.75, 3)
+        self.assertTrue(r["alpha"]["excluded"])
+        self.assertAlmostEqual(r["value"]["mean"], 0.502, 2)
+        self.assertEqual(r["rms_contrast"], 0)
+        code, o = run("stats", save(gradient(32, 32), "opaque.png"))
+        self.assertEqual(o["alpha"], {"transparent_share": 0.0, "excluded": False})
+
+    def test_measures_skip_transparent_pixels(self):
+        img = paint(64, 64, lambda x, y: (200, 40, 40, 255) if x < 32 else (0, 0, 0, 0))
+        code, g = run("gamut", save(img, "red_half.png"))
+        self.assertEqual(code, 0, g)
+        self.assertEqual(g["chromatic_share"], 1.0)
+        self.assertTrue(g["alpha"]["excluded"])
+
+
 class Museum(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("AW_NET") == "1", "network fixtures: set AW_NET=1")
     def test_pinned_fixtures(self):
