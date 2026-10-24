@@ -6,6 +6,8 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.4.0 · not tagged yet: C-20261023-1, render-then-paint gate (`geomgate`), painted-sprite style check (`sprite`),
+  transparent pixels left out of `stats` and the measures.
 - 0.3.0 · 2026-10-23, the first tagged release (owner's go-ahead 2026-10-23): C-20261022-7 and -8, craft light logic and composition rows, AI-look rows
   17-29, rubric 2, rank cycles, winner must fit the brief, cache sampling key, label side order.
 - 0.2.0 · never tagged, shipped inside 0.3.0: C-20261022-5 and -6, light, colour and composition measures (`light`, `gamut`, `accents`,
@@ -14,6 +16,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261023-1 · 2026-10-23 · geomgate and sprite commands; transparent pixels left out of stats and measures (0.4.0)
+- because: user request (a render-then-paint game sprite job, gates proven on a sawmill's renders and paintings); L-008, L-009, L-010
+- files: skills/artwright/scripts/aw_geom.py (new: `geomgate` ring rim by profile cross-correlation, spokes, region anomalies at game size, contact, edges as information; `sprite` style fit against references; standard library ports of numpy and scipy prototypes), skills/artwright/scripts/aw.py (`alpha_mask`; `stats` reads opaque pixels for value and colour and reports `alpha`; parsers; version 0.4.0), skills/artwright/scripts/aw_measure.py (`light`, `gamut`, `depth` measure opaque pixels; `accents` and `comp` report `alpha`), skills/artwright/references/sprite-json.md (new: the render folder contract), skills/artwright/references/cli.md (rows; flags section), skills/artwright/SKILL.md (Image handling: transparency, the geometry gate), skills/artwright-judge/SKILL.md (A batch step 1: rank only candidates that pass geomgate), skills/artwright-pixel/SKILL.md (Painted sprites are not pixel art), tests/test_aw.py (GeomGate, Sprite, Alpha), scripts/budget.py and AGENTS.md (aw_geom.py under 100 KB), README.md (examples), .claude-plugin/plugin.json (0.4.0)
+- A painting made over a 3D render can now be checked against the render's shapes before it is judged, and a painted sprite against the set it joins. On the sawmill set the port reproduces the prototype's numbers. Descriptions are unchanged, so triggers are unchanged; the evals were not re-run.
 
 ### C-20261022-8 · 2026-10-22 · Judge: rubric 2, winner must fit, rank cycles, cache sampling key, label side order (0.3.0)
 - because: user request (book-learnings build, track 6: ideas after Huyen, *AI Engineering*); R-20261022-3; ai-docs/decisions/2026-10-22-books-track6.md F3-F7; T-20261022-7

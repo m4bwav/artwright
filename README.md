@@ -54,6 +54,8 @@ python aw.py info photo.jpg                 # size, alpha, SHA-256, token cost b
 python aw.py sheet renders/ -o sheet.png    # one labelled contact sheet instead of many reads
 python aw.py stats painting.jpg --notan n/  # value, contrast, colourfulness, symmetry; no beauty score
 python aw.py pixel sprite.png --budget 16 --palette pico-8
+python aw.py geomgate render/ painted.png   # did the painting keep the 3D render's shapes
+python aw.py sprite new.png --refs sprites/ # a painted sprite's style against the set it joins
 python aw.py compare prepare a.png b.png    # the pair in both orders, labelled 1 and 2
 python aw.py rank --write                   # Bradley-Terry with ties into artwright/verdict.json
 ```

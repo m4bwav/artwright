@@ -33,7 +33,9 @@ from two candidates to four or more degrades models about seven times as much as
 
 ## A batch
 
-1. Dedupe: `aw.py dedupe <dir>`; drop near-copies (keep the first of each group).
+1. Dedupe: `aw.py dedupe <dir>`; drop near-copies (keep the first of each group). When the candidates were
+   painted over a 3D render and the render folder exists, run `aw.py geomgate <render dir> <img>` on each and
+   rank only those with `pass: true`; list the rest with their `failing_gates`, never as close losers.
 2. Triage: `aw.py sheet <dir> -o sheet.png`; one Read; strike only rendering-integrity failures (hands, merged
    objects, broken text) and clear brief misses, naming each by its letter. Never rank from the sheet.
 3. Pairs: up to about 12 candidates, round robin; above that, Swiss rounds: `aw.py rank --work W --next 6` gives

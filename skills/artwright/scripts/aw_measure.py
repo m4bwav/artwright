@@ -8,7 +8,7 @@ pointer to look at, never a grade. Thresholds were set from flag rates on museum
 
 import math
 
-from aw import Fail, Img, Path, crop, de2000, flatten, gray_img, lab, load, luma_list, mean_sd, out, resize_box, resize_nearest, save_png, small, sobel
+from aw import Fail, Img, Path, alpha_mask, crop, de2000, flatten, gray_img, lab, load, luma_list, mean_sd, out, resize_box, resize_nearest, save_png, small, sobel
 
 HUES = ((20, "pink"), (50, "red"), (80, "orange"), (115, "yellow"), (165, "green"), (225, "cyan"), (290, "azure"),
         (315, "blue"), (345, "magenta"), (361, "pink"))
@@ -57,6 +57,15 @@ def lab_rgb(L, a, b):
 def lab_px(img, edge=256):
     s = small(img, edge)
     return s, [lab(c) for c in flatten(s)]
+
+
+def lab_opaque(img, edge=256):
+    """Like lab_px, plus which pixels are opaque enough to measure and the alpha note (transparent pixels are left
+    out, never read as white)."""
+    s = small(img, edge)
+    keep, alpha = alpha_mask(s)
+    cols = [c[:3] for c in s.pixels()] if alpha["excluded"] else flatten(s)
+    return s, [lab(c) for c in cols], keep, alpha
 
 
 def otsu(vals, bins=100):
@@ -150,10 +159,11 @@ def light_split(px):
 
 
 def cmd_light(a):
-    s, px = lab_px(load(a.image), a.edge)
+    s, px, keep, alpha = lab_opaque(load(a.image), a.edge)
     b = box_arg(a.box, s.w, s.h)
-    if b:
-        px = [p for i, p in enumerate(px) if in_box(i, s.w, b)]
+    px = [p for i, p in enumerate(px) if keep[i] and (not b or in_box(i, s.w, b))]
+    if not px:
+        raise Fail("no opaque pixels in the box")
     t, li, sh = light_split(px)
     if not li or not sh:
         raise Fail("one value family only: nothing to compare")
@@ -176,7 +186,8 @@ def cmd_light(a):
     if gap < 20:
         flags.append("low_value_gap")
         read.append("light and shadow sides close in value: reads overcast or over-filled (fine if the brief is)")
-    return out({"file": a.image, "proxy": "box" if b else "global (one surface with --box is more trustworthy)",
+    return out({"file": a.image, "alpha": alpha,
+                "proxy": "box" if b else "global (one surface with --box is more trustworthy)",
                 "threshold_L": round(t, 1), "lights": fl, "shadows": fs, "value_gap": gap,
                 "value_gap_steps": round(gap / 10, 1), "temp_shift_b": ts, "tint_shift_a": tt, "chroma_ratio": cr,
                 "flags": flags, "readings": read, "note": HEUR})
@@ -225,10 +236,12 @@ def draw_line(img, p, q, c):
 
 
 def cmd_gamut(a):
-    s, px = lab_px(load(a.image), a.edge)
+    s, px, keep, alpha = lab_opaque(load(a.image), a.edge)
+    cols = [c[:3] for c, k in zip(s.pixels(), keep) if k]
+    px = [p for p, k in zip(px, keep) if k]
     n = len(px)
     ca, cb = sum(p[1] for p in px) / n, sum(p[2] for p in px) / n
-    res = {"file": a.image, "cast": {"a": round(ca, 2), "b": round(cb, 2), "C": round(math.hypot(ca, cb), 2),
+    res = {"file": a.image, "alpha": alpha, "cast": {"a": round(ca, 2), "b": round(cb, 2), "C": round(math.hypot(ca, cb), 2),
                                      "hue": hue_name(hue_of(ca, cb)) if math.hypot(ca, cb) > 2 else "neutral"}}
     chrom = sorted((p for p in px if chroma(p) > 8), key=chroma)
     res["chromatic_share"] = round(len(chrom) / n, 3)
@@ -287,7 +300,7 @@ def cmd_gamut(a):
         o = Img(257, 257, bytearray(b"\x80\x80\x80\xff" * (257 * 257)))
         draw_line(o, (0, 128), (256, 128), (100, 100, 100))
         draw_line(o, (128, 0), (128, 256), (100, 100, 100))
-        for c, p in zip(flatten(s), px):
+        for c, p in zip(cols, px):
             o.put(max(0, min(256, round(128 + p[1]))), max(0, min(256, round(128 - p[2]))), c)
         for i, p in enumerate(hl):
             q = hl[i - 1]
@@ -297,12 +310,14 @@ def cmd_gamut(a):
 
 
 def cmd_accents(a):
-    s, px = lab_px(load(a.image), a.edge)
+    s, px, keep, alpha = lab_opaque(load(a.image), a.edge)
+    if alpha["excluded"]:
+        px = [p if k else (100.0, 0.0, 0.0) for p, k in zip(px, keep)]  # transparent reads as neutral, no accent
     w, h, n = s.w, s.h, len(px)
     C = [chroma(p) for p in px]
     chrom = [i for i in range(n) if C[i] > 8]
     focal = focal_cell(luma_list(s), w, h)
-    res = {"file": a.image, "focal_cell": [round(v, 3) for v in focal], "accents": [], "note": HEUR}
+    res = {"file": a.image, "alpha": alpha, "focal_cell": [round(v, 3) for v in focal], "accents": [], "note": HEUR}
     if not chrom:
         res["readings"] = ["no chroma: no accents"]
         return out(res)
@@ -342,17 +357,20 @@ def band_stats(px):
 
 
 def cmd_depth(a):
-    s, px = lab_px(load(a.image), a.edge)
+    s, px, keep, alpha = lab_opaque(load(a.image), a.edge)
     w, h, n = s.w, s.h, len(px)
     if a.depth:
         d = load(a.depth)
         dv = luma_list(d if (d.w, d.h) == (w, h) else resize_box(d, w, h))
         order = sorted(range(n), key=lambda i: dv[i], reverse=not a.far_bright)
-        bands = [[px[i] for i in order[k * n // 3:(k + 1) * n // 3]] for k in range(3)]
+        order = [i for i in order if keep[i]]
+        bands = [[px[i] for i in order[k * len(order) // 3:(k + 1) * len(order) // 3]] for k in range(3)]
         proxy = "depth map (%s = near)" % ("dark" if a.far_bright else "bright")
     else:
-        bands = [px[(2 - k) * h // 3 * w:(3 - k) * h // 3 * w] for k in range(3)]
+        bands = [[px[i] for i in range((2 - k) * h // 3 * w, (3 - k) * h // 3 * w) if keep[i]] for k in range(3)]
         proxy = "bands (weak: assumes distance rises up the frame, as in a landscape; pass --depth)"
+    if not all(bands):
+        raise Fail("a depth band has no opaque pixels")
     near, mid, far = (band_stats(b) for b in bands)
     flags, read = [], []
     for key, word in (("contrast", "contrast"), ("C_median", "chroma")):
@@ -365,7 +383,7 @@ def cmd_depth(a):
     if far["b_mean"] > mid["b_mean"] + 3:
         flags.append("warm_distance")
         read.append("distance warmer than the middle: right only toward a low sun")
-    return out({"file": a.image, "proxy": proxy, "near": near, "middle": mid, "far": far, "flags": flags,
+    return out({"file": a.image, "alpha": alpha, "proxy": proxy, "near": near, "middle": mid, "far": far, "flags": flags,
                 "readings": read, "note": HEUR})
 
 
@@ -421,7 +439,10 @@ def cmd_comp(a):
     L = [p[0] for p in px]
     lum = [v / 100 for v in L]
     sub = box_arg(a.subject, w, h)
-    flags, res = [], {"file": a.image, "measured_at": [w, h], "margin_trimmed": trim}
+    flags, res = [], {"file": a.image, "measured_at": [w, h], "margin_trimmed": trim,
+                      "alpha": alpha_mask(s)[1]}
+    if res["alpha"]["excluded"]:
+        res["alpha"]["note"] = "composition reads the whole frame: transparent pixels on white"
     # 1. value masses: k-means on L* at 64 px, then connected masses of each value
     t = small(s, 64)
     tL = [lab(c)[0] for c in flatten(t)]

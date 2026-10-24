@@ -41,6 +41,12 @@ contradiction, say so in one line and refresh after the task. Then route:
   run `aw.py light`, `gamut`, `accents`, `depth` or `comp` (`--subject x,y,w,h` when the subject is known) before
   answering, not by eye alone. A flag says where to look; confirm it on the image before it becomes a finding
   ([references/cli.md](references/cli.md)).
+- A sprite or cut-out with transparency: `stats`, `light`, `gamut` and `depth` measure its opaque pixels and
+  report the transparent share in `alpha`; never read a transparent background as white highlights.
+- A painting made over a 3D render (render-then-paint, img2img or ControlNet over a Blender render): run
+  `aw.py geomgate <render dir> <painted>` before judging it. It checks the rim and spokes of a ring part, a new
+  object inside a part, and parts that must touch; the render folder's contract is
+  [references/sprite-json.md](references/sprite-json.md). A failing gate names the part: look there, then reject.
 - An unchanged file with the same rubric is never judged twice: `aw.py cache get <img>` first.
 
 ## Critique of one work
