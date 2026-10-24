@@ -10,6 +10,15 @@ Updated 2026-10-24 (0.4.2 release; the books track notes below still hold).
   0,0,0,0 no longer fails without `--scale` (found by pixelwright's wiki survey). Installed locally.
 - Still open: the 5 failing eval cases in evergreen.json (paid evals, not re-run).
 
+## Scene illustration gates (2026-10-24, branch scene-illustration)
+
+- 0.5.0 untagged: `setfit`, `comp --text-band`, rubric 3 (criterion 6 Mechanism). PR left open for the owner;
+  do not merge or tag without his go-ahead. Rubric 3 changes cache keys, as rubric 2 did.
+- The `busy_text_band` threshold (1.0) comes from one five-screen series; recheck it on another game's screens.
+- The scene mechanism gates (rim, hub, feed, tail) stay in the job's own folder: they need a scene.json with the
+  wheel and water path, which no contract here describes yet. A generic version would need a sprite-json-like
+  contract for scenes first.
+
 ## Books track 6 (2026-10-22)
 
 - craft.md light logic, atmosphere and composition rows (eye path rewritten), ai-look rows 17-29, rubric 2,

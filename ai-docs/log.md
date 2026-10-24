@@ -147,3 +147,10 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 - `pixel`: a run touching a fully transparent pixel is left out of `transitional_pixels`; test
   `Pixel.test_outline_on_transparent_black_is_not_a_blend` failed at 11.11% before the fix. 65 unit tests green, CI
   green on six jobs. PR #18 merged, `v0.4.2` tagged on the owner's go-ahead; 0.4.0 and 0.4.1 ship inside it.
+
+## [2026-10-24] build | 0.5.0: setfit, comp --text-band, rubric 3 mechanism criterion (C-20261024-4)
+- Generalised a loading-screen job's series gate into `aw.py setfit` (aw_geom.py, standard library; texture at `--width` 960 via a separable Gaussian in pure Python, about 6 s for five 1920 px screens with Pillow). On that job's five-screen series it reproduces the prototype: edge density 0.24 to 0.36, the held-out screen's fine grain at position 1.30, passing at widen 0.3. The treatment is an external command run without a shell (`{in}`, `{out}`).
+- Tried and dropped: a leave-one-out self-check of every reference. On a four-image set the extreme member always falls outside the other three's range, so it fired on every member and would have pushed the widen far too wide. Calibration stays a held-out member plus a known-bad image (L-014).
+- `comp --text-band`: edge and contrast pull against the frame; `busy_text_band` at 1.0 fired on 3 of 10 top and bottom 15% bands of that series (0.8 fired on 9). Checked by eye on three screens: the busy ones are dense crops and dark trees across a bright sky, the calm one snow.
+- Rubric 3 adds criterion 6, Mechanism (a gate for any picture of a working machine). Cache and verdict defaults moved to rubric 3.
+- Tests 70 (1 skipped without AW_NET). Evals not re-run (descriptions unchanged). L-014 to L-016.

@@ -6,6 +6,10 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.5.0 · not tagged yet: C-20261024-4, `setfit` (one illustration against its series, with an external
+  treatment), `comp --text-band`, rubric 3 with the mechanism criterion.
+- 0.4.1 · not tagged yet: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
+- 0.4.0 · not tagged yet: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
 - 0.4.2 · 2026-10-24 (owner's go-ahead 2026-10-24), carries 0.4.0 and 0.4.1: C-20261024-3, transparent pixels left out of `transitional_pixels`.
 - 0.4.1 · never tagged, shipped inside 0.4.2: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
 - 0.4.0 · never tagged, shipped inside 0.4.2: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
@@ -19,6 +23,10 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Changes
 
+### C-20261024-4 · 2026-10-24 · `setfit` series gate, `comp --text-band`, rubric 3 with a mechanism criterion (0.5.0)
+because: user request (a loading screen painted to replace one in a series of five, with gates proven in that job); L-014, L-015, L-016
+files: skills/artwright/scripts/aw_geom.py (`setfit`: stats measures at 256 px, edge density and fine grain at `--width`, `--treat` external command, widen 0.3), skills/artwright/scripts/aw_measure.py (`text_bands`, `busy_text_band` flag), skills/artwright/scripts/aw.py (parsers; rubric version default 3; verdict init rubric 3; version 0.5.0), skills/artwright/references/cli.md (setfit row, comp row, busy_text_band flag; rubric default), skills/artwright/SKILL.md (Image handling: setfit and the text band), skills/artwright-judge/references/rubric.md (criterion 6 Mechanism; version 3), skills/artwright-judge/SKILL.md (A batch step 1: setfit; Fit to a brief step 4: mechanism), skills/artwright-judge/references/verdict-contract.md (example rubric 3), tests/test_aw.py (SetFit, TextBand), README.md (example), .claude-plugin/plugin.json (0.5.0)
+A one-off series gate and scene gates from a game job became generic: `setfit` reproduces the job's numbers on its series (edge density 0.24 to 0.36, the held-out screen's fine grain at 1.30 of the range, passing at 0.3), and the treatment stays an external command so any game's darkening fits. The text band threshold (1.0) was set from flag rates on that five-screen series. Mechanism joins the rubric as a gate for any picture of a working machine; verdicts cached under rubric 2 no longer match. Descriptions are unchanged, so triggers are unchanged; the evals were not re-run.
 ### C-20261024-3 · 2026-10-24 · `pixel`: runs touching a fully transparent pixel are left out of `transitional_pixels` (0.4.2)
 because: user request (a pixelwright wiki-survey finding: an outlined sprite on transparent black failed without `--scale`)
 files: skills/artwright/scripts/aw.py (transitional_share; VERSION), tests/test_aw.py

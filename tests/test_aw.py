@@ -830,6 +830,108 @@ class Sprite(unittest.TestCase):
         self.assertIn("two reference", r["error"])
 
 
+def series_scene(seed, smooth=False, shift=0, w=160, h=90):
+    """A painted landscape of a series: sky, hills, ground, with brush texture in 4 px dabs and per-pixel grain.
+    Members differ a little in value and texture; smooth drops the texture (img2img over a flat render), shift
+    moves every L* (a darker painting with the same brushwork)."""
+    rnd = random.Random(seed)
+    off, amp = (seed - 3) * 2 + shift, 13 + (seed - 3)
+    dab = {(x, y): rnd.uniform(-amp, amp) for x in range(w // 4 + 1) for y in range(h // 4 + 1)}
+
+    def px(x, y):
+        t = 0.0 if smooth else dab[(x // 4, y // 4)] + rnd.uniform(-amp / 2, amp / 2)
+        if y < h // 3:
+            L, A, B = 78, -4, -18
+        elif y < 2 * h // 3:
+            L, A, B = 58, -18, 20
+        else:
+            L, A, B = 45, 6, 28
+        return aw.lab_rgb(max(2, min(98, L + off + t)), A, B)
+    return paint(w, h, px)
+
+
+class SetFit(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.refs = [save(series_scene(s), "series%d.png" % s) for s in (1, 2, 4, 5)]
+        cls.refarg = ",".join(str(r) for r in cls.refs)
+
+    def fit(self, cand, *extra):
+        code, r = run("setfit", cand, "--refs", self.refarg, "--width", "160", *extra)
+        self.assertEqual(code, 0, r)
+        return r["candidates"][0]
+
+    def test_member_passes(self):
+        c = self.fit(save(series_scene(3), "series3.png"))
+        self.assertTrue(c["pass"], c)
+        self.assertEqual(set(c["measures"]), set(aw.sys.modules["aw_geom"].SETFIT_KEYS))
+
+    def test_smooth_candidate_fails_texture(self):
+        c = self.fit(save(series_scene(3, smooth=True), "series3_smooth.png"))
+        self.assertFalse(c["pass"])
+        self.assertIn("edge_density", c["failing"])
+        self.assertIn("fine_grain", c["failing"])
+        self.assertLess(c["measures"]["edge_density"]["value"], c["measures"]["edge_density"]["set_min"])
+        self.assertTrue(c["measures"]["value_mean"]["pass"])
+
+    def test_dark_candidate_fails_value(self):
+        c = self.fit(save(series_scene(3, shift=-18), "series3_dark.png"))
+        self.assertIn("value_mean", c["failing"])
+        self.assertLess(c["measures"]["value_mean"]["position"], 0)
+        self.assertNotIn("edge_density", c["failing"])
+
+    def test_treat_command_runs(self):
+        script = TMP / "treat_darken.py"
+        script.write_text(
+            "import sys\nsys.path.insert(0, %r)\nimport aw\n"
+            "img = aw.load(sys.argv[1])\n"
+            "img.d[0::4] = bytes(v // 2 for v in img.d[0::4])\n"
+            "img.d[1::4] = bytes(v // 2 for v in img.d[1::4])\n"
+            "img.d[2::4] = bytes(v // 2 for v in img.d[2::4])\n"
+            "aw.save_png(img, sys.argv[2])\n" % str(ROOT / "skills" / "artwright" / "scripts"), encoding="utf-8")
+        cmd = '"%s" "%s" {in} {out}' % (sys.executable, script)
+        kept = TMP / "treated"
+        c = self.fit(save(series_scene(3), "series3t.png"), "--treat", cmd, "--treated-out", kept)
+        self.assertIn("treated_mean", c["measures"])
+        self.assertTrue(c["measures"]["treated_mean"]["pass"], c)
+        self.assertLess(c["measures"]["treated_mean"]["value"], c["measures"]["value_mean"]["value"])
+        self.assertTrue(Path(c["treated"]).is_file())
+        code, r = run("setfit", self.refs[0], "--refs", self.refarg, "--treat", "python x.py {in}")
+        self.assertEqual(code, 1)
+        self.assertIn("{out}", r["error"])
+
+    def test_needs_two_references(self):
+        code, r = run("setfit", self.refs[0], "--refs", "%s,%s" % (self.refs[0], self.refs[1]))
+        self.assertEqual(code, 1)
+        self.assertIn("two reference", r["error"])
+
+
+class TextBand(unittest.TestCase):
+    def test_busy_band_flags_calm_band_does_not(self):
+        rnd = random.Random(4)
+
+        def px(x, y):
+            if y < 14:
+                return (150, 180, 220)  # a flat sky where the title sits
+            if y >= 82:
+                v = rnd.choice((20, 235))  # dense high-contrast detail where the tip sits
+                return (v, v, v)
+            return aw.lab_rgb(50 + 10 * ((x // 8 + y // 8) % 2), 0, 10)
+        path = save(paint(160, 96, px), "textband.png")
+        code, r = run("comp", path, "--text-band", "0,0,1,0.14", "--text-band", "0,0.86,1,0.14")
+        self.assertEqual(code, 0, r)
+        top, bottom = r["text_bands"]
+        self.assertFalse(top["busy"], top)
+        self.assertTrue(bottom["busy"], bottom)
+        self.assertLess(top["edge_pull"], 0.5)
+        self.assertGreater(bottom["contrast_pull"], 1.0)
+        self.assertIn("busy_text_band", r["flags"])
+        code, r = run("comp", path, "--text-band", "0,0,1,0.14")
+        self.assertNotIn("busy_text_band", r["flags"])
+        code, r = run("comp", path)
+        self.assertNotIn("text_bands", r)
+
+
 class Alpha(unittest.TestCase):
     def test_stats_skips_transparent_pixels(self):
         img = paint(64, 64, lambda x, y: (128, 128, 128, 255) if 16 <= x < 48 and 16 <= y < 48 else (0, 0, 0, 0))

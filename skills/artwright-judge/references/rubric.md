@@ -1,9 +1,10 @@
 # Judging rubric
 
 The rubric every pairwise, brief-fit and critique verdict uses, with the abstain rules. Rubric id
-`artwright-judge`, version `2` (the `--rubric` and `--rubric-version` that `aw.py cache` keys on). Version 2
-(2026-10-22) split light logic into its own criterion, listed the composition checks in order and made brief fit
-gate the batch winner; verdicts cached under version 1 no longer match.
+`artwright-judge`, version `3` (the `--rubric` and `--rubric-version` that `aw.py cache` keys on). Version 3
+(2026-10-24) added the mechanism criterion (6). Version 2 (2026-10-22) split light logic into its own criterion,
+listed the composition checks in order and made brief fit gate the batch winner. Verdicts cached under an older
+version no longer match.
 
 Back to [SKILL.md](../SKILL.md). Sources: synthesis section 4 and R-20261021-2 to -7 in the repository's
 RESEARCH.md.
@@ -28,8 +29,20 @@ RESEARCH.md.
    relativity holds).
 5. **Rendering integrity** (a gate, not taste). Anatomy and hands; duplicated or merged objects; text; seams;
    perspective; mixels; two light directions in one composite.
-6. **Style coherence.** One consistent style; it matches the movement or reference asked for, by named traits.
-7. **Expressive intent.** Mood and story match the brief, including briefs that ask for rough or "ugly" work.
+6. **Mechanism: does the machine work as drawn** (a gate, like 5). Apply it to any image whose subject or brief
+   includes a working machine or device: a mill, a pump, a forge bellows, a crane, a clock, a vehicle, a weapon.
+   Skip it for a ruin, a toy, a pure ornament, or a brief that asks for a broken or impossible machine. Trace the
+   power from its source to the tool and check each link is drawn: water or wind reaches the wheel or sails, a
+   shaft or belt carries the motion through the wall, the saw, stones or hammer sit at the end of it. Parts sit
+   where the physics needs them: water meets a wheel where its type takes it (low on the upstream side for an
+   undershot or breastshot wheel, over the top for an overshot one) and leaves downstream; nothing pours from an
+   axle or a hub; a lever has a pivot, a belt has two pulleys, a load hangs from something that can hold it. Name
+   the broken link and its region ("the race stops a wheel's width short of the wheel, lower left"). When the
+   painting was made over a 3D render, the render shows the working layout: compare against it, and judge any
+   measure on the painting relative to the render's own score in the same zone, never against a fixed number
+   (L-015).
+7. **Style coherence.** One consistent style; it matches the movement or reference asked for, by named traits.
+8. **Expressive intent.** Mood and story match the brief, including briefs that ask for rough or "ugly" work.
 
 ## Procedure
 

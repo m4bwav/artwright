@@ -44,7 +44,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.4.2"
+VERSION = "0.5.0"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -1569,7 +1569,7 @@ def agreement(works, labels_path):
 # ----- verdict contract
 
 def new_verdict(kind, brief, wd):
-    return {"artwright": "1", "kind": kind, "brief": brief, "rubric": {"id": "artwright-judge", "version": "2"},
+    return {"artwright": "1", "kind": kind, "brief": brief, "rubric": {"id": "artwright-judge", "version": "3"},
             "judge": {"model": None, "prompt_version": "1"}, "created": now(), "status": "draft",
             "items": [], "ranking": [], "fit": [], "fixes": [], "abstained": [], "notes": ""}
 
@@ -1784,6 +1784,8 @@ def build():
     sp.choices["depth"].add_argument("--depth", help="depth map image (bright = near, as Depth Anything writes)")
     sp.choices["depth"].add_argument("--far-bright", action="store_true", help="the map is bright far (a Mist pass)")
     sp.choices["comp"].add_argument("--subject", help="x,y,w,h fractions: the intended subject")
+    sp.choices["comp"].add_argument("--text-band", action="append",
+                                    help="x,y,w,h fractions where text will sit (repeatable): edge and contrast pull")
     sp.choices["comp"].add_argument("--out", help="folder for masses3.png and masses4.png")
     p = sp.add_parser("palette")
     p.add_argument("image")
@@ -1820,7 +1822,7 @@ def build():
     p.add_argument("action", choices=["get", "put", "stats", "label", "agreement"])
     p.add_argument("args", nargs="*")
     p.add_argument("--rubric", default="artwright-judge")
-    p.add_argument("--rubric-version", default="2")
+    p.add_argument("--rubric-version", default="3")
     p.add_argument("--model")
     p.add_argument("--prompt-version", default="1")
     p.add_argument("--temperature", type=float)
@@ -1856,6 +1858,14 @@ def build():
     p.add_argument("--min-coverage", type=float, default=0.9,
                    help="fail a sprite whose opaque share is under this times the references' median (0: off)")
     p.add_argument("--out")
+    p = sp.add_parser("setfit")
+    p.add_argument("candidates", nargs="+")
+    p.add_argument("--refs", nargs="+", required=True, help="the series: files or folders, comma-separated or spaced")
+    p.add_argument("--treat", help="external command with {in} and {out}, e.g. 'python treat.py {in} {out}'")
+    p.add_argument("--treated-out", help="folder for the candidates' treated images")
+    p.add_argument("--widen", type=float, default=0.3, help="widen the references' range by this share of it, each side")
+    p.add_argument("--width", type=int, default=960, help="width the texture measures read at")
+    p.add_argument("--out")
     return ap
 
 
@@ -1877,7 +1887,7 @@ def main(argv=None):
 # light, colour and composition measures live in aw_measure.py (kept apart so each file stays under 100 KB)
 sys.modules.setdefault("aw", sys.modules[__name__])
 from aw_measure import *  # noqa: E402,F401,F403
-from aw_geom import cmd_geomgate, cmd_sprite  # noqa: E402,F401
+from aw_geom import cmd_geomgate, cmd_setfit, cmd_sprite  # noqa: E402,F401
 
 
 if __name__ == "__main__":

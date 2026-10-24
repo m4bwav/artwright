@@ -6,6 +6,29 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-016 · 2026-10-24 · A texture gap from img2img over a flat render needs a second paint pass, not a noise overlay
+- Trigger: a loading screen painted by img2img over a flat 3D render came out far smoother than the series it joins (edge density 0.08 to 0.10 against the series' 0.24 to 0.36 at 960 px). A deterministic paper-grain overlay barely moved fine grain; a second img2img pass at denoise 0.5 raised edge density to 0.20.
+- Hypothesis: the render's flat shading survives a single low-denoise pass, so the painting inherits its smooth fields. Pigment-scale grain is finer than the scale the series is measured at and averages out there, so an overlay adds noise without adding brushwork the measure (or a viewer at screen size) can see.
+- Rule: when `setfit` fails edge density or fine grain on a painting made over a render, run a second paint pass at a higher denoise (0.5 is where it moved) and measure again; never add a noise or grain overlay to pass the gate. If the gap remains, report it with the numbers instead of gaming the measure.
+- Evidence: a private game project's work folder, sawmill-3d/scene (gates/set_gate.py, paint/, finals/C2from104_g05.png and siblings, grain.py), 2026-10-24
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-24
+
+### L-015 · 2026-10-24 · Judge a measure on a painting relative to the clean render's own score in the same zone
+- Trigger: mechanism gates on a scene painted over a 3D render (a water wheel: water at the upstream low rim, none at the hub, water continuing downstream) gave wrong verdicts with fixed shares. A pale painted hub tripped a "water at the hub" colour test, and per-region edge precision and recall could not separate correct paintings from broken ones even at 480 px (extends L-009), so it became a reported measure.
+- Hypothesis: a fixed threshold mixes what the scene contains with what the painting lost. The clean render scores the correct layout in the same zone with the same colour test, so a ratio to it passes a correct render by construction and counts only what the painting dropped.
+- Rule: score each zone on the render and on the painting with the same test and gate the painting at a fraction of the render's score (the feed gate settled at 0.7). Keep colour tests out of zones where a painted part can share the colour (a pale hub reads as foam). Edge agreement at scene scale is information, never a gate.
+- Evidence: a private game project's work folder, sawmill-3d/scene/gates/scene_gates.py (rim, hub, feed, tail gates; regions reported), test_hub_stream.png, test_feed_grass.png, test_tail_grass.png and their .gates.json, 2026-10-24
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-24
+
+### L-014 · 2026-10-24 · Calibrate a gate on a known-good set member and a known-bad image before trusting its threshold
+- Trigger: on one scene job, three gate thresholds set from reasoning alone were wrong. The series gate at a widen of 0.25 failed one of the series' own screens on fine grain (it sat 0.27 of the range above the others); the feed gate at 0.5 of the render's share passed a wheel standing on dry ground (0.7 fixed it).
+- Hypothesis: a threshold is a guess until it has seen one case that must pass and one that must fail; the margin between them is what the threshold sits in, and reasoning alone does not know where either falls.
+- Rule: before trusting a gate, run a known-good case (a set member held out as the candidate, or the clean render) that must pass and a known-bad image made for that gate (a smoother copy, grass painted over the race, a stream from the hub) that must fail; set the threshold between them and keep both images as the gate's test. `setfit`'s widen of 0.3 is the smallest that let the held-out member through.
+- Evidence: a private game project's work folder, sawmill-3d/scene/gates (set_gate.py WIDEN comment; make_negatives.py and make_feed_negative.py with the test_*.png they write); `aw.py setfit` on that series puts the held-out screen's fine grain at position 1.30 and passes it at 0.3 (2026-10-24); tests SetFit.test_member_passes and test_smooth_candidate_fails_texture
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-24
 ### L-013 · 2026-10-24 · Judges and mechanism gates miss a light no object explains; check each big shadow against the render's
 - Trigger: the sawmill loading screen candidate A passed all four mechanism gates and won the blind pairwise ranking
   in both orders, yet the first thing the reviewer named was a long hard-edged diagonal shadow from the river up the
