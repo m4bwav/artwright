@@ -6,6 +6,17 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-012 · 2026-10-24 · A small native sprite gets a false grid and its shading ramps read as blends
+- Trigger: pixelwright's make eval (a 16x16 potion recovered exactly, 10x16 after crop): `aw.py pixel` found scale 7,
+  26.7% alignment, 0% uniform blocks and 7.03% transitional pixels, so a pixel-perfect result failed the gate.
+- Hypothesis: a sprite this small has too few edges for the grid search, and at native scale every one-pixel step
+  between two flat colours (dark, mid, light) passes the transitional test.
+- Rule: a caller that knows the image is native passes `--scale 1`; at a stated scale of 1 the transitional share is
+  reported, not failed. Plain `pixel` on a tiny sprite still guesses the grid; read `grid.scale` before trusting it.
+- Evidence: C-20261024-2; Pixel.test_native_ramp_passes_at_stated_scale_1; the eval's potion passes with both fixes.
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-24
+
 ### L-011 · 2026-10-24 · Gate a sprite's coverage against its neighbours; a size the style check only shows gets waved through
 - Trigger: a painted 2x2 game building (96x96) passed `sprite` on every gated measure at coverage 0.39 while the reference work buildings sat at 0.42 to 0.62 (median 0.52); the reviewer rejected it as too small, and the project's style guide says large buildings fill their canvas. The size was even noted as a known gap and shipped anyway.
 - Hypothesis: a measure that is printed but not gated reads as advisory, so the agent explains it instead of fixing it; size relative to neighbours is the first thing a player sees at 1x.

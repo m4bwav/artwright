@@ -44,7 +44,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -1152,7 +1152,9 @@ def pixel_one(path, a):
         fails.append("off-grid pixels (lattice alignment %s%%)" % g.get("lattice_alignment"))
     if uniform < 1:
         fails.append("blocks not uniform (%s%%)" % res["uniform_blocks"])
-    if trans > 0.001:
+    # at a scale the caller states as 1 the image is native: a one-pixel shading step between two colours is a
+    # ramp, not a blend, so the share is reported but does not fail it (palette and budget still apply)
+    if trans > 0.001 and a.scale != 1:
         fails.append("transitional (blend) pixels %s%%" % res["transitional_pixels"])
     if a.budget and len(uniq) > a.budget:
         fails.append("%d colours over a budget of %d" % (len(uniq), a.budget))

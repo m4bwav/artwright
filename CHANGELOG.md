@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.4.1 · not tagged yet: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
 - 0.4.0 · not tagged yet: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
   check (`sprite`) with a coverage floor, transparent pixels left out of `stats` and the measures.
 - 0.3.0 · 2026-10-23, the first tagged release (owner's go-ahead 2026-10-23): C-20261022-7 and -8, craft light logic and composition rows, AI-look rows
@@ -16,6 +17,13 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261024-2 · 2026-10-24 · `pixel`: at a stated `--scale 1`, transitional pixels are reported, not failed (0.4.1)
+because: L-012
+files: skills/artwright/scripts/aw.py (pixel_one fails; VERSION), skills/artwright-pixel/SKILL.md (Read the JSON),
+tests/test_aw.py (Pixel.test_native_ramp_passes_at_stated_scale_1), .claude-plugin/plugin.json (0.4.1)
+A native sprite's one-pixel shading steps counted as blend pixels, so pixelwright's make gate failed a pixel-perfect
+result. Without `--scale` nothing changes: a blurred image whose grid falls back to 1 still fails on its blends.
 
 ### C-20261024-1 · 2026-10-24 · `sprite` gates coverage with a floor (`--min-coverage`, default 0.9 of the references' median)
 because: L-011

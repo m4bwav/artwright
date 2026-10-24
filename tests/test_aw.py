@@ -175,6 +175,20 @@ class Pixel(unittest.TestCase):
         self.assertFalse(it["clean_pixel_art"])
         self.assertGreater(it["transitional_pixels"], 0)
 
+    def test_native_ramp_passes_at_stated_scale_1(self):
+        """A one-pixel shading ramp in native art is not a blend once the caller says the scale is 1."""
+        img = aw.Img(12, 4)
+        ramp = [PAL4[0], PAL4[1], PAL4[2]] * 4
+        for y in range(4):
+            for x in range(12):
+                img.put(x, y, ramp[x])
+        code, r = run("pixel", save(img, "ramp.png"), "--scale", "1", "--budget", "4")
+        it = r["items"][0]
+        self.assertGreater(it["transitional_pixels"], 0)
+        self.assertTrue(it["clean_pixel_art"], it["problems"])
+        code, r = run("pixel", save(img, "ramp.png"), "--budget", "4")
+        self.assertFalse(r["items"][0]["clean_pixel_art"])
+
     def test_mixels_break_uniformity(self):
         native = up(noise(18, 18, PAL4, seed=4), 3)
         mixed = TMP / "mixed.png"

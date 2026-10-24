@@ -28,7 +28,8 @@ Read the JSON before looking at the image:
 
 - `grid.scale` and `grid.offset`: the apparent pixel size. `lattice_alignment` under 100% means off-grid pixels.
 - `uniform_blocks` under 100%: blocks of mixed colour (mixels or resampling).
-- `transitional_pixels` above 0: blend pixels between colours (blur, anti-aliasing from resampling).
+- `transitional_pixels` above 0: blend pixels between colours (blur, anti-aliasing from resampling). With
+  `--scale 1` (the caller states the image is native) it is reported but does not fail: a one-pixel ramp is shading.
 - `unique_colours` against the budget; `near_duplicate_colour_pairs` (each colour needs a role).
 - `orphans` (with coordinates), `jaggies`, `outline` colours, `partial_alpha_pixels`.
 - `clean_pixel_art` and `problems`: one integer scale, 100% alignment, uniform blocks, no blend pixels, colours
