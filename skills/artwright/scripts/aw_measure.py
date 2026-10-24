@@ -431,6 +431,29 @@ def trim_margin(s):
     return crop(s, d[0], d[1], w - d[0] - d[2], h - d[1] - d[3]), [round(v / z, 3) for v, z in zip(d, (w, h, w, h))]
 
 
+TEXT_BUSY = {"edge_pull": 1.0, "contrast_pull": 1.0}  # 3 of 10 bands on a five-screen series; 0.8 fired on 9
+
+
+def text_bands(s, specs):
+    """Edge and contrast pull inside each text band against the whole frame (untrimmed: the frame the text sits on).
+    edge_pull is the band's mean Sobel magnitude on L* over the image's; contrast_pull the band's SD of L* over the
+    image's. A band is busy when either reaches TEXT_BUSY: the text competes with the picture there."""
+    w, h = s.w, s.h
+    L = [lab(c)[0] for c in flatten(s)]
+    mag = sobel([v / 100 for v in L], w, h)
+    em, lsd = mean_sd(mag)[0] or 1e-9, mean_sd(L)[1] or 1e-9
+    res = []
+    for spec in specs:
+        b = box_arg(spec, w, h)
+        idx = [y * w + x for y in range(b[1], b[3]) for x in range(b[0], b[2])]
+        bm, bsd = mean_sd([L[i] for i in idx])
+        ep = mean_sd([mag[i] for i in idx])[0] / em
+        cp = bsd / lsd
+        res.append({"band": spec, "edge_pull": round(ep, 2), "contrast_pull": round(cp, 2), "mean_L": round(bm, 1),
+                    "busy": ep >= TEXT_BUSY["edge_pull"] or cp >= TEXT_BUSY["contrast_pull"]})
+    return res
+
+
 def cmd_comp(a):
     img = load(a.image)
     s, trim = trim_margin(small(img, a.edge))
@@ -610,6 +633,11 @@ def cmd_comp(a):
                                 "background_brighter": mo[0] > mi[0] + 10}
         if abs(mi[0] - mo[0]) < 10:
             flags.append("weak_figure_ground")
+    # 10. text bands: where a title or a tip will sit, edges and contrast should be quieter than the image's mean
+    if getattr(a, "text_band", None):
+        res["text_bands"] = text_bands(small(img, a.edge), a.text_band)
+        if any(b["busy"] for b in res["text_bands"]):
+            flags.append("busy_text_band")
     res.update(flags=flags, note=HEUR + "; not measured here: armature lines, intervals, interior tangents (ask a "
                                         "vision model)")
     return out(res)

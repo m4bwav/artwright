@@ -47,6 +47,13 @@ contradiction, say so in one line and refresh after the task. Then route:
   `aw.py geomgate <render dir> <painted>` before judging it. It checks the rim and spokes of a ring part, a new
   object inside a part, and parts that must touch; the render folder's contract is
   [references/sprite-json.md](references/sprite-json.md). A failing gate names the part: look there, then reject.
+- One image joining a series (a loading screen among the others, a plate in a set): `aw.py setfit <img> --refs
+  a,b,c` checks value, contrast, saturation, colourfulness, edge density and fine grain against the series, and
+  with `--treat "<command> {in} {out}"` the mean after the game's own darkening or blur. Before trusting a pass,
+  run one series member as the candidate (it must pass) and a known-bad image (it must fail) (L-014).
+- Text will sit on the image (titles, tips, a UI band): `aw.py comp <img> --text-band x,y,w,h` (repeatable) gives
+  edge and contrast pull inside the band against the frame; `busy_text_band` says the text will fight the picture
+  there. Take the bands from the real layout, not a guess.
 - An unchanged file with the same rubric is never judged twice: `aw.py cache get <img>` first.
 
 ## Critique of one work

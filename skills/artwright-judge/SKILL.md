@@ -35,7 +35,9 @@ from two candidates to four or more degrades models about seven times as much as
 
 1. Dedupe: `aw.py dedupe <dir>`; drop near-copies (keep the first of each group). When the candidates were
    painted over a 3D render and the render folder exists, run `aw.py geomgate <render dir> <img>` on each and
-   rank only those with `pass: true`; list the rest with their `failing_gates`, never as close losers.
+   rank only those with `pass: true`; list the rest with their `failing_gates`, never as close losers. A
+   candidate that joins a series (loading screens, chapter plates) runs `aw.py setfit <img> --refs <the series>`
+   the same way: one that fails a measure is listed with it, not ranked.
 2. Triage: `aw.py sheet <dir> -o sheet.png`; one Read; strike only rendering-integrity failures (hands, merged
    objects, broken text) and clear brief misses, naming each by its letter. Never rank from the sheet.
 3. Pairs: up to about 12 candidates, round robin; above that, Swiss rounds: `aw.py rank --work W --next 6` gives
@@ -63,6 +65,8 @@ Cost: a 16-image round robin in both orders is about 624k image tokens. Keep pai
 3. Verdict: `FITS`, `FITS WITH FIXES` or `DOES NOT FIT`; hard fails (wrong subject, wrong count, forbidden item,
    broken text the brief asked for) listed separately.
 4. Integrity gate: anatomy, hands, duplicated or merged objects, seams, perspective, mixels. A gate, not taste.
+   A working machine in the picture also takes the mechanism gate (rubric criterion 6): power source to tool
+   connected, water or wind where the machine's type needs it, nothing pouring from an axle.
 
 ## What to change next
 

@@ -1,6 +1,7 @@
-"""aw_geom.py: render-then-paint and painted-sprite gates for aw.py (geomgate, sprite).
+"""aw_geom.py: render-then-paint, painted-sprite and series gates for aw.py (geomgate, sprite, setfit).
 
-Imported by aw.py; run them through it (`aw.py geomgate RENDER_DIR PAINTED`, `aw.py sprite CAND --refs DIR`).
+Imported by aw.py; run them through it (`aw.py geomgate RENDER_DIR PAINTED`, `aw.py sprite CAND --refs DIR`,
+`aw.py setfit CAND --refs a,b,c`).
 Standard library only (Pillow, when present, does the resizes). The render directory contract is in
 ../references/sprite-json.md. Both gates describe and compare; neither is a beauty score.
 
@@ -12,12 +13,24 @@ residual outlier at game size; edge precision cannot tell it from brush texture 
 
 sprite measures a painted game sprite at its native size on its opaque pixels only and checks each measure against
 a reference set's range widened by 15%. It never posterizes: painted sprites are not pixel art.
+
+setfit checks one full illustration against the series it joins (a set of loading screens, chapter plates): value,
+contrast, saturation, colourfulness, edge density and fine grain, and optionally the mean luma after an external
+treatment command (darken, blur, vignette), each inside the references' range widened by 0.3 of that range. The
+widen was set so a series' own member held out as the candidate passes against the rest (L-014): calibrate a new
+set the same way, with one member that must pass and one known-bad image that must fail.
 """
 
+import colorsys
 import json
 import math
+import os
+import shlex
+import shutil
+import subprocess
+import tempfile
 
-from aw import Fail, Img, Path, inputs, lab, load, out, resize_box, resize_nearest, _pillow
+from aw import Fail, Img, Path, flatten, inputs, lab, load, out, resize_box, resize_nearest, small, sobel, _pillow
 
 TOL = {"centre_frac": 0.06, "axis_frac": 0.08, "tilt_deg": 8.0, "rim_coverage": 0.8, "rim_rms_frac": 0.05,
        "spoke_corr": 0.6, "region_anomaly": 5.0}
@@ -681,6 +694,161 @@ def cmd_sprite(a):
            "note": "opaque pixels at native size, never posterized; [low, high, median] of the references widened "
                    "by pad times their range; coverage has a floor only: min_coverage times the references' median (0 turns it off), "
                    "because bigger is fine and too small breaks the size ladder"}
+    if a.out:
+        p = Path(a.out)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(res, indent=1), encoding="utf-8")
+        res["report"] = str(p)
+    return out(res)
+
+
+# ---------------------------------------------------------------- setfit: one image against the series it joins
+
+SETFIT_KEYS = ("value_mean", "rms_contrast", "saturation", "colourfulness", "edge_density", "fine_grain")
+
+
+def _blur_rows(v, w, h, k):
+    """Separable Gaussian (kernel k, scipy's reflect border) over a w x h list of floats."""
+    r = len(k) // 2
+    mid = []
+    for y in range(h):
+        row = v[y * w:(y + 1) * w]
+        pad = row[r - 1::-1] + row + row[:-r - 1:-1] if r else row
+        acc = [0.0] * w
+        for j, kv in enumerate(k):
+            acc = [s + kv * p for s, p in zip(acc, pad[j:j + w])]
+        mid.append(acc)
+    res = []
+    for y in range(h):
+        acc = [0.0] * w
+        for j, kv in enumerate(k):
+            yy = y + j - r
+            while yy < 0 or yy >= h:
+                yy = -yy - 1 if yy < 0 else 2 * h - yy - 1
+            acc = [s + kv * p for s, p in zip(acc, mid[yy])]
+        res.extend(acc)
+    return res
+
+
+def _gauss(sigma):
+    r = int(4.0 * sigma + 0.5)
+    k = [math.exp(-0.5 * (i / sigma) ** 2) for i in range(-r, r + 1)]
+    t = sum(k)
+    return [x / t for x in k]
+
+
+def setfit_texture(img, width=960):
+    """Edge density (Gaussian 1 then Sobel magnitude over 0.25 on 0-1 luma) and fine-grain energy (RMS of the luma
+    minus its Gaussian 1.5 blur) at `width` px wide, the same scale for every image."""
+    h = max(3, round(img.h * width / img.w))
+    s = resize(img, width, h)
+    d = s.d
+    lum = []
+    for i in range(0, len(d), 4):
+        a = d[i + 3] / 255.0
+        lum.append(a * _luma601(d, i) + (1 - a))
+    b1 = _blur_rows(lum, width, h, _gauss(1.0))
+    mag = sobel(b1, width, h)
+    edges = sum(1 for m in mag if m > 0.25) / len(mag)
+    b15 = _blur_rows(lum, width, h, _gauss(1.5))
+    fine = math.sqrt(sum((p - q) ** 2 for p, q in zip(lum, b15)) / len(lum))
+    return edges, fine
+
+
+def setfit_base(img):
+    """The stats fields at 256 px on the image composited on white: value mean (luma), RMS contrast (SD of L*),
+    HSV saturation mean, Hasler-Suesstrunk colourfulness M."""
+    rgb = flatten(small(img, 256))
+    n = len(rgb)
+    lum = [(0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0 for r, g, b in rgb]
+    cache, L = {}, []
+    for c in rgb:
+        v = cache.get(c)
+        if v is None:
+            v = cache[c] = lab(c)[0]
+        L.append(v)
+    sat = [colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)[1] for r, g, b in rgb]
+    rg = [r - g for r, g, b in rgb]
+    yb = [0.5 * (r + g) - b for r, g, b in rgb]
+    M = math.hypot(_std(rg), _std(yb)) + 0.3 * math.hypot(_mean(rg), _mean(yb))
+    return {"value_mean": sum(lum) / n, "rms_contrast": _std(L), "saturation": sum(sat) / n, "colourfulness": M}
+
+
+def run_treat(cmd, src, dst):
+    """Run the user's treatment command with {in} and {out} filled in; no shell, so paths with spaces are safe."""
+    if "{in}" not in cmd or "{out}" not in cmd:
+        raise Fail("--treat needs {in} and {out} in the command, e.g. \"python treat.py {in} {out}\"")
+    win = os.name == "nt"
+    toks = shlex.split(cmd, posix=not win)
+    if win:
+        toks = [t[1:-1] if len(t) > 1 and t[0] == t[-1] == '"' else t for t in toks]
+    toks = [t.replace("{in}", str(src)).replace("{out}", str(dst)) for t in toks]
+    try:
+        p = subprocess.run(toks, capture_output=True, text=True, timeout=600)
+    except FileNotFoundError:
+        raise Fail("--treat: no such program: %s" % toks[0])
+    except subprocess.TimeoutExpired:
+        raise Fail("--treat timed out after 600 s on %s" % src)
+    if p.returncode != 0 or not Path(dst).is_file():
+        raise Fail("--treat failed on %s (exit %d): %s" % (src, p.returncode, (p.stderr or p.stdout or "no output")[-400:]))
+    return load(dst)
+
+
+def setfit_measure(path, a, tmp, tag):
+    img = load(path)
+    m = setfit_base(img)
+    m["edge_density"], m["fine_grain"] = setfit_texture(img, a.width)
+    if a.treat:
+        dst = Path(tmp) / ("treated_%s.png" % tag)
+        t = small(run_treat(a.treat, path, dst), 256)
+        m["treated_mean"] = _mean([_luma601(t.d, i) for i in range(0, len(t.d), 4)])
+    return m
+
+
+def _fit_rows(m, refm, widen):
+    rows, failing = {}, []
+    for k, v in m.items():
+        vals = [r[k] for r in refm]
+        lo, hi = min(vals), max(vals)
+        pad = widen * (hi - lo)
+        ok = lo - pad - 1e-9 <= v <= hi + pad + 1e-9
+        rows[k] = {"value": round(v, 4), "set_min": round(lo, 4), "set_max": round(hi, 4),
+                   "position": round((v - lo) / (hi - lo), 2) if hi > lo else None, "pass": ok}
+        if not ok:
+            failing.append(k)
+    return rows, failing
+
+
+def cmd_setfit(a):
+    refs = []
+    for r in a.refs:
+        refs += [t for t in r.split(",") if t]
+    refs = inputs(refs)
+    cands = inputs(a.candidates)
+    cset = {str(Path(c).resolve()) for c in cands}
+    refs = [r for r in refs if str(Path(r).resolve()) not in cset]
+    if len(refs) < 2:
+        raise Fail("need at least two reference images (a candidate is never its own reference)")
+    with tempfile.TemporaryDirectory(prefix="aw_setfit_") as tmp:
+        refm = [setfit_measure(r, a, tmp, "r%d" % i) for i, r in enumerate(refs)]
+        rows = []
+        for j, c in enumerate(cands):
+            m = setfit_measure(c, a, tmp, "c%d" % j)
+            meas, failing = _fit_rows(m, refm, a.widen)
+            row = {"file": c, "pass": not failing, "failing": failing, "measures": meas}
+            if a.treat and a.treated_out:
+                d = Path(a.treated_out)
+                d.mkdir(parents=True, exist_ok=True)
+                q = d / (Path(c).stem + ".treated.png")
+                shutil.copyfile(Path(tmp) / ("treated_c%d.png" % j), q)
+                row["treated"] = str(q)
+            rows.append(row)
+    res = {"references": refs, "widen": a.widen, "width": a.width, "treat": a.treat, "candidates": rows,
+           "pass": all(r["pass"] for r in rows)}
+    res["note"] = ("position is where the value sits in the references' range (0 the lowest, 1 the highest; 1.27 is "
+                   "0.27 of the range above it); calibrate on a held-out set member (must pass) and a known-bad image (must "
+                   "fail) before trusting the widen; each measure passes inside the range widened by widen times the range "
+                   "on each side; texture is measured at width px, so pigment-scale grain finer than that averages out")
     if a.out:
         p = Path(a.out)
         p.parent.mkdir(parents=True, exist_ok=True)
