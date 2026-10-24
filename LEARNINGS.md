@@ -6,6 +6,14 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-011 · 2026-10-24 · Gate a sprite's coverage against its neighbours; a size the style check only shows gets waved through
+- Trigger: a painted 2x2 game building (96x96) passed `sprite` on every gated measure at coverage 0.39 while the reference work buildings sat at 0.42 to 0.62 (median 0.52); the reviewer rejected it as too small, and the project's style guide says large buildings fill their canvas. The size was even noted as a known gap and shipped anyway.
+- Hypothesis: a measure that is printed but not gated reads as advisory, so the agent explains it instead of fixing it; size relative to neighbours is the first thing a player sees at 1x.
+- Rule: `sprite` fails coverage under `--min-coverage` (0.9) times the references' median; pick references of the same class (work buildings for a work building). A camera fitted to ground diamonds sets the ground scale, not how big the building reads: fix the size by massing and props first, then zoom.
+- Evidence: Sawmill round 1 in a private game project, 2026-10-23 (coverage 0.39, reviewer note "the size of the building seems too small compared to the other"); test Sprite.test_too_small_sprite_fails_coverage
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-24
+
 ### L-010 · 2026-10-23 · Leave transparent pixels out of value and colour statistics
 - Trigger: `aw.py stats` on a 96x96 painted building sprite (Sawmill.png, a private game project) reported `clip_white` 0.478. That was the transparent share of the canvas: every measure composited the sprite on white first.
 - Hypothesis: flattening on a background is right for a photograph or a painting and wrong for a sprite or cut-out, whose canvas is not part of the picture; a white composite turns the background into clipped highlights, a high value key and a grey colour cast.

@@ -775,6 +775,25 @@ class Sprite(unittest.TestCase):
         self.assertEqual(g["size"], [48, 48])
         self.assertLess(g["measures"]["coverage"], 0.8)
 
+    def test_too_small_sprite_fails_coverage(self):
+        refs = TMP / "sprite_refs_cov"
+        refs.mkdir(exist_ok=True)
+        for s in range(1, 6):
+            aw.save_png(house_sprite(s), refs / ("ref%d.png" % s))
+        big = house_sprite(3)
+        small = aw.Img(48, 48)  # the same house at half size: style unchanged, a quarter of the area
+        for y in range(0, 48, 2):
+            for x in range(0, 48, 2):
+                c = big.px(x, y)
+                if c[3]:
+                    small.put(12 + x // 2, 12 + y // 2, c)
+        cand = save(small, "cand_small.png")
+        code, r = run("sprite", cand, "--refs", refs)
+        self.assertEqual(code, 0, r)
+        self.assertIn("coverage", r["candidates"][0]["outside"])
+        code, r = run("sprite", cand, "--refs", refs, "--min-coverage", "0")
+        self.assertNotIn("coverage", r["candidates"][0]["outside"])
+
     def test_candidate_is_never_its_own_reference(self):
         d = TMP / "sprite_two"
         d.mkdir(exist_ok=True)

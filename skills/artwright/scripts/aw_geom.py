@@ -667,15 +667,20 @@ def cmd_sprite(a):
         m = sprite_measures(img)
         outside = {k: [round(m[k], 3)] + rng[k][:2] for k in SPRITE_KEYS
                    if k != "coverage" and not raw[k][0] - 1e-9 <= m[k] <= raw[k][1] + 1e-9}
+        floor = a.min_coverage * rng["coverage"][2]
+        if a.min_coverage and m["coverage"] < floor:
+            outside["coverage"] = [round(m["coverage"], 3), round(floor, 3), None]
         row = {"file": c, "size": [img.w, img.h], "measures": {k: round(v, 3) for k, v in m.items()},
                "outside": outside, "pass": not outside}
         if (img.w, img.h) not in sizes:
             row["warning"] = "size differs from every reference: measure the sprite at the size it ships"
         rows.append(row)
-    res = {"references": len(refs), "reference_range": rng, "pad": a.pad, "candidates": rows,
+    res = {"references": len(refs), "reference_range": rng, "pad": a.pad, "min_coverage": a.min_coverage,
+           "candidates": rows,
            "pass": all(r["pass"] for r in rows),
            "note": "opaque pixels at native size, never posterized; [low, high, median] of the references widened "
-                   "by pad times their range; coverage is shown, not gated"}
+                   "by pad times their range; coverage has a floor only: min_coverage times the references' median (0 turns it off), "
+                   "because bigger is fine and too small breaks the size ladder"}
     if a.out:
         p = Path(a.out)
         p.parent.mkdir(parents=True, exist_ok=True)

@@ -1848,6 +1848,8 @@ def build():
     p.add_argument("candidates", nargs="+")
     p.add_argument("--refs", nargs="+", required=True)
     p.add_argument("--pad", type=float, default=0.15)
+    p.add_argument("--min-coverage", type=float, default=0.9,
+                   help="fail a sprite whose opaque share is under this times the references' median (0: off)")
     p.add_argument("--out")
     return ap
 
