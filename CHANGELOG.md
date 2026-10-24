@@ -6,8 +6,8 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
-- 0.4.0 · not tagged yet: C-20261023-1, render-then-paint gate (`geomgate`), painted-sprite style check (`sprite`),
-  transparent pixels left out of `stats` and the measures.
+- 0.4.0 · not tagged yet: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
+  check (`sprite`) with a coverage floor, transparent pixels left out of `stats` and the measures.
 - 0.3.0 · 2026-10-23, the first tagged release (owner's go-ahead 2026-10-23): C-20261022-7 and -8, craft light logic and composition rows, AI-look rows
   17-29, rubric 2, rank cycles, winner must fit the brief, cache sampling key, label side order.
 - 0.2.0 · never tagged, shipped inside 0.3.0: C-20261022-5 and -6, light, colour and composition measures (`light`, `gamut`, `accents`,
@@ -16,6 +16,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261024-1 · 2026-10-24 · `sprite` gates coverage with a floor (`--min-coverage`, default 0.9 of the references' median)
+because: L-011
+files: skills/artwright/scripts/aw_geom.py (cmd_sprite), skills/artwright/scripts/aw.py (sprite parser), skills/artwright/references/cli.md (sprite row), tests/test_aw.py (Sprite.test_too_small_sprite_fails_coverage)
+Coverage was measured and shown but never gated, so a painted building at 0.39 of its canvas against references at a 0.52 median passed every check and its reviewer called it too small. A floor, not a range: bigger is fine.
 
 ### C-20261023-1 · 2026-10-23 · geomgate and sprite commands; transparent pixels left out of stats and measures (0.4.0)
 - because: user request (a render-then-paint game sprite job, gates proven on a sawmill's renders and paintings); L-008, L-009, L-010
