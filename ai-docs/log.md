@@ -142,3 +142,8 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 - Found while writing the synthetic test: the rim lag window is 8% of the radius, so a squash bigger than the window registers as weak matches and an RMS near 0.05, never as its full size; `axis_err` cannot exceed about 0.08. On a clean synthetic ring a 20% squash passed the ellipse gate with a thick rim (0.85 to 1.0 of the radius) and failed it with a thin one (0.94); the spokes gate failed it either way. Written into references/sprite-json.md. A saturated-lag rule (count a lag at the window edge as unmatched) would close it; not done, to keep the prototype's tolerances.
 - `stats` counted transparent pixels as white (clip_white 0.478 on a 96 px sprite was its transparent share); `stats`, `light`, `gamut` and `depth` now read opaque pixels, `accents` and `comp` report `alpha`. L-008 to L-010.
 - Unit tests 51 to 62 (1 skipped without AW_NET; 2 skipped with Pillow hidden), green both ways. The 5 failing cases in evergreen.json are eval cases (claude plugin eval), not unit tests; not re-run here.
+
+## [2026-10-24] release | 0.4.2 tagged (C-20261024-3)
+- `pixel`: a run touching a fully transparent pixel is left out of `transitional_pixels`; test
+  `Pixel.test_outline_on_transparent_black_is_not_a_blend` failed at 11.11% before the fix. 65 unit tests green, CI
+  green on six jobs. PR #18 merged, `v0.4.2` tagged on the owner's go-ahead; 0.4.0 and 0.4.1 ship inside it.
