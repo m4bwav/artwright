@@ -44,7 +44,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.7.0"
+VERSION = "0.7.1"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -967,7 +967,54 @@ def cmd_palette(a):
 
 # ----- pixel checks
 
-def _profiles(img, tol):
+def _peak_profiles(img, tol):
+    """Like _profiles, but a step counts only where it is a local peak along its row or column. JPEG ringing beside
+    an edge makes smaller steps next to it that fall off the pixel lattice; at quality 90 they drown a scale 2 or 3
+    grid (alignment near chance)."""
+    w, h, d = img.w, img.h, img.d
+
+    def dist(i, j):
+        return abs(d[i] - d[j]) + abs(d[i + 1] - d[j + 1]) + abs(d[i + 2] - d[j + 2]) + abs(d[i + 3] - d[j + 3])
+    colx, rowy = [0] * w, [0] * h
+    for y in range(h):
+        b = y * w * 4
+        st = [0] + [dist(b + x * 4, b + x * 4 - 4) for x in range(1, w)] + [0]
+        for x in range(1, w):
+            if st[x] > tol and st[x] >= st[x - 1] and st[x] >= st[x + 1]:
+                colx[x] += 1
+    for x in range(w):
+        st = [0] + [dist((y * w + x) * 4, ((y - 1) * w + x) * 4) for y in range(1, h)] + [0]
+        for y in range(1, h):
+            if st[y] > tol and st[y] >= st[y - 1] and st[y] >= st[y + 1]:
+                rowy[y] += 1
+    return colx, rowy
+
+
+def _lattice_contrast(img, s, ox, oy):
+    """Mean step size on the s px lattice over the mean off it (the lower axis), leaving out the JPEG block columns
+    and rows (multiples of 8). Real scale s art in a JPEG scores 2 or more; a smooth JPEG about 1."""
+    w, h, d = img.w, img.h, img.d
+    cx, ry = [0] * w, [0] * h
+    for y in range(h):
+        for x in range(1, w):
+            i = (y * w + x) * 4
+            cx[x] += abs(d[i] - d[i - 4]) + abs(d[i + 1] - d[i - 3]) + abs(d[i + 2] - d[i - 2])
+    for y in range(1, h):
+        for x in range(w):
+            i = (y * w + x) * 4
+            j = i - w * 4
+            ry[y] += abs(d[i] - d[j]) + abs(d[i + 1] - d[j + 1]) + abs(d[i + 2] - d[j + 2])
+
+    def ratio(prof, o):
+        on = [v for i, v in enumerate(prof) if i % 8 and i % s == o]
+        off = [v for i, v in enumerate(prof) if i % 8 and i % s != o]
+        return (sum(on) / max(1, len(on))) / max(1e-9, sum(off) / max(1, len(off)))
+    return min(ratio(cx, ox), ratio(ry, oy))
+
+
+def _profiles(img, tol, peaks=False):
+    if peaks:
+        return _peak_profiles(img, tol)
     w, h, d = img.w, img.h, img.d
     colx, rowy = [0] * w, [0] * h
     for y in range(h):
@@ -1007,8 +1054,8 @@ def _spacing_mode(prof):
     return max(cnt, key=lambda g: (cnt[g], g))
 
 
-def detect_grid(img, tol=24, max_scale=64):
-    colx, rowy = _profiles(img, tol)
+def detect_grid(img, tol=24, max_scale=64, peaks=False):
+    colx, rowy = _profiles(img, tol, peaks)
     clean = 1
     for s in range(2, min(max_scale, img.w, img.h) + 1):
         ax, _ = _align(colx, s)
@@ -1158,8 +1205,17 @@ def jpeg_blocks(img, tol):
 
 def pixel_one(path, a):
     img = load(path)
+    jpeg = fmt_of(path) == "jpeg"
     g = detect_grid(img, a.tol) if not a.scale else {"scale": a.scale, "offset": [0, 0]}
-    if not a.scale and g["scale"] in (2, 4, 8, 16) and fmt_of(path) == "jpeg":
+    if jpeg and not a.scale:
+        # peaks find a small grid under the ringing; at 8 and up, or with steps no larger on the lattice than off
+        # it, they are a smooth JPEG's block edges
+        gp = detect_grid(img, a.tol, peaks=True)
+        if 1 < gp["scale"] < 8 and gp["scale"] != g["scale"]:
+            c = _lattice_contrast(img, gp["scale"], *gp["offset"])
+            if c >= 1.6:
+                g = dict(gp, lattice_contrast=round(c, 2))
+    if not a.scale and g["scale"] in (2, 4, 8, 16) and jpeg:
         if g["scale"] < 8 and jpeg_blocks(img, a.tol) >= 0.8:
             g = {"scale": 1, "offset": [0, 0], "lattice_alignment": 100.0,
                  "note": "JPEG: the %d px lattice is the 8 px block edges, not a pixel grid; pass --scale if it is "
@@ -1167,7 +1223,7 @@ def pixel_one(path, a):
         elif g["scale"] >= 8:
             g["note"] = "JPEG blocks are 8 px: check a scale of 8 or 16 by eye before trusting it"
     if a.scale:
-        colx, rowy = _profiles(img, a.tol)
+        colx, rowy = _profiles(img, a.tol, jpeg)
         ax, ox = _align(colx, a.scale)
         ay, oy = _align(rowy, a.scale)
         g.update({"offset": [ox, oy], "lattice_alignment": round(min(ax, ay) * 100, 1)})

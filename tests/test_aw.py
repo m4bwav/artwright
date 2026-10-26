@@ -1043,6 +1043,35 @@ class Books12(unittest.TestCase):
         self.assertEqual(g["scale"], 1, g)
         self.assertIn("JPEG", g["note"])
 
+    @unittest.skipUnless(aw._pillow()[0], "writing a JPEG needs Pillow")
+    def test_jpeg_ringing_does_not_hide_a_small_grid(self):
+        Image = aw._pillow()[0]
+        rnd = random.Random(0)
+        pal = [(20, 20, 30), (200, 60, 50), (240, 200, 80), (60, 140, 70), (50, 90, 200), (230, 230, 230)]
+        im = Image.new("RGB", (64, 64))
+        im.putdata([pal[rnd.randrange(6)] if rnd.random() < 0.3 else pal[(x // 5 + y // 4) % 6]
+                    for y in range(64) for x in range(64)])
+        low = [(100, 100, 100), (112, 108, 104), (124, 118, 110), (90, 96, 104)]
+        rnd = random.Random(5)
+        lo = Image.new("RGB", (64, 64))
+        lo.putdata([low[rnd.randrange(4)] if rnd.random() < 0.2 else low[(x // 4 + y // 3) % 4]
+                    for y in range(64) for x in range(64)])
+        for name, src, s, before in (("pal_s2", im, 2, 1), ("pal_s3", im, 3, 1), ("low_s2", lo, 2, 8)):
+            p = TMP / ("%s_q90.jpg" % name)
+            src.resize((64 * s, 64 * s), Image.NEAREST).save(p, quality=90)
+            self.assertEqual(aw.detect_grid(aw.load(p))["scale"], before, name)  # ringing steps scatter off the lattice
+            g = aw.pixel_one(str(p), aw.build().parse_args(["pixel", str(p)]))[0]
+            self.assertEqual(g["grid"]["scale"], s, (name, g["grid"]))
+            self.assertEqual(g["native_size"], [64, 64])
+        from PIL import ImageFilter
+        rnd = random.Random(1)
+        sm = Image.new("RGB", (96, 96))
+        sm.putdata([tuple(rnd.randrange(256) for _ in range(3)) for _ in range(96 * 96)])
+        p = TMP / "smooth_q90.jpg"
+        sm.resize((480, 480), Image.BICUBIC).filter(ImageFilter.GaussianBlur(2)).save(p, quality=90)
+        self.assertEqual(aw.detect_grid(aw.load(p), peaks=True)["scale"], 4)  # block edges, once the ringing is gone
+        self.assertEqual(aw.pixel_one(str(p), aw.build().parse_args(["pixel", str(p)]))[0]["grid"]["scale"], 1)
+
     def test_sheet_background(self):
         a = save(gradient(40, 40), "sa.png")
         code, r = run("sheet", a, a, "-o", TMP / "grey_sheet.png", "--no-labels")

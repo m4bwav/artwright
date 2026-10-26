@@ -6,14 +6,13 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
-- 0.7.0 · not tagged yet: C-20261025-2, pixel measures (banding, pillow, corner doubles, interior jaggies, `--bg`,
+- 0.7.1 · not tagged yet: C-20261026-1, `pixel` finds a scale 2 or 3 grid in a quality 90 JPEG.
+- 0.7.0 · 2026-10-26 (owner's go-ahead 2026-10-26), carries 0.5.0 and 0.6.0: C-20261025-2, pixel measures (banding, pillow, corner doubles, interior jaggies, `--bg`,
   tile repetition), degrade banding and pillow, pixel-art and AI-look rows, material cues.
-- 0.6.0 · not tagged yet: C-20261025-1, anti-aliased measuring copy, value in L*, notan cuts, `light` separation,
+- 0.6.0 · never tagged, shipped inside 0.7.0: C-20261025-1, anti-aliased measuring copy, value in L*, notan cuts, `light` separation,
   grain estimate and comp's noise floor, JPEG block guard in `pixel`, grey sheets, degrade noise, band and alias.
-- 0.5.0 · not tagged yet: C-20261024-4, `setfit` (one illustration against its series, with an external
+- 0.5.0 · never tagged, shipped inside 0.7.0: C-20261024-4, `setfit` (one illustration against its series, with an external
   treatment), `comp --text-band`, rubric 3 with the mechanism criterion.
-- 0.4.1 · not tagged yet: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
-- 0.4.0 · not tagged yet: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
 - 0.4.2 · 2026-10-24 (owner's go-ahead 2026-10-24), carries 0.4.0 and 0.4.1: C-20261024-3, transparent pixels left out of `transitional_pixels`.
 - 0.4.1 · never tagged, shipped inside 0.4.2: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
 - 0.4.0 · never tagged, shipped inside 0.4.2: C-20261023-1 and C-20261024-1, render-then-paint gate (`geomgate`), painted-sprite style
@@ -26,6 +25,21 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261026-1 · 2026-10-26 · `pixel` finds a scale 2 or 3 grid in a high-quality JPEG (0.7.1); L-020
+- because: L-020, the round 2 handoff's open bug (a scale 2 palette JPEG at quality 90 read as scale 1)
+- files: skills/artwright/scripts/aw.py (_peak_profiles, _lattice_contrast, _profiles, detect_grid, pixel_one,
+  VERSION),
+  tests/test_aw.py (Books12.test_jpeg_ringing_does_not_hide_a_small_grid), LEARNINGS.md (L-020),
+  .claude-plugin/plugin.json
+- On a JPEG, `pixel` counts a colour step only where it peaks along its row or column, so the ringing beside an
+  edge no longer scatters steps off the lattice. Scale 2 and 3 palette art saved at quality 90 now reads at its
+  scale instead of 1, and a low-contrast scale 2 JPEG that read as 8 reads as 2. The 8 px block guard still uses
+  every step, so a smooth JPEG still reads as 1. The peak reading replaces the plain one only when it finds a
+  scale under 8 and the steps on that lattice are at least 1.6 times the size of those off it, block rows and
+  columns left out (`grid.lattice_contrast`). Without those two checks, smooth JPEGs read as 2, 4 or 8 from their
+  block edges (11 of 31 video contact sheets read 8). On 112 real JPEG renders the scale is unchanged. PNG and
+  other lossless input is unchanged.
 
 ### C-20261025-2 · 2026-10-25 · pixel-art measures, pixel and material rows from the round 2 books (0.7.0)
 because: user request (book-learnings round 2, track 13); L-019

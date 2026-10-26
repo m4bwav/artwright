@@ -6,6 +6,22 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-020 · 2026-10-26 · On a JPEG, count a step only where it peaks: ringing hides a small grid
+- Trigger: `aw.py pixel` read scale 2 and scale 3 palette art saved at quality 90 (and 95) as scale 1; the share of
+  steps on the true lattice was 0.56 at scale 2, near chance (0.5). A low-contrast scale 2 JPEG read as scale 8.
+- Hypothesis: ringing beside each real edge adds smaller steps over the tolerance one or two pixels away, off the
+  lattice. Raising the tolerance recovers the grid but drops edges between close palette colours.
+- Rule: on lossy input, keep a step only where it is a local peak along its row or column (non-maximum
+  suppression), at the usual tolerance. Keep the 8 px block test on the plain count, since blocks are what it
+  looks for. Then confirm it: with the ringing gone, a smooth JPEG's strongest remaining steps are its 8 px
+  block edges, which also sit on the 2 and 4 lattices. Trust the peak reading only below 8 and when the mean step
+  on the lattice is at least 1.6 times the mean off it, block rows and columns left out (smooth JPEGs 1.05-1.10,
+  real grids 2.2-7.6).
+- Evidence: Books12.test_jpeg_ringing_does_not_hide_a_small_grid (1, 1 and 8 before; 2, 3 and 2 after; fails with
+  the peak test removed); a smooth quality 90 JPEG stays 1; 112 real JPEG renders unchanged; alignment at the true scale 0.56 to 0.97 (scale 2) and 0.42 to 0.83 (scale 3)
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-26
+
 ### L-019 · 2026-10-25 · A defect count that real sprites score as high as the fixture is a locator, not a grade
 - Trigger: the book-proposed banding rule (runs whose exact span the next row repeats) found 0 hits on a disc with a one-pixel ring hugging its outline; curved bands shift one pixel a row. Widened to offsets 0 and 1, the ring scored 4.7 per 100 edge pixels, but 30 AI renders quantised to 48 px sprites scored 0 to 6.5 (median 3.3).
 - Hypothesis: equal runs side by side are common in any small quantised image (eyes, belts, flat bands), so the count cannot separate a bad sprite from an ordinary one; its coordinates still point at the bands worth looking at.
