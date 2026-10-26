@@ -940,7 +940,7 @@ class Alpha(unittest.TestCase):
         self.assertEqual(r["value"]["clip_white"], 0)
         self.assertAlmostEqual(r["alpha"]["transparent_share"], 0.75, 3)
         self.assertTrue(r["alpha"]["excluded"])
-        self.assertAlmostEqual(r["value"]["mean"], 0.502, 2)
+        self.assertAlmostEqual(r["value"]["mean"], 0.536, 2)  # L* of grey 128
         self.assertEqual(r["rms_contrast"], 0)
         code, o = run("stats", save(gradient(32, 32), "opaque.png"))
         self.assertEqual(o["alpha"], {"transparent_share": 0.0, "excluded": False})
@@ -951,6 +951,112 @@ class Alpha(unittest.TestCase):
         self.assertEqual(code, 0, g)
         self.assertEqual(g["chromatic_share"], 1.0)
         self.assertTrue(g["alpha"]["excluded"])
+
+
+def stripes(w, period=3):
+    """Fine diagonal stripes: the case a nearest-sampled reduction turns into false texture."""
+    import math
+    img = aw.Img(w, w)
+    for y in range(w):
+        row = bytearray()
+        for x in range(w):
+            v = 180 if math.sin(2 * math.pi * (x + 0.6 * y) / period) > 0 else 100
+            row += bytes((v, v, v, 255))
+        img.d[y * w * 4:(y + 1) * w * 4] = row
+    return img
+
+
+def flat_shapes(w=256):
+    """Hard-edged flat shapes on a flat ground: one sharp place, no texture."""
+    return paint(w, w, lambda x, y: (40, 40, 40) if 30 <= y < 80 and 40 <= x < 90 or 170 <= y < 230 and 160 <= x < 220
+                 else ((120, 120, 120) if 100 <= y < 150 else (200, 200, 200)))
+
+
+class Books12(unittest.TestCase):
+    """Round 2 track 12: anti-aliased measuring copy, lightness value, notan cuts, separation, grain, JPEG lattice."""
+
+    def test_small_does_not_alias_fine_stripes(self):
+        img = stripes(1200)
+        for stdlib in (False, True):
+            keep = aw._pillow
+            if stdlib:
+                aw._pillow = lambda: (None, None)
+            try:
+                s = aw.small(img)
+            finally:
+                aw._pillow = keep
+            sd = aw.mean_sd(aw.luma_list(s))[1] * 255
+            self.assertLess(sd, 5, "stdlib" if stdlib else "pillow")  # the nearest pre-step gave about 30
+
+    def test_value_is_lightness_not_luma(self):
+        code, r = run("stats", save(paint(32, 32, lambda x, y: (0, 0, 255)), "blue.png"))
+        self.assertAlmostEqual(r["value"]["mean"], 0.323, 2)  # luma read 0.07
+        self.assertAlmostEqual(r["value"]["luma_mean"], 0.072, 2)
+
+    def test_notan_cuts_where_values_divide(self):
+        img = paint(100, 100, lambda x, y: (40, 40, 40) if x < 20 else (220, 220, 220))
+        code, r = run("stats", save(img, "highkey.png"), "--notan", TMP / "notan_hk")
+        self.assertAlmostEqual(r["notan"]["light_share"], 0.8, 2)  # a median cut gives 0.5
+        self.assertEqual(sum(r["notan"]["shares_three"]) > 0.99, True)
+
+    def test_light_separation(self):
+        two = save(paint(64, 64, lambda x, y: (230, 210, 180) if x < 32 else (40, 50, 80)), "two_family.png")
+        code, r = run("light", two)
+        self.assertGreater(r["separation"], 0.9)
+        code, g = run("light", save(gradient(64, 64), "one_family.png"))
+        self.assertLess(g["separation"], r["separation"])
+
+    def test_grain_is_not_detail(self):
+        p = save(flat_shapes(), "flat_shapes.png")
+        noisy = TMP / "flat_noise.png"
+        run("degrade", p, "-o", noisy, "--kind", "noise", "--amount", "16")
+        code, r = run("comp", noisy)
+        self.assertNotIn("uniform_sharpness", r["flags"], r["sharpness"])  # fired before the noise floor
+        self.assertGreater(r["sharpness"]["noise_sigma"], 3)
+        code, s = run("stats", noisy)
+        self.assertNotEqual(s["noise"]["reading"], "clean")
+        code, c = run("stats", p)
+        self.assertEqual(c["noise"]["reading"], "clean")
+        import math
+        tex = paint(256, 256, lambda x, y: (188, 188, 188) if math.sin(x * 1.3) * math.sin(y * 1.1) > 0 else (68, 68, 68))
+        code, t = run("comp", save(tex, "even_texture.png"))
+        self.assertIn("uniform_sharpness", t["flags"])
+
+    @unittest.skipUnless(aw._pillow()[0], "writing a JPEG needs Pillow")
+    def test_jpeg_block_lattice_is_not_a_pixel_grid(self):
+        Image = aw._pillow()[0]
+        from PIL import ImageFilter
+        rnd = random.Random(1)
+        im = Image.new("RGB", (96, 96))
+        im.putdata([tuple(rnd.randrange(256) for _ in range(3)) for _ in range(96 * 96)])
+        im = im.resize((768, 768), Image.BICUBIC).filter(ImageFilter.GaussianBlur(6))
+        p = TMP / "smooth_q55.jpg"
+        im.save(p, quality=55)
+        args = aw.build().parse_args(["pixel", str(p)])
+        keep = aw.jpeg_blocks
+        aw.jpeg_blocks = lambda img, tol: 0.0
+        try:
+            self.assertEqual(aw.pixel_one(str(p), args)[0]["grid"]["scale"], 2)  # the block edges read as a grid
+        finally:
+            aw.jpeg_blocks = keep
+        g = aw.pixel_one(str(p), args)[0]["grid"]
+        self.assertEqual(g["scale"], 1, g)
+        self.assertIn("JPEG", g["note"])
+
+    def test_sheet_background(self):
+        a = save(gradient(40, 40), "sa.png")
+        code, r = run("sheet", a, a, "-o", TMP / "grey_sheet.png", "--no-labels")
+        self.assertEqual(aw.load(r["out"]).px(1, 1), (119, 119, 119, 255))
+        code, r = run("sheet", a, a, "-o", TMP / "white_sheet.png", "--no-labels", "--bg", "255,255,255")
+        self.assertEqual(aw.load(r["out"]).px(1, 1), (255, 255, 255, 255))
+
+    def test_band_degrade_makes_false_contours(self):
+        p = save(gradient(128, 32), "smooth_ramp.png")
+        o = TMP / "banded.png"
+        run("degrade", p, "-o", o, "--kind", "band")
+        levels = {round(aw.lab(c)[0]) for c in aw.load(o).pixels()}
+        self.assertLessEqual(len(levels), 17)
+        self.assertGreater(len({round(aw.lab(c)[0]) for c in aw.load(p).pixels()}), 60)
 
 
 class Museum(unittest.TestCase):

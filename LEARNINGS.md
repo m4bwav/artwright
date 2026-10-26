@@ -6,6 +6,22 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-018 · 2026-10-25 · A JPEG's 8 px block edges also sit on the 2 and 4 px lattices
+- Trigger: `aw.py pixel` read a smooth render saved as a quality 55 JPEG as scale 2 pixel art at 99.7% lattice alignment. The proposed fix (confirm the lattice on luma alone, blaming chroma subsampling) did not work: the luma showed the same steps.
+- Hypothesis: the steps are the DCT block edges, which are in luma too; every multiple of 8 is even, so a lattice test at 2 or 4 finds them all.
+- Rule: before trusting a small grid scale on a JPEG, measure the share of colour steps on the 8 px lattice; near all of them means blocks (real scale 2 art has about a quarter there). A scale of 8 or 16 on a JPEG cannot be told from blocks this way; say so and look.
+- Evidence: Books12.test_jpeg_block_lattice_is_not_a_pixel_grid (2 without the guard, 1 with); 97% of the fixture's steps on the 8 px lattice, a scale 2 palette JPEG 15%; decisions/2026-10-25-books-track12.md H7
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-25
+
+### L-017 · 2026-10-25 · Fixed measures run on the reduced copy; reduce by averaging, and estimate grain before reading derivatives
+- Trigger: two book-proposed failures reproduced on fixtures: `small()` sampled by nearest neighbour above 4x (3000 px stripes read luma SD 30.4, a true box 1.3), and grain of SD 16 made comp's Laplacian hierarchy fire `uniform_sharpness` on flat shapes with one sharp place.
+- Hypothesis: every 256 px measure inherits the reduction's aliasing, and a derivative measure has a noise floor proportional to the noise variance, so both read artefacts as picture content.
+- Rule: a new measure reads `small()`'s area-averaged copy; one built on a derivative (Laplacian, Sobel ratios) subtracts the grain floor first (`noise_sigma`, 20 sigma squared for the 4-neighbour Laplacian) and gets a `degrade --kind noise` test. Keep `resize_box` for hashes, whose distances were tuned on it.
+- Evidence: Books12.test_small_does_not_alias_fine_stripes and test_grain_is_not_detail (both fail with the fix removed); on 60 real stills the flag fired on the same 3 before and after; decisions/2026-10-25-books-track12.md H1, H5, H6
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-25
+
 ### L-016 · 2026-10-24 · A texture gap from img2img over a flat render needs a second paint pass, not a noise overlay
 - Trigger: a loading screen painted by img2img over a flat 3D render came out far smoother than the series it joins (edge density 0.08 to 0.10 against the series' 0.24 to 0.36 at 960 px). A deterministic paper-grain overlay barely moved fine grain; a second img2img pass at denoise 0.5 raised edge density to 0.20.
 - Hypothesis: the render's flat shading survives a single low-denoise pass, so the painting inherits its smooth fields. Pigment-scale grain is finer than the scale the series is measured at and averages out there, so an overlay adds noise without adding brushwork the measure (or a viewer at screen size) can see.

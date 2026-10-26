@@ -6,6 +6,8 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.6.0 · not tagged yet: C-20261025-1, anti-aliased measuring copy, value in L*, notan cuts, `light` separation,
+  grain estimate and comp's noise floor, JPEG block guard in `pixel`, grey sheets, degrade noise, band and alias.
 - 0.5.0 · not tagged yet: C-20261024-4, `setfit` (one illustration against its series, with an external
   treatment), `comp --text-band`, rubric 3 with the mechanism criterion.
 - 0.4.1 · not tagged yet: C-20261024-2, `pixel --scale 1` no longer fails native art on its shading ramps.
@@ -22,6 +24,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261025-1 · 2026-10-25 · measure fixes from the image-processing and graphics books (0.6.0)
+because: user request (book-learnings round 2, track 12); L-017, L-018
+files: skills/artwright/scripts/aw.py (`small` and `_halve`; `cmd_stats` value in L*, key cuts, `luma_mean`, `noise`, notan cuts and shares; `jpeg_blocks` and the guard in `pixel_one`; `cmd_sheet --bg`; degrade `noise`, `band`, `alias` and `--amount`; VERSION), skills/artwright/scripts/aw_measure.py (`otsu(eta=)`, `noise_sigma`, `light_split` separation, `cmd_light` separation and reading, `cmd_comp` noise floor), skills/artwright/references/cli.md (sheet, stats, light, comp, degrade rows; speed note; `uniform_sharpness` row), tests/test_aw.py (Books12; Alpha grey value 0.536), .claude-plugin/plugin.json (0.6.0), ai-docs/decisions/2026-10-25-books-track12.md
+Five faults reproduced on fixtures and fixed: a reduction over 4x sampled by nearest neighbour first, so fine stripes read as texture (SD 30.4 against 1.3); value read luma on encoded sRGB (pure blue 0.07, L* puts it at 0.32); the notan split at the median whatever the picture; grain lifted every cell of comp's sharpness hierarchy until `uniform_sharpness` fired on clean flat shapes; a smooth JPEG read as scale 2 pixel art from its 8 px block edges. New: `light` separation (Otsu's eta), `stats` noise, a neutral grey sheet background, three degrade kinds. On 60 real AI stills: 2 keys changed (both on the line), `uniform_sharpness` unchanged (3), all read clean. Rulings H1-H10. Descriptions unchanged; evals not re-run.
 
 ### C-20261024-4 · 2026-10-24 · `setfit` series gate, `comp --text-band`, rubric 3 with a mechanism criterion (0.5.0)
 because: user request (a loading screen painted to replace one in a series of five, with gates proven in that job); L-014, L-015, L-016

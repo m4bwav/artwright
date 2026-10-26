@@ -1,87 +1,43 @@
 # artwright handoff
 
-Updated 2026-10-24 (0.4.2 release; the books track notes below still hold).
+Updated 2026-10-25 (books round 2, track 12). Older detail is in [log.md](log.md) and the decisions files.
 
-## 0.4.2 released (2026-10-24)
+## State
 
-- Tagged `v0.4.2` on main (merge e2de3c2, PR #18) with the owner's go-ahead ("release everything"); the release
-  workflow attached `artwright-0.4.2.zip`. 0.4.0 and 0.4.1 were never tagged and ship inside it.
-- 0.4.2: `transitional_share` skips a run touching a fully transparent pixel, so an outlined sprite on RGBA
-  0,0,0,0 no longer fails without `--scale` (found by pixelwright's wiki survey). Installed locally.
+- Public repository https://github.com/m4bwav/artwright. Latest tag `v0.4.2` (2026-10-24). Untagged on main:
+  0.5.0 (`setfit`, `comp --text-band`, rubric 3) and 0.6.0 (track 12). Tags need the owner's go-ahead.
+- Hand-off PRs comfyui-gen#82 and polywright#24 and the scene-illustration PR #17 are merged.
 - Still open: the 5 failing eval cases in evergreen.json (paid evals, not re-run).
 
-## Scene illustration gates (2026-10-24, branch scene-illustration)
+## Books round 2, track 12 (2026-10-25)
 
-- 0.5.0 untagged: `setfit`, `comp --text-band`, rubric 3 (criterion 6 Mechanism). PR left open for the owner;
-  do not merge or tag without his go-ahead. Rubric 3 changes cache keys, as rubric 2 did.
+- 0.6.0: anti-aliased measuring copy, value in L* (key cuts 0.38/0.68), notan by Otsu and k-means, `light`
+  separation, `stats` noise and comp's noise floor, JPEG block guard in `pixel`, grey sheets, degrade noise, band,
+  alias. Rulings H1-H10 in [decisions/2026-10-25-books-track12.md](decisions/2026-10-25-books-track12.md).
+- The grain readings (1 and 3 L*) are set from synthetic noise only; no real grainy photo was labelled.
+- Next: track 13 (pixel measures: banding, pillow, corner doubles, interior jaggies, `--bg`, `--tile`; pixel-art
+  and ai-look text; craft.md material cues).
+
+## Carried forward
+
 - The `busy_text_band` threshold (1.0) comes from one five-screen series; recheck it on another game's screens.
-- The scene mechanism gates (rim, hub, feed, tail) stay in the job's own folder: they need a scene.json with the
-  wheel and water path, which no contract here describes yet. A generic version would need a sprite-json-like
-  contract for scenes first.
+- Scene mechanism gates (rim, hub, feed, tail) stay in their job's folder until a scene contract exists.
+- Rubric 3 changed cache keys (as rubric 2 did); recompute calibration agreement at the next calibration (the
+  0.825 was rubric 1).
+- action-winner-fit is 5/6: about one run in five never loads the judge. Descriptions are at ~596 of 600 tokens;
+  trim before adding (L-002).
+- No round-robin judged batch exists yet, so the cycle rule has had no real test.
+- Flag thresholds are set from flag rates, not labels (L-004). Calibrate on owner labels when they exist.
 
-## Books track 6 (2026-10-22)
+## Things the next session must not forget
 
-- craft.md light logic, atmosphere and composition rows (eye path rewritten), ai-look rows 17-29, rubric 2,
-  judge winner must pass brief fit, `rank` cycles, cache sampling key, `cache label --shown-first`. Version 0.3.0
-  in the manifest and aw.py, untagged. Rulings F1-F8 in
-  [decisions/2026-10-22-books-track6.md](decisions/2026-10-22-books-track6.md).
-- Rubric 2 changes cache keys: verdicts cached under rubric 1 no longer match. Recompute the calibration
-  agreement under rubric 2 at the next calibration (the 0.825 was rubric 1).
-- action-winner-fit is 5/6: about one run in five never loads the judge (trigger flake). The descriptions are at
-  the budget; a fix means trimming another phrase first (L-002).
-- No round-robin judged batch exists yet, so the cycle rule has had no real test (the calibration set is
-  disjoint pairs).
 - `claude plugin eval --keep-temp` keeps each run's `out/trace.jsonl`; read it before blaming the skill (L-007).
-- Released 2026-10-23 as `v0.3.0` on main, the first tag (owner's go-ahead); 0.1.1 and 0.2.0 were never tagged and ship inside it.
-
-## Books track 5 (2026-10-22)
-
-- Light, colour and composition measures (`light`, `gamut`, `accents`, `depth`, `comp`) in the new
-  `skills/artwright/scripts/aw_measure.py`; new `stats` fields and degrade kinds; version 0.2.0 in the manifest
-  and aw.py, untagged. Rulings E1-E6 in [decisions/2026-10-22-books-track5.md](decisions/2026-10-22-books-track5.md).
-- PR #7 is merged (8ee7740). No tag exists: `v0.1.1` goes on 8ee7740 (its manifest says 0.1.1), and `v0.2.0` on
-  main after the track 5 PR, both only on the owner's go-ahead.
-- Flag thresholds are set from flag rates, not labels. When owner labels for composition or light exist,
-  calibrate there (L-004).
-- Track 6 (craft.md light logic, ai-look tells, rubric, judge brief fit, cache key) builds on these commands. The
-  ai-look rows should cite the flags in references/cli.md ("Light, colour and composition flags").
-
-## State (Step 4)
-
-- Public repository https://github.com/m4bwav/artwright; installed as artwright@mark-local 0.1.0; not released.
-- PR #7 (0.1.1 bump, CHANGELOG release line, exit codes in README and AGENTS.md) merged 2026-10-22. Next: tag
-  `v0.1.1` on 8ee7740 when the owner says go, check the zip on the release page, reinstall artwright@mark-local.
-- Calibration done: 40 of 40 labelled; judge accuracy vs owner 0.825 (passes 0.8), both-orders agreement 0.775
-  (does not). Taste notes in the private studio's `taste.md`; ruling D1.
-- A/B done once (T-20261022-5): with 17/20, without 12/20, +25 points inside the 27-point margin; tool verdict CUT,
-  paired 5-0 says keep (D5). Eval spend for the day $44.24.
-- Wiki: tie known issue replaced by the fixed behaviour; still says 0.1.0 "not yet released" (footer, Home, FAQ,
-  Development) until the tag.
-- Hand-off PRs still wait for the owner: m4bwav/comfyui-gen#82, m4bwav/polywright#24.
-
-## Waiting for Mark
-
-- The go-ahead for the `v0.1.1` tag (PR #7 is merged).
-- The two hand-off PRs.
-
-## Next
-
-Release 0.1.1 once PR #7 is merged; then the wiki's release pass (Versions page, "not yet released" lines). Open
-finding: the with arm of action-palette tried to edit the repo's LEARNINGS.md; find the instruction. Optional
-A/B top-up (`--runs 3` on the 8 differing cases, about $6). Prompt: [next-session-prompt.md](next-session-prompt.md).
-
-## Things learned that the next session must not forget
-
-- `evergreen.py worth --ab` takes one skill folder (`skills/artwright`), not the plugin root; it tracks only that
-  skill's firing, so cases owned by judge and pixel show "never fired".
-- The A/B run records keep no per-run skill trace; the run folders are under the system temp folder (do not walk
-  AppData; read only the exact `aggregate-result.json` path the run prints).
-- Eval loops go in a `.sh` file run as `wsl -d Ubuntu -- bash /mnt/...` (L-003). The LLM grader sees only the last
-  message.
-- Artifact pages: embed images as data URIs. Descriptions at ~596 of 600 tokens: trim before adding (L-002).
+- `evergreen.py worth --ab` takes one skill folder, not the plugin root; it tracks only that skill's firing.
+- Eval loops go in a `.sh` file run under WSL (L-003). The LLM grader sees only the last message.
+- Keep `resize_box` for the perceptual hashes; measures read `small()` (L-017).
 - `gh pr merge` can be refused by the auto-mode classifier even with the owner's go-ahead; assign and label then.
 
 ## Read first
 
-1. [next-session-prompt.md](next-session-prompt.md), then [log.md](log.md) (last entry).
-2. [decisions/2026-10-22-step4-rulings.md](decisions/2026-10-22-step4-rulings.md), `TESTS.md` (T-20261022-5).
+1. [log.md](log.md) (last entries), then the newest decisions file.
+2. `TESTS.md` for eval history; `references/cli.md` for every command.

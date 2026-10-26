@@ -13,6 +13,7 @@ from aw import Fail, Img, Path, alpha_mask, crop, de2000, flatten, gray_img, lab
 HUES = ((20, "pink"), (50, "red"), (80, "orange"), (115, "yellow"), (165, "green"), (225, "cyan"), (290, "azure"),
         (315, "blue"), (345, "magenta"), (361, "pink"))
 HEUR = "flags are uncalibrated heuristics (references/cli.md): confirm each by looking before writing it down"
+SEP_WEAK = 0.5  # Otsu separation below this: one value family more than two (heuristic; see track 12 rulings)
 
 
 def hue_of(a, b):
@@ -68,10 +69,11 @@ def lab_opaque(img, edge=256):
     return s, [lab(c) for c in cols], keep, alpha
 
 
-def otsu(vals, bins=100):
+def otsu(vals, bins=100, eta=False):
+    """Otsu's threshold; with eta, also the separability (between-class over total variance, 0 to 1)."""
     lo, hi = min(vals), max(vals)
     if hi - lo < 1e-9:
-        return lo
+        return (lo, 0.0) if eta else lo
     hist = [0] * bins
     for v in vals:
         hist[min(bins - 1, int((v - lo) / (hi - lo) * bins))] += 1
@@ -83,7 +85,38 @@ def otsu(vals, bins=100):
             var = w0 * (n - w0) * (s0 / w0 - (tot - s0) / (n - w0)) ** 2
             if var > best:
                 best, t = var, i
-    return lo + (t + 1) * (hi - lo) / bins
+    th = lo + (t + 1) * (hi - lo) / bins
+    if not eta:
+        return th
+    tv = sum(i * i * c for i, c in enumerate(hist)) / n - (tot / n) ** 2
+    return th, (best / n / n / tv if tv > 0 else 0.0)
+
+
+def noise_sigma(L, w, h, g=16):
+    """Noise SD in L* units from the flattest tenth of a g x g grid of cells (lowest mean Sobel), by Immerkaer's
+    estimator (a 3x3 kernel that cancels flat, linear and most curved tone, leaving the grain)."""
+    if w < 3 * g or h < 3 * g:
+        g = max(1, min(w, h) // 3)
+    mag = sobel(L, w, h)
+    cells = []
+    for gy in range(g):
+        for gx in range(g):
+            ys = range(max(1, gy * h // g), min(h - 1, (gy + 1) * h // g))
+            xs = range(max(1, gx * w // g), min(w - 1, (gx + 1) * w // g))
+            v = [mag[y * w + x] for y in ys for x in xs]
+            if v:
+                cells.append((sum(v) / len(v), ys, xs))
+    cells.sort(key=lambda c: c[0])
+    tot = cnt = 0
+    for _, ys, xs in cells[:max(1, len(cells) // 10)]:
+        for y in ys:
+            for x in xs:
+                i = y * w + x
+                tot += abs(4 * L[i] - 2 * (L[i - 1] + L[i + 1] + L[i - w] + L[i + w])
+                           + L[i - w - 1] + L[i - w + 1] + L[i + w - 1] + L[i + w + 1])
+                cnt += 1
+    sig = math.sqrt(math.pi / 2) * tot / (6 * cnt) if cnt else 0.0
+    return round(sig, 2), ("clean" if sig < 1 else ("fine grain" if sig < 3 else "noisy"))
 
 
 def regions(lbl, w, h, conn8=False, every=False):
@@ -154,8 +187,8 @@ def light_split(px):
     sv = sorted(p[0] for p in px)
     lo, hi = pct(sv, 0.01), pct(sv, 0.99)
     keep = [p for p in px if lo <= p[0] <= hi] or px
-    t = otsu([p[0] for p in keep])
-    return t, [p for p in keep if p[0] > t], [p for p in keep if p[0] <= t]
+    t, e = otsu([p[0] for p in keep], eta=True)
+    return t, [p for p in keep if p[0] > t], [p for p in keep if p[0] <= t], e
 
 
 def cmd_light(a):
@@ -164,7 +197,7 @@ def cmd_light(a):
     px = [p for i, p in enumerate(px) if keep[i] and (not b or in_box(i, s.w, b))]
     if not px:
         raise Fail("no opaque pixels in the box")
-    t, li, sh = light_split(px)
+    t, li, sh, sep = light_split(px)
     if not li or not sh:
         raise Fail("one value family only: nothing to compare")
     fl, fs = family(li), family(sh)
@@ -186,9 +219,11 @@ def cmd_light(a):
     if gap < 20:
         flags.append("low_value_gap")
         read.append("light and shadow sides close in value: reads overcast or over-filled (fine if the brief is)")
+    if sep < SEP_WEAK:
+        read.append("one value family more than two (separation %.2f): the light and shadow numbers are weak" % sep)
     return out({"file": a.image, "alpha": alpha,
                 "proxy": "box" if b else "global (one surface with --box is more trustworthy)",
-                "threshold_L": round(t, 1), "lights": fl, "shadows": fs, "value_gap": gap,
+                "threshold_L": round(t, 1), "separation": round(sep, 3), "lights": fl, "shadows": fs, "value_gap": gap,
                 "value_gap_steps": round(gap / 10, 1), "temp_shift_b": ts, "tint_shift_a": tt, "chroma_ratio": cr,
                 "flags": flags, "readings": read, "note": HEUR})
 
@@ -583,10 +618,15 @@ def cmd_comp(a):
         for gx in range(8):
             v = [lap[y * w + x] for y in range(gy * h // 8, (gy + 1) * h // 8) for x in range(gx * w // 8, (gx + 1) * w // 8)]
             cells.append(mean_sd(v)[1] ** 2 if v else 0.0)
+    # grain lifts every cell by about 20 sigma^2 (the kernel's squared weights), so take that floor off first
+    sig = noise_sigma(L, w, h)[0] / 100
+    floor = 20 * sig * sig
+    cells = [max(0.0, c - floor) for c in cells]
     sharp = max(range(64), key=lambda i: cells[i])
     sc = ((sharp % 8 + 0.5) / 8, (sharp // 8 + 0.5) / 8)
     ratio = cells[sharp] / (med(cells) or 1e-9)
     res["sharpness"] = {"sharpest_cell": sc, "ratio_to_median": round(min(ratio, 999), 2),
+                        "noise_sigma": round(sig * 100, 2), "noise_floor": round(floor, 6),
                         "focal_distance": round(math.hypot(sc[0] - fc[0], sc[1] - fc[1]), 3)}
     if ratio < 3:
         flags.append("uniform_sharpness")

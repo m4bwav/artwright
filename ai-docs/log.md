@@ -154,3 +154,9 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 - `comp --text-band`: edge and contrast pull against the frame; `busy_text_band` at 1.0 fired on 3 of 10 top and bottom 15% bands of that series (0.8 fired on 9). Checked by eye on three screens: the busy ones are dense crops and dark trees across a bright sky, the calm one snow.
 - Rubric 3 adds criterion 6, Mechanism (a gate for any picture of a working machine). Cache and verdict defaults moved to rubric 3.
 - Tests 70 (1 skipped without AW_NET). Evals not re-run (descriptions unchanged). L-014 to L-016.
+
+## [2026-10-25] build | 0.6.0: measure fixes from the round 2 books (C-20261025-1)
+- Book-learnings round 2 track 12 (Gonzalez and Woods, CGPP). Reproduced each proposed fault on a fixture before fixing it: aliased measuring copy above 4x, value as luma, median notan, grain read as sharpness, JPEG blocks read as a 2 px grid. The luma-only JPEG check the notes proposed did not work (block edges are in luma too); the guard tests the 8 px lattice instead (L-018).
+- Real data: 60 random AI stills from the local render folder. Keys changed on 2 (both at 0.37, on the line), `uniform_sharpness` fired on the same 3, every still read clean grain (median 0.06 L*), separation 0.67 to 0.95 (10th to 90th). On 30 stills of 1216 to 1824 px the area-averaged copy lowered edge density by 0 to 8%. A carpet photo with no flat cell read as noisy (texture), documented.
+- Tests 79 (8 new; 1 skipped without AW_NET); mutations of the reduction, the noise floor and the notan cut each caught. Budget: aw.py 82 KB (yellow, under 100). Rulings H1-H10.
+## [2026-10-25] index | rebuilt (13 entries)
