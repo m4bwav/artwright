@@ -13,6 +13,7 @@ from aw import Fail, Img, Path, alpha_mask, crop, de2000, flatten, gray_img, lab
 HUES = ((20, "pink"), (50, "red"), (80, "orange"), (115, "yellow"), (165, "green"), (225, "cyan"), (290, "azure"),
         (315, "blue"), (345, "magenta"), (361, "pink"))
 HEUR = "flags are uncalibrated heuristics (references/cli.md): confirm each by looking before writing it down"
+TILE_RAMP, TILE_SPREAD = 6.0, 1.0  # tile repetition lines in L* and CV (heuristic, set on fixtures; track 13)
 SEP_WEAK = 0.5  # Otsu separation below this: one value family more than two (heuristic; see track 12 rulings)
 
 
@@ -681,3 +682,209 @@ def cmd_comp(a):
     res.update(flags=flags, note=HEUR + "; not measured here: armature lines, intervals, interior tangents (ask a "
                                         "vision model)")
     return out(res)
+
+
+# ---------------------------------------------------------------- pixel-art measures (aw.py pixel; reported, never failed)
+
+def _px_colours(img):
+    d = img.d
+    return [bytes(d[i:i + 4]) if d[i + 3] else None for i in range(0, len(d), 4)]
+
+
+def edge_distance(img):
+    """City-block distance from each opaque pixel to the nearest transparent pixel or the canvas edge (two-pass
+    chamfer); 0 for transparent pixels."""
+    w, h = img.w, img.h
+    dist = [w + h if v else 0 for v in img.d[3::4]]
+    for y in range(h):
+        for x in range(w):
+            i = y * w + x
+            if dist[i]:
+                dist[i] = min(dist[i], (dist[i - w] if y else 0) + 1, (dist[i - 1] if x else 0) + 1)
+    for y in range(h - 1, -1, -1):
+        for x in range(w - 1, -1, -1):
+            i = y * w + x
+            if dist[i]:
+                dist[i] = min(dist[i], (dist[i + w] if y < h - 1 else 0) + 1, (dist[i + 1] if x < w - 1 else 0) + 1)
+    return dist
+
+
+def _runs(line):
+    """Maximal runs of 2 to 8 of one opaque colour: (start, end, colour)."""
+    res, s = [], 0
+    for k in range(1, len(line) + 1):
+        if k == len(line) or line[k] != line[s]:
+            if line[s] is not None and 2 <= k - s <= 8:
+                res.append((s, k, line[s]))
+            s = k
+    return res
+
+
+def banding(img):
+    """Runs of 2 to 8 of one colour that the next row (or column) repeats at the same length in another opaque colour,
+    straight under or one pixel along: bands hugging each other, which read as a thick blurred line (Azzi's banding;
+    Silber's super pixel on the diagonal)."""
+    w, h = img.w, img.h
+    c = _px_colours(img)
+    rows = [c[y * w:(y + 1) * w] for y in range(h)]
+    cols = [[rows[y][x] for y in range(h)] for x in range(w)]
+    hits = []
+    for lines, n, flip in ((rows, w, False), (cols, h, True)):
+        for j in range(len(lines) - 1):
+            nxt = lines[j + 1]
+            for s, e, col in _runs(lines[j]):
+                for sh in (0, -1, 1):  # straight under, or one pixel along: the diagonal band (super pixel)
+                    a, b = s + sh, e + sh
+                    o = nxt[a] if 0 <= a and b <= n else None
+                    if (o is not None and o != col and all(nxt[k] == o for k in range(a, b))
+                            and (a == 0 or nxt[a - 1] != o) and (b == n or nxt[b] != o)):
+                        hits.append([j, s] if flip else [s, j])
+                        break
+    edge = sum(1 for y in range(h) for x in range(w) if c[y * w + x] is not None and any(
+        not (0 <= x + dx < w and 0 <= y + dy < h) or c[(y + dy) * w + x + dx] != c[y * w + x]
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))))
+    return {"count": len(hits), "per_100_edge_px": round(100 * len(hits) / max(1, edge), 1), "first": hits[:20]}
+
+
+def corner_doubles(img):
+    """Stair-step corners on one-pixel lines: a pixel with exactly one same-colour neighbour across and one up or
+    down, the diagonal between them not that colour, and one arm turning back parallel to the other (a staircase).
+    Removing it keeps the line joined. A square corner, whose arms run on, is not counted."""
+    w, h = img.w, img.h
+    c = _px_colours(img)
+
+    def at(x, y):
+        return c[y * w + x] if 0 <= x < w and 0 <= y < h else None
+    hits = []
+    for y in range(h):
+        for x in range(w):
+            p = c[y * w + x]
+            if p is None:
+                continue
+            hx = [dx for dx in (-1, 1) if at(x + dx, y) == p]
+            vy = [dy for dy in (-1, 1) if at(x, y + dy) == p]
+            if len(hx) != 1 or len(vy) != 1:
+                continue
+            dx, dy = hx[0], vy[0]
+            if at(x + dx, y + dy) == p:
+                continue
+            if at(x - dx, y + dy) == p or at(x + dx, y - dy) == p:
+                hits.append([x, y])
+    return {"count": len(hits), "first": hits[:20]}
+
+
+def _ranks(v):
+    o = sorted(range(len(v)), key=lambda i: v[i])
+    r = [0.0] * len(v)
+    i = 0
+    while i < len(o):
+        j = i
+        while j + 1 < len(o) and v[o[j + 1]] == v[o[i]]:
+            j += 1
+        for k in range(i, j + 1):
+            r[o[k]] = (i + j) / 2
+        i = j + 1
+    return r
+
+
+def spearman(a, b):
+    ra, rb = _ranks(a), _ranks(b)
+    ma, sa = mean_sd(ra)
+    mb, sb = mean_sd(rb)
+    if not sa or not sb:
+        return 0.0
+    return sum((x - ma) * (y - mb) for x, y in zip(ra, rb)) / (len(ra) * sa * sb)
+
+
+def pillow(img):
+    """Pillow shading: lightness that follows the distance from the silhouette (dark rim, light middle) rather than a
+    light direction. edge_corr is the rank correlation of L* with that distance, light_corr the best over 8
+    directions of L* with position; pillow when edge_corr >= 0.6 and light_corr < 0.4 (heuristic)."""
+    w, h = img.w, img.h
+    dist = edge_distance(img)
+    idx = [i for i, v in enumerate(dist) if v]
+    if len(idx) < 100 or len(idx) == w * h:
+        return None
+    cache = {}
+    L = []
+    for i in idx:
+        k = bytes(img.d[i * 4:i * 4 + 3])
+        if k not in cache:
+            cache[k] = lab(k)[0]
+        L.append(cache[k])
+    ec = spearman(L, [dist[i] for i in idx])
+    lc = max(abs(spearman(L, [(i % w) * math.cos(t) + (i // w) * math.sin(t) for i in idx]))
+             for t in (k * math.pi / 8 for k in range(8)))
+    return {"edge_corr": round(ec, 2), "light_corr": round(lc, 2), "pillow": ec >= 0.6 and lc < 0.4}
+
+
+def silhouette_px(img):
+    w, h, d = img.w, img.h, img.d
+    return [(x, y) for y in range(h) for x in range(w) if d[(y * w + x) * 4 + 3] and any(
+        not (0 <= x + dx < w and 0 <= y + dy < h) or not d[((y + dy) * w + x + dx) * 4 + 3]
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
+
+
+def edge_lost(img, bgs):
+    """Share of silhouette pixels within 10 L* of each background: above about 0.3 the sprite dissolves there."""
+    sil = silhouette_px(img)
+    if not sil:
+        return None
+    Ls = [lab(img.d[(y * img.w + x) * 4:(y * img.w + x) * 4 + 3])[0] for x, y in sil]
+    res = []
+    for bg in bgs:
+        lb = lab(bg)[0]
+        share = sum(1 for v in Ls if abs(v - lb) < 10) / len(Ls)
+        res.append({"bg": "#%02x%02x%02x" % tuple(bg), "share": round(share, 3), "lost": share > 0.3})
+    return res
+
+
+def colour_jaggies(img, jag):
+    """Derek Yu's step rule on interior colour boundaries: the jaggies count of each colour covering 5% or more of the
+    opaque pixels, outline colours (half or more of their pixels on the silhouette) left out."""
+    c = _px_colours(img)
+    op = [v for v in c if v is not None]
+    sil = set(y * img.w + x for x, y in silhouette_px(img))
+    tot = 0
+    for col in set(op):
+        where = [i for i, v in enumerate(c) if v == col]
+        if len(where) < 0.05 * len(op) or sum(i in sil for i in where) * 2 >= len(where):
+            continue
+        tot += jag(img, set(where))
+    return tot
+
+
+def tile_repetition(img):
+    """What makes a tile stripe or box when repeated: a ramp across it (mean L* left half minus right, top minus
+    bottom), detail bunched in one place (spread of colour changes over a 4x4 grid, as a coefficient of variation)
+    and a border row or column that is one colour over 75% of its length."""
+    w, h = img.w, img.h
+    L = [lab(c)[0] for c in flatten(img)]
+
+    def mean(v):
+        return sum(v) / max(1, len(v))
+    glr = mean([L[y * w + x] for y in range(h) for x in range(w // 2)]) - mean(
+        [L[y * w + x] for y in range(h) for x in range(w - w // 2, w)])
+    gtb = mean(L[:h // 2 * w]) - mean(L[(h - h // 2) * w:])
+    ch = [0] * 16
+    for y in range(h):
+        for x in range(w):
+            i = y * w + x
+            if (x + 1 < w and L[i] != L[i + 1]) or (y + 1 < h and L[i] != L[i + w]):
+                ch[min(3, y * 4 // h) * 4 + min(3, x * 4 // w)] += 1
+    m, sd = mean_sd(ch)
+    cv = sd / m if m else 0.0
+    border = [L[:w], L[(h - 1) * w:], L[0::w], L[w - 1::w]]
+
+    def longest(v):
+        b = k = 1
+        for p, q in zip(v, v[1:]):
+            k = k + 1 if p == q else 1
+            b = max(b, k)
+        return b / len(v)
+    inner = [longest(L[y * w:(y + 1) * w]) for y in range(1, h - 1)] + [longest(L[x::w]) for x in range(1, w - 1)]
+    rows = [i for i, v in enumerate(border) if longest(v) > 0.75] if mean(inner) < 0.5 else []
+    res = {"gradient_lr": round(glr, 1), "gradient_tb": round(gtb, 1), "detail_spread": round(cv, 2),
+           "flat_border_sides": [("top", "bottom", "left", "right")[i] for i in rows]}
+    res["repetition_suspected"] = max(abs(glr), abs(gtb)) > TILE_RAMP or cv > TILE_SPREAD or bool(rows)
+    return res

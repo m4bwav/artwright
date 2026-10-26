@@ -22,7 +22,11 @@ AI sheets drift between frames (head size, light angle, detail level). The remed
 
 Timing conventions, not standards (R-20261021-8, verified: yes as sourced; no single authority):
 
-- Walk cycles 4 to 8 frames (4 since the NES era; 6 as a smooth minimum); idles 2 to 4.
+- Walk cycles 4 to 8 frames (4 since the NES era; 6 as a smooth minimum); idles 2 to 4. Books agree: 8 typical, 16
+  smooth, 2 or 3 barely a walk (Silber §8.5; Dawe and Humphries ch. 6).
+- A loop needs 3 frames at least; a 2-frame idle works only slowly, at about 500 ms a frame (Azzi p. 232; Silber §8.3).
+- Pixels that appear and vanish frame to frame read as flicker; when a row appears, pop 2 or 3 pixels, not 1, and
+  keep faces and eyes out of shimmering or sub-pixel regions (Azzi pp. 199, 205; Silber §8.3).
 - 8 to 12 fps typical; 100 ms per frame is the common tool default.
 - Holds of 200 to 400 ms on anticipation and impact. Uniform timing everywhere reads as stiff.
 - Extra in-betweens expose inconsistency; fewer, better frames beat many drifting ones.
@@ -32,10 +36,23 @@ Visual references: Slynyrd Pixelblog #8 (intro to animation), #25 (motion cycles
 ## Tiles
 
 - **Seams**: for a wrapping tile, the left edge must continue the right and the top the bottom; for a set, each declared neighbour edge must continue its partner. `aw.py pixel` diffs those edges and renders a **3x3 tiled preview** at integer scale for the judge. No published automated seam test was found; this check is artwright's own (R-20261021-8, verified: no).
-- **Repetition**: in the 3x3 preview, look for a bright or dark spot that repeats as an obvious grid.
+- **Repetition**: in the 3x3 preview, look for a bright or dark spot that repeats as an obvious grid. `--tile` also
+  reports a ramp across the tile (`gradient_lr`, `gradient_tb`: half against half, in L*), detail bunched in one
+  place (`detail_spread`) and a flat border side, with `repetition_suspected` when one passes its line (6 L*, 1.0;
+  heuristic, 4 of 20 real seamless tiles, the flagged ones striping visibly). The books' list: a gradient across a
+  tile, one standout feature, details lined up along an edge (Silber §9.3; Dawe and Humphries ch. 5).
+- **Starting a set**: sketch the base tile as a plus sign joined at the middle, so both wraps are tested at once
+  (Dawe and Humphries ch. 5). Scatter props in odd counts. A 9-slice frame keeps its light direction; a three-tile
+  stretch does not (Silber, exercise 9.1). Agree the tile size before drawing: a 32 px tile is four 16s of work (§9.1).
 - **Autotile sets**: corner-based sets cap at 16 tiles (2^4); full 8-neighbour blob sets need 47. Godot 4 terrains use peering bits per tile. Generators to point to: Blobsmith (47 tiles from six bases, exports Godot 4 TileSet and Tiled .tsx), AutoBlob (Aseprite script) ([Tiled forum](https://discourse.mapeditor.org/t/neither-terrain-nor-wang-can-handle-a-blob-tileset/4671), [Blobsmith](https://blobsmith.itch.io/blobsmith); verified: yes via R-20261021-8).
 - **Sheet spacing**: margin and spacing between tiles in a sheet (one pack uses 4 px and 2 px) stop texture bleeding at runtime.
 - **One density per set**: every sprite and tile in a set should detect the same pixel scale; mixed scales are fixed by redrawing, not filtering.
+
+## Isometric
+
+- Lines step two across for one up (2:1, about 26.6 degrees), the standard pixel isometric; a diamond tile is a
+  lineless checker of that step. Oblique (1:1) is the simpler alternative. To turn a side view isometric, skew and
+  scale its height by about 0.87 (Azzi pp. 145-153; book).
 
 ## Engine import (pointers only)
 

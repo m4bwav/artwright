@@ -44,7 +44,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.6.0"
+VERSION = "0.7.0"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -1092,10 +1092,11 @@ def orphans(img):
     return res
 
 
-def jaggies(img):
-    """Derek Yu's rule on the silhouette: along a curve, step lengths grow or shrink monotonically."""
+def jaggies(img, mask=None):
+    """Derek Yu's rule on the silhouette (or on a set of pixel indices): along a curve, step lengths grow or shrink
+    monotonically."""
     w, h = img.w, img.h
-    op = [[img.px(x, y)[3] > 0 for x in range(w)] for y in range(h)]
+    op = [[(y * w + x in mask) if mask is not None else img.px(x, y)[3] > 0 for x in range(w)] for y in range(h)]
 
     def count(seq):
         seq = [v for v in seq if v is not None]
@@ -1187,9 +1188,16 @@ def pixel_one(path, a):
            "unique_colours": len(uniq), "budget": a.budget, "near_duplicate_colour_pairs": near,
            "partial_alpha_pixels": partial,
            "orphans": None if orph is None else {"count": len(orph), "first": orph[:20]}}
+    if native.w * native.h <= 512 * 512:
+        res["banding"] = banding(native)
+        res["corner_doubles"] = corner_doubles(native)
     if min(alpha) < 255 and native.w * native.h <= 512 * 512:
         res["jaggies"] = jaggies(native)
+        res["jaggies_interior"] = colour_jaggies(native, jaggies)
         res["outline"] = outline(native)
+        res["pillow"] = pillow(native)
+        if a.bg:
+            res["edge_lost_on_bg"] = edge_lost(native, [tuple(int(v) for v in b.split(",")) for b in a.bg])
     if a.palette:
         name, pal = get_palette(a.palette)
         ps = set(pal)
@@ -1200,7 +1208,7 @@ def pixel_one(path, a):
                           "off_palette": [{"hex": hexc(c), "nearest": hexc(min(pl, key=lambda t: de2000(lab(c), t[1]))[0])}
                                           for c in off[:20]], "off_palette_count": len(off)}
     if a.tile:
-        res["tile"] = tile_seams(native)
+        res["tile"] = dict(tile_seams(native), **tile_repetition(native))
         if a.preview:
             t = Img(native.w * 3, native.h * 3)
             for k in range(9):
@@ -1707,7 +1715,8 @@ def cmd_verdict(a):
 
 LAB_KINDS = ("warm-shadows", "glow-shadows", "uniform-sat", "midgrey", "haze-off")
 DEGRADE_KINDS = ("saturate", "crush", "crop", "jpeg", "orphans", "mixels", "blur") + LAB_KINDS + ("hotspot", "tangent",
-                                                                                                  "noise", "band", "alias")
+                                                                                                  "noise", "band", "alias",
+                                                                                                  "banding", "pillow")
 
 def cmd_degrade(a):
     img = load(a.image)
@@ -1803,6 +1812,17 @@ def cmd_degrade(a):
         for i in range(0, len(d), 4):
             L, A, B = lab(d[i:i + 3])
             d[i:i + 3] = bytes(lab_rgb(min(100, (int(L / q) + 0.5) * q), A, B))
+    elif k in ("banding", "pillow"):  # pixel art: an inner ring hugging the outline; shading by distance from it
+        dist = edge_distance(img)
+        cols = sorted({bytes(d[i:i + 3]) for i in range(0, len(d), 4) if d[i + 3]}, key=lambda c: lab(c)[0])
+        top = max(dist) or 1
+        for j, v in enumerate(dist):
+            if not v:
+                continue
+            if k == "banding" and v == 2:  # one ring in the second-darkest colour, hugging the outline
+                d[j * 4:j * 4 + 3] = cols[min(1, len(cols) - 1)]
+            elif k == "pillow":
+                d[j * 4:j * 4 + 3] = cols[min(len(cols) - 1, (v - 1) * len(cols) // top)]
     elif k == "alias":  # nearest shrink by 2.7 and back: fine detail turns to false pattern (no whole factor)
         o = resize_nearest(resize_nearest(img, max(1, int(w / 2.7)), max(1, int(h / 2.7))), w, h)
     elif k == "tangent":
@@ -1875,6 +1895,7 @@ def build():
     p.add_argument("--frames", action="store_true")
     p.add_argument("--preview")
     p.add_argument("--zoom", type=int, default=4)
+    p.add_argument("--bg", action="append", help="R,G,B of a game background (repeatable): silhouette share lost on it")
     p = sp.add_parser("hash")
     p.add_argument("images", nargs="+")
     p = sp.add_parser("dedupe")

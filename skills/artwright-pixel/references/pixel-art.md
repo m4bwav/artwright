@@ -2,7 +2,8 @@
 
 What to check and how to critique a pixel-art image, with the numbers `aw.py pixel` reports against.
 
-Checked 2026-10-21
+Checked 2026-10-21; book rows added 2026-10-25 (Azzi, *Pixel Logic*; Silber, *Pixel Art for Game Developers*;
+Dawe and Humphries, *Make Your Own Pixel Art*; Hughes et al., *Computer Graphics: Principles and Practice*).
 
 Back to [SKILL.md](../SKILL.md).
 
@@ -22,15 +23,24 @@ Back to [SKILL.md](../SKILL.md).
 | Ramp spacing | 8 ramps 45 degrees apart; neutrals from desaturated middle columns | Slynyrd Pixelblog 1 | yes |
 | Straight ramps | Brightness-only ramps are allowed but lack interest and harmonise poorly | Slynyrd Pixelblog 1 | yes |
 | Orphans | Single pixels not joined to a same-colour cluster are usually avoided, except inside a texture | [Slynyrd Pixelblog 2](https://slynyrd.com/blog/2018/2/15/pixelblog-2-texture) | yes |
+| Anti-aliasing amount | An AA run is about half the length of the step it softens; one or two in-between shades, three at most; none on clean 45-degree lines; convex curves take the lighter in-between, concave the darker | Azzi pp. 45-49 | book |
+| Interior edges | Boundaries between colours inside the sprite (cel and shadow shapes) follow the same step rules as the outline (`jaggies_interior`) | Azzi p. 28 | book |
+| Outline type by background | None, black, coloured (each part's darkest shade) or selective. Selective outlines suit dark or neutral grounds; on light or busy grounds a dark contour keeps the sprite apart (`--bg` reports the silhouette share lost on a ground) | Azzi pp. 30-37, 106, 197-198; Dawe and Humphries ch. 3 | book |
+| Ramp direction | Lights drift toward yellow, shadows toward purple or blue (or red); near-blacks keep a tint instead of #000000; small sprites need only 2 or 3 colours a ramp; skin ramps stay tight | Azzi pp. 69, 72-76; Silber §6.6 | book |
+| Dither limits | Only between neighbouring, low-contrast ramp steps; never on parts that animate (it shimmers) or on small sprites | Azzi pp. 111, 116-120; Silber §9.5 | book |
+| Native size | The smallest feature that must read (an eye, a button) sets the sprite's size, not the other way round | Azzi p. 95 | book |
+| Value separation | A detail of one to three pixels must differ from its neighbours in value, not hue alone: equal-value blue edges read fuzzy, blue on black barely separates, yellow on white is weak | CGPP §28.19 p. 780 (the pixel translation is ours) | book |
+| Line rhythm | Irregular run patterns (2, 1, 2, 2, 1) are aliasing; long straight lines read cleanest on whole ratios (1:1, 2:1, 3:1) | CGPP §18.2 pp. 498-499 | book |
+| Dark seam | A thin dark line between two clashing colours settles them, one reason outlines work | CGPP §28.19 p. 779 | book |
 
 ## Defect vocabulary
 
 - **Orphan (stray) pixel**: no same-colour 8-neighbour; reads as dirt. Not a defect inside a deliberate dither or texture.
 - **Jaggy**: a single pixel or short segment that breaks a line's run pattern (Derek Yu).
-- **Banding**: thick uniform bands of colour that draw the eye to the seams (Derek Yu).
-- **Pillow shading**: shading from the outline inward instead of from a light source (Derek Yu).
+- **Banding**: two runs of different colours and the same length hugging each other, straight under or one pixel along (on a diagonal, Silber's super pixel), so two thin lines read as one thick blurred one. The usual result of quantising a smooth render: rings that follow the outline. Fix by lengthening or shortening one band's end, or with anti-aliasing (Azzi pp. 55-57; Silber §10.1). `banding` gives the count and the first coordinates.
+- **Pillow shading**: shading from the outline inward instead of from a light source (Derek Yu). `pillow` correlates lightness with the distance from the silhouette (`edge_corr`) and with each of eight light directions (`light_corr`).
 - **Mixels**: pixels of mixed sizes in one image, or off the grid (R-20261021-8).
-- **Doubles**: lines two pixels thick where one was meant; doubled corners on a run.
+- **Doubles**: lines two pixels thick where one was meant; doubled corners on a run. `corner_doubles` counts the stair-step corner pixels of one-pixel lines (removable without breaking the line; square corners are not counted). pixelwright's `clean.corners` removes them.
 - **Noise**: speckle from error-diffusion dither or a generator, alternating ramp neighbours in flat areas.
 - **Soft edges**: blur or in-between colours from bilinear resizing.
 - **Non-binary alpha**: any alpha other than 0 or 255 on a sprite.
@@ -41,12 +51,13 @@ Back to [SKILL.md](../SKILL.md).
 Work top down; a failure higher up outranks everything below it.
 
 1. **Read at 1x** (and at the game's integer scale). Never judge from a bilinear-scaled image.
-2. **Silhouette**: fill it black; does it still say what it is?
-3. **Value**: lit side among the lightest values, core shadow among the darkest; survives desaturation.
-4. **Palette roles**: each colour earns its place; no near-duplicates; ramps hue-shift.
-5. **Clusters**: clean shapes, no orphans or noise.
-6. **Outlines**: consistent thickness, no jaggies or doubles, selective outlining where it helps.
-7. **Light**: one direction across the sprite and across frames; no pillow shading.
+2. **Silhouette**: fill it black; does it still say what it is? Then blur it (`aw.py degrade <img> -o b.png --kind blur`): the main shapes should survive (Azzi p. 112).
+3. **Colour design and spacing**: one main colour, one contrasting second colour, and a charm point (a scarf, an eye colour) that still reads at 1x; every feature has a pixel of space round it (Azzi pp. 79, 104, 106-108; Dawe and Humphries ch. 5).
+4. **Value**: lit side among the lightest values, core shadow among the darkest; survives desaturation.
+5. **Palette roles**: each colour earns its place; no near-duplicates; ramps hue-shift.
+6. **Clusters**: clean shapes, no orphans or noise, no banding.
+7. **Outlines**: consistent thickness, no jaggies or doubles, selective outlining where it helps.
+8. **Light**: one direction across the sprite and across frames; no pillow shading. A mirrored sprite mirrors its light: re-light it or accept it knowingly (Silber §7.3).
 
 The pixel-critic agent in aseprite-ai-artist uses a close order: silhouette, too dark or flat, value contrast, flat shading, palette sprawl, semi-transparent pixels, strays, lines, light, animation ([pixel-critic.md](https://github.com/with-pebbly/aseprite-ai-artist/blob/main/agents/pixel-critic.md), verified: yes).
 

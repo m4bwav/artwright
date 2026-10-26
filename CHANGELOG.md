@@ -6,6 +6,8 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.0 · not tagged yet: C-20261025-2, pixel measures (banding, pillow, corner doubles, interior jaggies, `--bg`,
+  tile repetition), degrade banding and pillow, pixel-art and AI-look rows, material cues.
 - 0.6.0 · not tagged yet: C-20261025-1, anti-aliased measuring copy, value in L*, notan cuts, `light` separation,
   grain estimate and comp's noise floor, JPEG block guard in `pixel`, grey sheets, degrade noise, band and alias.
 - 0.5.0 · not tagged yet: C-20261024-4, `setfit` (one illustration against its series, with an external
@@ -24,6 +26,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261025-2 · 2026-10-25 · pixel-art measures, pixel and material rows from the round 2 books (0.7.0)
+because: user request (book-learnings round 2, track 13); L-019
+files: skills/artwright/scripts/aw_measure.py (`edge_distance`, `banding`, `corner_doubles`, `spearman`, `pillow`, `silhouette_px`, `edge_lost`, `colour_jaggies`, `tile_repetition`, `TILE_RAMP`, `TILE_SPREAD`), skills/artwright/scripts/aw.py (`jaggies(mask=)`; `pixel_one` new fields; `pixel --bg`; degrade `banding`, `pillow`; VERSION), skills/artwright/references/cli.md (pixel and degrade rows), skills/artwright-pixel/SKILL.md (Step 1 reported numbers), skills/artwright-pixel/references/pixel-art.md (nine craft rows, banding, pillow and doubles defined against the numbers, critique order with colour design, spacing, blur test and mirrored light), skills/artwright-pixel/references/sprites-tiles.md (loop and flicker timing, tile repetition numbers and starting a set, Isometric), skills/artwright-judge/references/ai-look.md (rows 30-34), skills/artwright/references/craft.md (Material cues; Highlights and rims corrected for metals), skills/artwright-judge/references/vocabulary.md (contact shadow, Fresnel reflection), tests/test_aw.py (Books13), .claude-plugin/plugin.json (0.7.0), ai-docs/decisions/2026-10-25-books-track13.md
+The pixel critique named banding, pillow shading and doubled corners but the script could not see them; now it counts them, with coordinates, and checks a sprite against the game's grounds and a tile for repetition. Every new number is reported, never failed: on 30 AI renders quantised the naive way, banding ran 0 to 6.5 per 100 edge pixels (median 3.3), above the fixture with a hugging ring (4.7), so it locates rather than grades; pillow fired on none; tile repetition flagged 4 of 20 real seamless tiles, the ones that stripe when repeated. Rows cite Azzi, Silber, Dawe and Humphries, and CGPP with pages. Descriptions unchanged; evals not re-run. Rulings I1-I9.
 
 ### C-20261025-1 · 2026-10-25 · measure fixes from the image-processing and graphics books (0.6.0)
 because: user request (book-learnings round 2, track 12); L-017, L-018

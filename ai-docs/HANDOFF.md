@@ -5,7 +5,7 @@ Updated 2026-10-25 (books round 2, track 12). Older detail is in [log.md](log.md
 ## State
 
 - Public repository https://github.com/m4bwav/artwright. Latest tag `v0.4.2` (2026-10-24). Untagged on main:
-  0.5.0 (`setfit`, `comp --text-band`, rubric 3) and 0.6.0 (track 12). Tags need the owner's go-ahead.
+  0.5.0 (`setfit`, `comp --text-band`, rubric 3), 0.6.0 (track 12) and 0.7.0 (track 13). Tags need the owner's go-ahead.
 - Hand-off PRs comfyui-gen#82 and polywright#24 and the scene-illustration PR #17 are merged.
 - Still open: the 5 failing eval cases in evergreen.json (paid evals, not re-run).
 
@@ -15,8 +15,14 @@ Updated 2026-10-25 (books round 2, track 12). Older detail is in [log.md](log.md
   separation, `stats` noise and comp's noise floor, JPEG block guard in `pixel`, grey sheets, degrade noise, band,
   alias. Rulings H1-H10 in [decisions/2026-10-25-books-track12.md](decisions/2026-10-25-books-track12.md).
 - The grain readings (1 and 3 L*) are set from synthetic noise only; no real grainy photo was labelled.
-- Next: track 13 (pixel measures: banding, pillow, corner doubles, interior jaggies, `--bg`, `--tile`; pixel-art
-  and ai-look text; craft.md material cues).
+
+## Books round 2, track 13 (2026-10-25)
+
+- 0.7.0: `pixel` reports banding, corner doubles, interior jaggies, pillow, `--bg` edge loss and tile repetition
+  (all reported, none failed); degrade banding and pillow; pixel-art, sprites-tiles, ai-look (30-34), craft.md
+  Material cues. Rulings I1-I9 in [decisions/2026-10-25-books-track13.md](decisions/2026-10-25-books-track13.md).
+- No hand-made pixel art was available locally: thresholds come from fixtures and AI renders quantised to sprites.
+  Score real hand-made sprites before giving any of these a pass line (L-019).
 
 ## Carried forward
 
