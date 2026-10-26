@@ -110,3 +110,18 @@ Related: see also [../HANDOFF.md](../HANDOFF.md), [../log.md](../log.md).
 ## Since 0.3.0 (2026-10-23)
 
 Use `2026-10-23-wiki-verify.py` and its three outputs, kept in the owner's private notes (`wiki-build`; they print the masked home folder, which this repository's path guard refuses) (`.out.txt` is the Linux run with Pillow that the pages show, `.nopillow.out.txt`, `.win39.out.txt`). The 2026-10-22 script copied only aw.py, so every command fails on 0.2.0 and later (aw_measure.py), and it had been edited after its output was saved; replay an old version against its own saved output to catch that. Pages that name the version or commit are now 0.3.0 at 2c13c08: Home, FAQ, Development, Errors-and-Edge-Cases, Versions-and-Upgrading, _Footer.
+
+## Since 0.7.1 (2026-10-26)
+
+Wiki commit 41c7ba3. The kit is in the owner's private notes (`wiki-build`, with a README): `2026-10-26-wiki-verify.py`
+(copies aw.py, aw_measure.py and aw_geom.py; 169 cases) and its outputs: `.out.txt` (Linux, Pillow; the pages show
+it), `.nopillow.out.txt`, `.win39.out.txt`, `.v042.out.txt` (the same script against v0.4.2) and `.v010.out.txt`
+(the 2026-10-22 script against 0.1.0), plus `tools/` (section diff, page-block remapper, fragment filler). Pages
+that name the version or commit are now 0.7.1 at 5d0a14e: Home, Getting-Started (plugin details, zip, doctor),
+Commands (`--version`), Errors-and-Edge-Cases (opening line, JPEG sections), Versions-and-Upgrading, FAQ,
+Development (manifest, checks, releases, examples), _Sidebar, _Footer. To update: run the script against a fresh
+clone of the new tag on WSL (clone under `~/wwtmp`, since /tmp is cleared), with `--no-pillow`, and on Windows with
+`--python <3.9>`; `tools/secdiff.py` old new lists changed sections (wikiwright `diffout` does not split on
+`=== label ===`); `tools/remap.py <wiki> old new --write` carries page blocks across; then the gates listed in the
+kit's README. Versions-and-Upgrading's 0.1.0 and 0.3.0 blocks are checked against `.v010.out.txt` and the
+2026-10-23 output, so pass both to `outputs`.
