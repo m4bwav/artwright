@@ -1,12 +1,15 @@
 # artwright handoff
 
-Updated 2026-10-26 (0.7.0 tagged; 0.7.1 JPEG grid fix). Older detail is in [log.md](log.md) and the decisions files.
+Updated 2026-10-26 (0.7.0 and 0.7.1 tagged; wiki at 0.7.1). Older detail is in [log.md](log.md) and the decisions files.
 
 ## State
 
-- Public repository https://github.com/m4bwav/artwright. Latest tag `v0.7.0` (2026-10-26; carries 0.5.0, 0.6.0
-  and 0.7.0). Untagged on main: 0.7.1 (`pixel` finds a scale 2 or 3 grid in a quality 90 JPEG, L-020). Tags need
-  the owner's go-ahead.
+- Public repository https://github.com/m4bwav/artwright. Latest tag `v0.7.1` (2026-10-26: `pixel` finds a scale 2
+  or 3 grid in a quality 90 JPEG, L-020); `v0.7.0` the same day carries 0.5.0, 0.6.0 and 0.7.0. Tags need the
+  owner's go-ahead.
+- Wiki updated to 0.7.1 on 2026-10-26 (wiki commit 41c7ba3): how in
+  [notes/2026-10-22-github-wiki.md](notes/2026-10-22-github-wiki.md), "Since 0.7.1". Its findings for the next
+  release are under "Wiki findings (2026-10-26)" below.
 - Hand-off PRs comfyui-gen#82 and polywright#24 and the scene-illustration PR #17 are merged.
 - Still open: the 5 failing eval cases in evergreen.json (paid evals, not re-run).
 
@@ -24,6 +27,23 @@ Updated 2026-10-26 (0.7.0 tagged; 0.7.1 JPEG grid fix). Older detail is in [log.
   Material cues. Rulings I1-I9 in [decisions/2026-10-25-books-track13.md](decisions/2026-10-25-books-track13.md).
 - No hand-made pixel art was available locally: thresholds come from fixtures and AI renders quantised to sprites.
   Score real hand-made sprites before giving any of these a pass line (L-019).
+
+## Wiki findings (2026-10-26)
+
+1. Bug: the 0.6.0 JPEG block guard in `pixel` does not fire when ffmpeg decodes the JPEG (no Pillow). A smooth
+   quality 55 JPEG had 0.665 of its steps on the 8 px lattice through ffmpeg 9.0.1 (0.952 through Pillow), under
+   the guard's 0.8, so it read as scale 2 with 146005 orphans on Windows, Python 3.9. Still so in 0.7.1.
+2. `stats` noise is measured on the 256 px copy, so Gaussian grain of SD 16 on a 2000 x 1200 image reads `clean`
+   (0.5 L*) and the same grain on a 256 px copy reads `noisy` (3.93). cli.md does not say the estimate is at
+   256 px.
+3. CHANGELOG Releases list at v0.7.1: 0.7.1 still "not tagged yet", and 0.4.0 "never tagged, shipped inside 0.4.2",
+   but tags and releases `v0.4.0` (2026-10-24) and `v0.7.1` (2026-10-26) exist.
+4. sprite-json.md says `edges_info` is per part "at 256 px"; it is at most 256 px (a 192 px render is measured at
+   192), and a part with no edges inside it reports precision and recall 1.0.
+5. Measures differ slightly with and without Pillow since 0.6.0 (box filter against 2x2 halving); one test flag
+   flipped (`competing_focal` on the tangent degrade, focal margin 0.015 against 0.042). Not a doc claim either
+   way; worth one line in cli.md.
+6. Cosmetic: Windows, Python 3.9 printed `"gradient_tb": -0.0` for a flat tile where Linux printed `0.0`.
 
 ## Carried forward
 
