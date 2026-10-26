@@ -1059,6 +1059,108 @@ class Books12(unittest.TestCase):
         self.assertGreater(len({round(aw.lab(c)[0]) for c in aw.load(p).pixels()}), 60)
 
 
+RAMP5 = [(40, 30, 60), (90, 60, 90), (150, 100, 110), (210, 160, 140), (245, 225, 190)]
+
+
+def shaded_disc(kind, n=32):
+    """A 1 px outlined disc, shaded from the top left ("light") or by distance from the rim ("pillow")."""
+    import math
+    c, r = (n - 1) / 2, n / 2 - 1
+
+    def px(x, y):
+        d = math.hypot(x - c, y - c)
+        if d > r:
+            return (0, 0, 0, 0)
+        if d > r - 1:
+            return (20, 15, 30, 255)
+        if kind == "pillow":
+            k = int((r - d) / (r / 5))
+        else:
+            k = int((((x - c) * -0.7 + (y - c) * -0.7) / r + 1) / 2 * 5)
+        return RAMP5[max(0, min(4, k))] + (255,)
+    return paint(n, n, px)
+
+
+def dots(n, pts, colour=(0, 0, 0)):
+    s = set(pts)
+    return paint(n, n, lambda x, y: colour + (255,) if (x, y) in s else (0, 0, 0, 0))
+
+
+def split_square(steps):
+    """A 26 px outlined square split into two colours along a staircase whose run lengths are `steps`."""
+    edge, y = [], 1
+    x = 4
+    for k in steps:
+        edge += [x] * k
+        x += 1
+    edge += [x] * (24 - len(edge))
+
+    def px(xx, yy):
+        if not (1 <= xx <= 24 and 1 <= yy <= 24):
+            return (0, 0, 0, 0)
+        if xx in (1, 24) or yy in (1, 24):
+            return (20, 20, 20, 255)
+        return (200, 90, 60, 255) if xx < edge[yy - 1] else (60, 120, 200, 255)
+    return paint(26, 26, px)
+
+
+class Books13(unittest.TestCase):
+    """Round 2 track 13: pixel-art measures (banding, pillow, corner doubles, interior jaggies, backgrounds, tiles)."""
+
+    def pix(self, img, name, *extra):
+        code, r = run("pixel", save(img, name), "--scale", "1", *extra)
+        return r["items"][0]
+
+    def test_pillow_shading(self):
+        self.assertFalse(self.pix(shaded_disc("light"), "disc_light.png")["pillow"]["pillow"])
+        r = self.pix(shaded_disc("pillow"), "disc_pillow.png")["pillow"]
+        self.assertTrue(r["pillow"], r)
+        o = TMP / "disc_light_pillowed.png"
+        run("degrade", TMP / "disc_light.png", "-o", o, "--kind", "pillow")
+        code, d = run("pixel", o, "--scale", "1")
+        self.assertTrue(d["items"][0]["pillow"]["pillow"])
+
+    def test_banding_rises_with_a_hugging_ring(self):
+        clean = self.pix(shaded_disc("light"), "disc_light.png")["banding"]["count"]
+        o = TMP / "disc_banded.png"
+        run("degrade", TMP / "disc_light.png", "-o", o, "--kind", "banding")
+        code, d = run("pixel", o, "--scale", "1")
+        self.assertGreater(d["items"][0]["banding"]["count"], clean + 8)
+
+    def test_corner_doubles(self):
+        two_one = [(i, i // 2) for i in range(14)]
+        stairs = [p for i in range(7) for p in ((i, i), (i + 1, i))]
+        square = [(x, y) for x in range(2, 12) for y in (2, 11)] + [(x, y) for x in (2, 11) for y in range(2, 12)]
+        self.assertEqual(self.pix(dots(16, two_one), "line21.png")["corner_doubles"]["count"], 0)
+        self.assertEqual(self.pix(dots(16, square), "square_line.png")["corner_doubles"]["count"], 0)
+        self.assertGreater(self.pix(dots(16, stairs), "stairs.png")["corner_doubles"]["count"], 6)
+
+    def test_interior_jaggies(self):
+        clean = self.pix(split_square([3, 3, 3, 3, 3]), "split_clean.png")["jaggies_interior"]
+        bad = self.pix(split_square([3, 3, 1, 3, 3]), "split_bad.png")["jaggies_interior"]
+        self.assertGreater(bad, clean)
+
+    def test_edge_lost_on_dark_background(self):
+        r = self.pix(shaded_disc("light"), "disc_light.png", "--bg", "16,16,16", "--bg", "192,192,192")
+        dark, light = r["edge_lost_on_bg"]
+        self.assertTrue(dark["lost"], dark)
+        self.assertFalse(light["lost"], light)
+
+    def test_tile_repetition(self):
+        ramp = paint(16, 16, lambda x, y: ((40, 60, 40), (70, 100, 60), (100, 140, 80), (140, 180, 110))[x // 4] + (255,))
+        rnd = random.Random(4)
+        speck = [[rnd.random() < 0.3 for _ in range(16)] for _ in range(16)]
+        even = paint(16, 16, lambda x, y: (90, 140, 70, 255) if speck[y][x] else (70, 110, 60, 255))
+        rock = paint(16, 16, lambda x, y: (120, 120, 120, 255) if 6 <= x < 10 and 6 <= y < 10 else (70, 110, 60, 255))
+        t = {k: self.pix(v, "tile_%s.png" % k, "--tile")["tile"] for k, v in
+             (("ramp", ramp), ("even", even), ("rock", rock))}
+        self.assertTrue(t["ramp"]["repetition_suspected"], t["ramp"])
+        self.assertTrue(t["rock"]["repetition_suspected"], t["rock"])
+        self.assertFalse(t["even"]["repetition_suspected"], t["even"])
+        self.assertGreater(abs(t["ramp"]["gradient_lr"]), 10)
+        self.assertGreater(t["rock"]["detail_spread"], t["even"]["detail_spread"])
+
+
 class Museum(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("AW_NET") == "1", "network fixtures: set AW_NET=1")
     def test_pinned_fixtures(self):

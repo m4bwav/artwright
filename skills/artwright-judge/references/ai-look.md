@@ -4,7 +4,7 @@ Common defaults of generation models that make an image read as generic, each wi
 
 Checked 2026-10-22 · Back to [SKILL.md](../SKILL.md)
 
-Verification: the tells and fixes come from practitioner reports and the research pass, `verified: no` unless a line cites an R- entry. Rows 17 to 29 apply light and composition teaching read in Gurney, Roberts and Mateu-Mestre (R-20261022-1, -2; the craft rows are in [craft.md](../../artwright/references/craft.md)); that a model does them by default is practitioner observation.
+Verification: the tells and fixes come from practitioner reports and the research pass, `verified: no` unless a line cites an R- entry. Rows 17 to 29 apply light and composition teaching read in Gurney, Roberts and Mateu-Mestre (R-20261022-1, -2; the craft rows are in [craft.md](../../artwright/references/craft.md)); rows 30 to 34 apply *Computer Graphics: Principles and Practice* and three pixel-art books (2026-10-25); that a model does them by default is practitioner observation.
 
 **Measure first.** Where a row names a flag, run the command (`aw.py light`, `depth` or `comp`, see "Light, colour and composition flags" in [cli.md](../../artwright/references/cli.md)) and open the region it points to. A flag is a place to look, never the finding.
 
@@ -45,5 +45,11 @@ Fix channels: **P** prompt wording · **N** negative prompt (only where CFG > 1:
 | 27 | Horizon at half | the horizon cutting the frame in two (`horizon_split`), or through a head (`horizon_through_head`) | P: "horizon on the lower third", or a camera height that moves it |
 | 28 | Background beats subject | a bright patch or sharp detail behind out-contrasting the subject (`competing_focal`, `focal_off_subject`, `weak_figure_ground`) | P: "background darker and softer than the subject"; I: the background |
 | 29 | Toy soldiers and eye-level default | figures evenly spaced and sized in rows; every shot from standing eye height whatever the mood | P: "clustered group, one figure apart", a named camera height ("low angle from knee height"); C: a pose map |
+
+| 30 | Floating objects | feet, cups and cars with no contact shadow, hovering over the ground | P: "a soft dark contact shadow under each foot"; I: the contact area |
+| 31 | Moire and shimmer | fine regular patterns (chain-link, window screens, pinstripes, distant brick, rows of seats) turning into false bands or swirls; in video they crawl | P: describe the pattern as a tone at that distance, or bring it close; I: the patch |
+| 32 | Detail ignores distance | far objects drawn with as many marks, as crisply, as near ones | P: "distant buildings simplified to a few shapes"; overlaps 18 |
+| 33 | Metal and plastic confused | white highlights on gold or brass; tinted highlights on plastic under white light | P: "gold with warm yellow reflections", "white plastic with clean white highlights" |
+| 34 | Quantised-render pixel art | rings of colour hugging the outline (`banding`), shading from the rim inward (`pillow`), value-only ramps, pure black shadows, dither on a tiny sprite (`aw.py pixel`, artwright-pixel) | M: draw at native size or snap first (pixelwright); P: "light from the top left"; fix the ramps by hand |
 
 Describe each tell with evidence ("highlights blown on the left cheek and sky") and judge it against the brief. A deliberately glossy commercial brief may want 1, 2 and 6.

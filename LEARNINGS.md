@@ -6,6 +6,14 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-019 · 2026-10-25 · A defect count that real sprites score as high as the fixture is a locator, not a grade
+- Trigger: the book-proposed banding rule (runs whose exact span the next row repeats) found 0 hits on a disc with a one-pixel ring hugging its outline; curved bands shift one pixel a row. Widened to offsets 0 and 1, the ring scored 4.7 per 100 edge pixels, but 30 AI renders quantised to 48 px sprites scored 0 to 6.5 (median 3.3).
+- Hypothesis: equal runs side by side are common in any small quantised image (eyes, belts, flat bands), so the count cannot separate a bad sprite from an ordinary one; its coordinates still point at the bands worth looking at.
+- Rule: before giving a new pixel measure a pass line, score it on a real batch of the images it is for; if they overlap the defect fixture, ship it reported with coordinates and let the critique look (a degrade test still proves it rises with the defect).
+- Evidence: Books13.test_banding_rises_with_a_hugging_ring; the 30-sprite run in decisions/2026-10-25-books-track13.md I2
+- Scope: repo:artwright
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-25
+
 ### L-018 · 2026-10-25 · A JPEG's 8 px block edges also sit on the 2 and 4 px lattices
 - Trigger: `aw.py pixel` read a smooth render saved as a quality 55 JPEG as scale 2 pixel art at 99.7% lattice alignment. The proposed fix (confirm the lattice on luma alone, blaming chroma subsampling) did not work: the luma showed the same steps.
 - Hypothesis: the steps are the DCT block edges, which are in luma too; every multiple of 8 is even, so a lattice test at 2 or 4 finds them all.

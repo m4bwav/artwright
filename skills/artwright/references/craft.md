@@ -78,11 +78,24 @@ stylised brief can break any of them on purpose: judge against the brief, never 
 | Shadow chroma | In one surface, the shadow is darker, duller and cooler than the light, by about the same amount for every colour. Shadows more saturated than the lights (`glowing_shadows`) read as glowing | book: Gurney CL p. 52 |
 | Form and cast shadows | Light side, terminator, core shadow, reflected light (darker than any lit part), and the darkest occlusion at contact. A cast shadow is sharp at its base and softens and widens away from the caster | book: Gurney CL pp. 46-47, 50 |
 | Texture | Texture shows most in the half-tone next to the terminator, little in full light, almost none in shadow. Even texture everywhere is a rendering tell | book: Gurney CL p. 47 |
-| Highlights and rims | A highlight is a reflection of the source and takes its colour; pure white is rare. A rim needs a source behind and a dark ground, takes a lighter version of the local colour, and varies in width | book: Gurney CL pp. 60, 162-165 |
+| Highlights and rims | A highlight is a reflection of the source and takes its colour on paint, plastic, skin, wood and glass; on metal it takes the metal's colour too (see Material cues); pure white is rare. A rim needs a source behind and a dark ground, takes a lighter version of the local colour, and varies in width | book: Gurney CL pp. 60, 162-165 |
 | Backlit thin things | Leaves, sails and ears lit from behind are the most saturated notes in the scene | book: Gurney CL pp. 152-155 |
 | Bright sources | A strong light wears a halo of its own colour that eats into nearby edges; starbursts, rings and hexagons are camera artefacts, not vision | book: Gurney CL p. 166 |
 | One plan | Every element obeys one lighting plan: same side, same colour, same hardness. Two light directions in one composite is an integrity failure | book: Gurney CL p. 210; IR p. 72 |
 | Photo look | Shadows clipped to black, highlights to white, weak colour shifts, snapshot framing, stiff gesture, random detail: the marks of copying a photo, and common in images trained on photos | book: Gurney CL pp. 170-171; IR pp. 64-65 |
+
+## Material cues
+
+How a surface's light says what it is made of. Use them to check a render or a painting, and to name a material in a prompt.
+
+| Check | What to look for | verified |
+|---|---|---|
+| Metal or not | Non-metals (paint, plastic, skin, wood, glass) reflect the light's own colour in their highlights; metals tint highlights and reflections with their own colour and show almost no diffuse colour. A white highlight on gold, or an orange one on white plastic under white light, misreads the material | book: CGPP §14.9.3 p. 361, §27.8.1 p. 728 |
+| Grazing angles | Glossy non-metals reflect more toward grazing: a polished floor mirrors the far end and shows its own colour near the viewer; even matte paint and cloth look shinier at grazing | book: CGPP §27.8.1 pp. 727-728 |
+| Highlight size | Smoother is smaller and brighter, rougher broader and dimmer. A large, very bright highlight contradicts itself | book: CGPP §14.9.3 pp. 359-361 |
+| Soft materials | Skin, wax, marble and milk carry light under the surface: the shadow edge softens and warms (red on skin), colour bleeds within the object | book: CGPP §27.13.2 pp. 738-739 |
+| Coloured glass and water | Transmitted colour deepens with thickness: thick parts darker and more saturated, thin edges paler | book: CGPP §14.10.3 p. 368 |
+| Grounding | A contact shadow decides whether an object touches the surface; even a faint, roughly shaped one does it. None reads as floating | book: CGPP §5.6 pp. 112-113 |
 
 ## Atmosphere and distance
 

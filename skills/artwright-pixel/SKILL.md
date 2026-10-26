@@ -32,6 +32,9 @@ Read the JSON before looking at the image:
   `--scale 1` (the caller states the image is native) it is reported but does not fail: a one-pixel ramp is shading.
 - `unique_colours` against the budget; `near_duplicate_colour_pairs` (each colour needs a role).
 - `orphans` (with coordinates), `jaggies`, `outline` colours, `partial_alpha_pixels`.
+- Reported, never failed: `banding` and `corner_doubles` (counts with coordinates: where to look),
+  `jaggies_interior` (steps on inner colour edges), `pillow` (`pillow: true` is shading from the rim inward), and with
+  `--bg R,G,B` (repeatable, the game's grounds) `edge_lost_on_bg` (silhouette share within 10 L* of each).
 - `clean_pixel_art` and `problems`: one integer scale, 100% alignment, uniform blocks, no blend pixels, colours
   within budget, binary alpha. That is the definition of done for an AI sprite (R-20261021-8).
 

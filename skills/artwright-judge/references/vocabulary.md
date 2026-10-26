@@ -138,6 +138,8 @@ How to use it:
 - **contre-jour**: shooting into the light, haze, flare, translucent edges
 - **key light**: the main source that sets direction and shadow
 - **fill light**: softer secondary light lifting shadows
+- **contact shadow**: the small dark shadow where an object meets the ground; without it things float
+- **Fresnel reflection**: glossy surfaces mirror more at grazing angles (a floor shining toward the far end)
 - **high-key**: bright, low contrast, few shadows, airy
 - **low-key**: mostly dark, high contrast, small lit areas, moody
 - **hard light**: small or distant source, crisp shadow edges

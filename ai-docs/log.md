@@ -160,3 +160,9 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 - Real data: 60 random AI stills from the local render folder. Keys changed on 2 (both at 0.37, on the line), `uniform_sharpness` fired on the same 3, every still read clean grain (median 0.06 L*), separation 0.67 to 0.95 (10th to 90th). On 30 stills of 1216 to 1824 px the area-averaged copy lowered edge density by 0 to 8%. A carpet photo with no flat cell read as noisy (texture), documented.
 - Tests 79 (8 new; 1 skipped without AW_NET); mutations of the reduction, the noise floor and the notan cut each caught. Budget: aw.py 82 KB (yellow, under 100). Rulings H1-H10.
 ## [2026-10-25] index | rebuilt (13 entries)
+
+## [2026-10-25] build | 0.7.0: pixel-art measures and rows from the round 2 books (C-20261025-2)
+- Book-learnings round 2 track 13 (Azzi, Silber, Dawe and Humphries; CGPP and Gonzalez for corner doubles and material cues). New `pixel` numbers in aw_measure.py: banding, corner doubles (the same stair-step rule as pixelwright's `clean.corners`), interior jaggies, pillow, `--bg` edge loss, tile repetition; degrade banding and pillow.
+- The exact-span banding rule missed a hugging ring on a curve (offsets 0 and 1 now); on 30 AI renders quantised to 48 px sprites banding ran 0 to 6.5 per 100 edge pixels, so it is a locator (L-019). Pillow fired on 0 of 30. Tile repetition flagged 4 of 20 seamless tiles made from render crops; the flagged ones stripe in a 3x3 repeat, an unflagged one does not.
+- Tests 85 (6 new); five mutations (each measure blanked, the stair condition dropped, the tile lines raised) caught. aw.py 83 KB, aw_measure.py 39 KB, knowledge files 192 KB (green). Rulings I1-I9.
+## [2026-10-25] index | rebuilt (14 entries)
