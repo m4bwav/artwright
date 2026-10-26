@@ -44,7 +44,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.5.0"
+VERSION = "0.6.0"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -589,10 +589,39 @@ def median_cut(cols, k):
 
 # ---------------------------------------------------------------- helpers for analysis
 
+def _halve(img):
+    """2x2 area average (premultiplied by alpha)."""
+    w, h, d, sw = img.w // 2, img.h // 2, img.d, img.w * 4
+    o = Img(w, h)
+    od = o.d
+    for y in range(h):
+        r0 = 2 * y * sw
+        r1 = r0 + sw
+        for x in range(w):
+            i, j, k = r0 + 8 * x, r1 + 8 * x, (y * w + x) * 4
+            a0, a1, a2, a3 = d[i + 3], d[i + 7], d[j + 3], d[j + 7]
+            A = a0 + a1 + a2 + a3
+            if A:
+                for c in range(3):
+                    od[k + c] = (d[i + c] * a0 + d[i + 4 + c] * a1 + d[j + c] * a2 + d[j + 4 + c] * a3) // A
+            od[k + 3] = A // 4
+    return o
+
+
 def small(img, edge=256):
+    """The measuring copy. Every source pixel counts: a reduction over 4x through resize_box's nearest pre-step
+    reads fine detail as false texture (aliasing), so it goes through Pillow's BOX filter, or 2x2 halving without
+    Pillow (slower)."""
     if max(img.w, img.h) <= edge:
         return img
     w, h = fit_dims(img.w, img.h, edge)
+    if img.w > 4 * w and img.h > 4 * h:
+        Image, _ = _pillow()
+        if Image is not None:
+            im = Image.frombytes("RGBA", (img.w, img.h), bytes(img.d)).resize((w, h), Image.BOX)
+            return Img(w, h, bytearray(im.tobytes()))
+        while img.w >= 4 * w and img.h >= 4 * h:
+            img = _halve(img)
     return resize_box(img, w, h)
 
 
@@ -738,7 +767,10 @@ def cmd_sheet(a):
     if cell < 32:
         raise Fail("too many images for one %d px sheet; split the batch" % SHEET_MAX)
     W, H = pad + cols * (cell + pad), pad + rows * (cell + pad)
-    sheet = Img(W, H, bytearray(b"\xff\xff\xff\xff" * (W * H)))
+    bg = tuple(int(v) for v in a.bg.split(","))
+    if len(bg) != 3 or not all(0 <= v <= 255 for v in bg):
+        raise Fail("--bg takes R,G,B")
+    sheet = Img(W, H, bytearray(bytes(bg + (255,)) * (W * H)))
     mapping, scale = {}, max(2, cell // 96)
     for i, f in enumerate(files):
         lab_ = letters(i)
@@ -753,7 +785,7 @@ def cmd_sheet(a):
             w, h = img.w * k, img.h * k
         t = resize_nearest(img, w, h) if a.pixel else resize_box(img, w, h)
         t = Img(t.w, t.h, bytearray(b"".join(bytes(c) for c in
-                                             ((r, g, b, 255) for r, g, b in flatten(t, (255, 255, 255))))))
+                                             ((r, g, b, 255) for r, g, b in flatten(t, bg)))))
         cx, cy = pad + (i % cols) * (cell + pad), pad + (i // cols) * (cell + pad)
         paste(sheet, t, cx + (cell - w) // 2, cy + (cell - h) // 2)
         if not a.no_labels:
@@ -772,7 +804,12 @@ def cmd_stats(a):
     # spatial measures (edges, symmetry, balance, focal cell, notan) read the full grid on white
     lum_all = [(0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0 for r, g, b in flat]
     rgb = [c[:3] for c, k in zip(s.pixels(), keep) if k] if alpha["excluded"] else flat
-    lum = [(0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0 for r, g, b in rgb]
+    luma_m = mean_sd([(0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0 for r, g, b in rgb])[0]
+    labs_grid = [lab(c) for c in (s.pixels() if alpha["excluded"] else flat)]
+    labs = [p for p, k in zip(labs_grid, keep) if k]
+    lstar = [p[0] for p in labs]
+    # value is lightness (L*/100), not luma on encoded sRGB: luma reads pure blue as 0.07, L* as 0.32
+    lum = [v / 100 for v in lstar]
     n = len(lum)
     m, sd = mean_sd(lum)
     hist = [0] * 10
@@ -790,9 +827,6 @@ def cmd_stats(a):
     myb, syb = mean_sd(yb)
     M = math.sqrt(srg ** 2 + syb ** 2) + 0.3 * math.sqrt(mrg ** 2 + myb ** 2)
     level = min(HS_LEVELS, key=lambda t: abs(M - t[0]))[1]
-    labs_grid = [lab(c) for c in (s.pixels() if alpha["excluded"] else flat)]
-    labs = [p for p, k in zip(labs_grid, keep) if k]
-    lstar = [p[0] for p in labs]
     sats, warm, cool, hot = [], 0, 0, 0
     for r, g, b in rgb:
         hh, ss, vv = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
@@ -862,7 +896,8 @@ def cmd_stats(a):
     cm_, csd = mean_sd([c for c in cc if c is not None])
     bvals = [p[2] for p in labs]
     res = {"file": a.image, "size": [img.w, img.h], "measured_at": [w, h], "alpha": alpha,
-           "value": {"mean": round(m, 3), "key": "low" if m < 0.35 else ("high" if m > 0.65 else "middle"),
+           "value": {"mean": round(m, 3), "scale": "L*/100", "luma_mean": round(luma_m, 3),
+                     "key": "low" if m < 0.38 else ("high" if m > 0.68 else "middle"),
                      "histogram_10": hist, "groups_estimate": peaks,
                      "middle_share": round(sum(1 for v in lstar if 35 <= v <= 65) / n, 3), "bimodality": round(bim, 3),
                      "clip_black": round(sum(1 for v in lstar if v < 3) / n, 4),
@@ -872,6 +907,8 @@ def cmd_stats(a):
            "chroma_cells": {"mean": round(cm_, 2), "spread": round(csd / cm_, 3) if cm_ else 0.0,
                             "peak_cell": list(cpc), "peak_focal_distance": round(math.hypot(cpc[0] - focal[0], cpc[1] - focal[1]), 3)},
            "rms_contrast": round(mean_sd(lstar)[1], 2),
+           "noise": dict(zip(("sigma_L", "reading"), noise_sigma([p[0] for p in labs_grid], w, h)),
+                         proxy="flattest tenth of 16x16 cells", note="grain, not texture: SD in L* units"),
            "colourfulness": {"M": round(M, 1), "level": level, "method": "Hasler-Suesstrunk 2003, signed rg/yb, nearest Table 2 anchor"},
            "saturation": {"mean": round(sum(sats) / n, 3), "share_hot": round(hot / n, 3)},
            "temperature": {"warm_share": round(warm / max(1, warm + cool), 3), "chromatic_share": round((warm + cool) / n, 3),
@@ -887,14 +924,21 @@ def cmd_stats(a):
            "fractal_dimension": round(fd, 3) if fd is not None else None,
            "note": "descriptions, not a beauty score; thirds_distance is never a reason (references/evidence.md)"}
     if a.notan:
+        # cut where the values divide (Otsu; k-means for three), not at the median: the shares are the point
         d = Path(a.notan)
-        srt = sorted(lum)
-        mid, t1, t2 = srt[n // 2], srt[n // 3], srt[2 * n // 3]
+        L_all = [p[0] / 100 for p in labs_grid] if not alpha["excluded"] else [lab(c)[0] / 100 for c in flat]
+        mid = otsu(lum)
+        cs = kmeans1(lum, 3)[0]
+        t1, t2 = (cs[0] + cs[1]) / 2, (cs[1] + cs[2]) / 2
         res["notan"] = {
-            "grey": save_png(gray_img(lum_all, w, h), d / "grey.png"),
-            "two_value": save_png(gray_img([1.0 if v > mid else 0.0 for v in lum_all], w, h), d / "notan2.png"),
-            "three_value": save_png(gray_img([1.0 if v > t2 else (0.5 if v > t1 else 0.0) for v in lum_all], w, h),
-                                    d / "notan3.png")}
+            "grey": save_png(gray_img(L_all, w, h), d / "grey.png"),
+            "two_value": save_png(gray_img([1.0 if v > mid else 0.0 for v in L_all], w, h), d / "notan2.png"),
+            "three_value": save_png(gray_img([1.0 if v > t2 else (0.5 if v > t1 else 0.0) for v in L_all], w, h),
+                                    d / "notan3.png"),
+            "cut_two": round(mid, 3), "light_share": round(sum(v > mid for v in lum) / n, 3),
+            "cuts_three": [round(t1, 3), round(t2, 3)],
+            "shares_three": [round(sum(v <= t1 for v in lum) / n, 3), round(sum(t1 < v <= t2 for v in lum) / n, 3),
+                             round(sum(v > t2 for v in lum) / n, 3)]}
     return out(res)
 
 
@@ -1103,9 +1147,24 @@ def tile_seams(img):
             "seam_suspected": lr > 2 * m_in + 10 or tb > 2 * m_in + 10}
 
 
+def jpeg_blocks(img, tol):
+    """Share of colour steps on the 8 px lattice (the lower of the two axes). A JPEG's block edges sit there, and
+    every one of them is also on the 2 and 4 px lattices, so a smooth JPEG reads as scale 2 pixel art; real scale 2
+    or 4 art has about a quarter or half of its steps on the 8 px lattice."""
+    lx, ly = _profiles(img, tol)
+    return min(_align(lx, 8)[0], _align(ly, 8)[0])
+
+
 def pixel_one(path, a):
     img = load(path)
     g = detect_grid(img, a.tol) if not a.scale else {"scale": a.scale, "offset": [0, 0]}
+    if not a.scale and g["scale"] in (2, 4, 8, 16) and fmt_of(path) == "jpeg":
+        if g["scale"] < 8 and jpeg_blocks(img, a.tol) >= 0.8:
+            g = {"scale": 1, "offset": [0, 0], "lattice_alignment": 100.0,
+                 "note": "JPEG: the %d px lattice is the 8 px block edges, not a pixel grid; pass --scale if it is "
+                         "real" % g["scale"]}
+        elif g["scale"] >= 8:
+            g["note"] = "JPEG blocks are 8 px: check a scale of 8 or 16 by eye before trusting it"
     if a.scale:
         colx, rowy = _profiles(img, a.tol)
         ax, ox = _align(colx, a.scale)
@@ -1647,7 +1706,8 @@ def cmd_verdict(a):
 # ----- degrade
 
 LAB_KINDS = ("warm-shadows", "glow-shadows", "uniform-sat", "midgrey", "haze-off")
-DEGRADE_KINDS = ("saturate", "crush", "crop", "jpeg", "orphans", "mixels", "blur") + LAB_KINDS + ("hotspot", "tangent")
+DEGRADE_KINDS = ("saturate", "crush", "crop", "jpeg", "orphans", "mixels", "blur") + LAB_KINDS + ("hotspot", "tangent",
+                                                                                                  "noise", "band", "alias")
 
 def cmd_degrade(a):
     img = load(a.image)
@@ -1703,7 +1763,7 @@ def cmd_degrade(a):
     elif k in LAB_KINDS:
         px = [lab(c) for c in zip(d[0::4], d[1::4], d[2::4])]
         if k in ("warm-shadows", "glow-shadows"):
-            t, li, _ = light_split(px)
+            t, li, _, _ = light_split(px)
             la, lb = sum(p[1] for p in li) / len(li), sum(p[2] for p in li) / len(li)
         if k == "uniform-sat":
             mc = med([chroma(p) for p in px])
@@ -1732,6 +1792,19 @@ def cmd_degrade(a):
         for yy in range(y, y + sz):
             for xx in range(x, x + sz):
                 o.put(xx, yy, (255, 255, 255))
+    elif k == "noise":  # Gaussian grain, SD --amount (default 8) on each channel
+        sg = 8.0 if a.amount is None else a.amount
+        for i in range(0, len(d), 4):
+            for c in range(3):
+                d[i + c] = max(0, min(255, int(round(d[i + c] + rnd.gauss(0, sg)))))
+    elif k == "band":  # false contours: L* posterised to --amount levels (default 16)
+        lv = int(a.amount or 16)
+        q = 100 / lv
+        for i in range(0, len(d), 4):
+            L, A, B = lab(d[i:i + 3])
+            d[i:i + 3] = bytes(lab_rgb(min(100, (int(L / q) + 0.5) * q), A, B))
+    elif k == "alias":  # nearest shrink by 2.7 and back: fine detail turns to false pattern (no whole factor)
+        o = resize_nearest(resize_nearest(img, max(1, int(w / 2.7)), max(1, int(h / 2.7))), w, h)
     elif k == "tangent":
         side, ink = rnd.randrange(4), (255, 255, 255) if sum(d[0::4]) < 128 * w * h else (0, 0, 0)
         th, ins = max(2, min(w, h) // 120), max(2, min(w, h) // 80)
@@ -1771,6 +1844,7 @@ def build():
     p.add_argument("--cell", type=int, default=384)
     p.add_argument("--pixel", action="store_true")
     p.add_argument("--no-labels", action="store_true")
+    p.add_argument("--bg", default="119,119,119", help="R,G,B behind the cells (neutral grey, L* 50; white skews colour)")
     p = sp.add_parser("stats")
     p.add_argument("image")
     p.add_argument("--edge", type=int, default=256)
@@ -1842,6 +1916,7 @@ def build():
     p.add_argument("-o", "--out", required=True)
     p.add_argument("--kind", required=True, choices=DEGRADE_KINDS)
     p.add_argument("--seed", type=int, default=1)
+    p.add_argument("--amount", type=float, help="noise: SD (8); band: levels (16)")
     p = sp.add_parser("geomgate")
     p.add_argument("render_dir")
     p.add_argument("painted")
