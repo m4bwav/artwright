@@ -1,11 +1,12 @@
 # artwright handoff
 
-Updated 2026-10-25 (books round 2, track 12). Older detail is in [log.md](log.md) and the decisions files.
+Updated 2026-10-26 (0.7.0 tagged; 0.7.1 JPEG grid fix). Older detail is in [log.md](log.md) and the decisions files.
 
 ## State
 
-- Public repository https://github.com/m4bwav/artwright. Latest tag `v0.4.2` (2026-10-24). Untagged on main:
-  0.5.0 (`setfit`, `comp --text-band`, rubric 3), 0.6.0 (track 12) and 0.7.0 (track 13). Tags need the owner's go-ahead.
+- Public repository https://github.com/m4bwav/artwright. Latest tag `v0.7.0` (2026-10-26; carries 0.5.0, 0.6.0
+  and 0.7.0). Untagged on main: 0.7.1 (`pixel` finds a scale 2 or 3 grid in a quality 90 JPEG, L-020). Tags need
+  the owner's go-ahead.
 - Hand-off PRs comfyui-gen#82 and polywright#24 and the scene-illustration PR #17 are merged.
 - Still open: the 5 failing eval cases in evergreen.json (paid evals, not re-run).
 
