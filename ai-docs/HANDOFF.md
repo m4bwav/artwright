@@ -1,10 +1,15 @@
 # artwright handoff
 
-Updated 2026-10-26 (0.7.2 fix validated; release and wiki publication pending). Older detail is in
+Updated 2026-10-26 (0.7.2 released; wiki published at 0de6f45). Older detail is in
 [log.md](log.md) and the decisions files.
 
 ## State
 
+- [PR #25](https://github.com/m4bwav/artwright/pull/25) merged at `a185c05`;
+  [0.7.2 release](https://github.com/m4bwav/artwright/releases/tag/v0.7.2), release workflow green.
+  [Wiki](https://github.com/m4bwav/artwright/wiki) commit `0de6f45`: 12 pages live, zero failures,
+  59 anchor links, zero broken. Outputs 102 checked, zero missing; snippets eight blocks and 90 commands;
+  prose zero strong findings. Released tag archive replayed on Linux and Windows, with and without Pillow.
 - Public repository https://github.com/m4bwav/artwright. Latest tag `v0.7.1` (2026-10-26: `pixel` finds a scale 2
   or 3 grid in a quality 90 JPEG, L-020); `v0.7.0` the same day carries 0.5.0, 0.6.0 and 0.7.0. Tags need the
   owner's standing release authorization applies after version bumps and passing checks.
