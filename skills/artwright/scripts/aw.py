@@ -44,7 +44,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.7.1"
+VERSION = "0.7.2"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -1200,7 +1200,16 @@ def jpeg_blocks(img, tol):
     every one of them is also on the 2 and 4 px lattices, so a smooth JPEG reads as scale 2 pixel art; real scale 2
     or 4 art has about a quarter or half of its steps on the 8 px lattice."""
     lx, ly = _profiles(img, tol)
-    return min(_align(lx, 8)[0], _align(ly, 8)[0])
+    rgb = min(_align(lx, 8)[0], _align(ly, 8)[0])
+    if rgb >= 0.8:
+        return rgb
+    # ffmpeg's chroma upsampling adds 2 px colour steps. Luma retains the 8 px block edges.
+    grey = Img(img.w, img.h)
+    for i in range(0, len(img.d), 4):
+        v = round(0.2126 * img.d[i] + 0.7152 * img.d[i + 1] + 0.0722 * img.d[i + 2])
+        grey.d[i:i + 4] = bytes((v, v, v, img.d[i + 3]))
+    lx, ly = _profiles(grey, tol)
+    return max(rgb, min(_align(lx, 8)[0], _align(ly, 8)[0])) if sum(lx) and sum(ly) else rgb
 
 
 def pixel_one(path, a):

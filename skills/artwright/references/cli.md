@@ -41,7 +41,11 @@ Token cost: images are read at `ceil(w/28) x ceil(h/28)` visual tokens after fit
 Speed without Pillow: about 0.1–0.3 s per megapixel to decode a PNG; `stats` measures at 256 px. The measuring copy
 averages every source pixel (Pillow's BOX filter; without Pillow, 2x2 halving, a few seconds more on a large image),
 so fine detail is not read as false texture. On a JPEG, `pixel` does not take the 8 px block edges for a 2 or 4 px
-grid (`grid.note`), and asks for a look at a found scale of 8 or 16.
+grid (`grid.note`), and asks for a look at a found scale of 8 or 16. The JPEG block guard checks both colour and
+luma steps because ffmpeg's chroma upsampling can add a 2 px colour lattice. An explicit `--scale` bypasses it.
+`stats` noise describes the measuring copy, whose long edge is at most `--edge` (default 256 px), rather than
+the source image's grain. Shrinking a large grainy image can make it read `clean`. Pillow's BOX filter and
+the fallback halving filter can give slightly different measures, including flags near a threshold.
 
 ## Light, colour and composition flags
 

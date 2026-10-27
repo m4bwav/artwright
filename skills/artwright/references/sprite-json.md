@@ -44,8 +44,9 @@ Other keys (camera, ground base, loop, frames) are ignored, so a renderer's own 
   residual plus 0.01. Above 5 is a new object (a blade painted on a roof). Brush texture stays under it.
 - **contact**: each pair touches within 3 px in the render (a ring counts with the space between its arms
   filled). This checks the model, so it fails the same way for every painting of it.
-- `edges_info` (not a gate): edge precision and recall per part at 256 px. Painted texture moves edges, so a low
-  precision is not a failure; `--no-edges` skips it.
+- `edges_info` (not a gate): edge precision and recall per part at a long edge of at most 256 px. A smaller
+  render stays at its size. A part with no edges reports precision and recall 1.0. Painted texture moves edges,
+  so a low precision is not a failure; `--no-edges` skips it.
 
 The output has `pass`, `failing_gates`, each gate's numbers and `tol`. A failing gate is a finding, not an error:
 the command exits 0. Tolerances were set on one sawmill's renders and paintings (2026-10-23); confirm a failure by

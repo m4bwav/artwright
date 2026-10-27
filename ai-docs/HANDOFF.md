@@ -1,12 +1,13 @@
 # artwright handoff
 
-Updated 2026-10-26 (0.7.0 and 0.7.1 tagged; wiki at 0.7.1). Older detail is in [log.md](log.md) and the decisions files.
+Updated 2026-10-26 (0.7.2 fix validated; release and wiki publication pending). Older detail is in
+[log.md](log.md) and the decisions files.
 
 ## State
 
 - Public repository https://github.com/m4bwav/artwright. Latest tag `v0.7.1` (2026-10-26: `pixel` finds a scale 2
   or 3 grid in a quality 90 JPEG, L-020); `v0.7.0` the same day carries 0.5.0, 0.6.0 and 0.7.0. Tags need the
-  owner's go-ahead.
+  owner's standing release authorization applies after version bumps and passing checks.
 - Wiki updated to 0.7.1 on 2026-10-26 (wiki commit 41c7ba3): how in
   [notes/2026-10-22-github-wiki.md](notes/2026-10-22-github-wiki.md), "Since 0.7.1". Its findings for the next
   release are under "Wiki findings (2026-10-26)" below.
@@ -29,6 +30,11 @@ Updated 2026-10-26 (0.7.0 and 0.7.1 tagged; wiki at 0.7.1). Older detail is in [
   Score real hand-made sprites before giving any of these a pass line (L-019).
 
 ## Wiki findings (2026-10-26)
+
+The 0.7.2 follow-up fixes findings 1, 2 and 4 and documents the filter difference in finding 5.
+PR #24 already fixed finding 3. Tests: 87 run, one museum skip, zero failures; 112 real JPEGs across
+both decoders (224 decodes) keep their grid scales. The ffmpeg fixture's extra 2 px steps come from chroma
+upsampling; the guard now checks luma as well as RGB. Finding 6 is cosmetic and unchanged.
 
 1. Bug: the 0.6.0 JPEG block guard in `pixel` does not fire when ffmpeg decodes the JPEG (no Pillow). A smooth
    quality 55 JPEG had 0.665 of its steps on the 8 px lattice through ffmpeg 9.0.1 (0.952 through Pillow), under

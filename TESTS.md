@@ -8,6 +8,15 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20261026-1 · 2026-10-26 · offline CLI and decoder regressions · Windows · passed
+- 87 tests run, one museum-network test skipped, no failures. Skill checks: 0 problems. Budget passes,
+  aw.py 86 KB (yellow). Diff whitespace check passes.
+- The new no-Pillow fixture failed before the fix: scale 2 instead of 1. Its RGB block share was 0.665;
+  luma restores the block evidence to 0.881. The fixture and explicit-scale override now pass.
+- 112 real JPEGs compared against 0.7.1 through both Pillow and ffmpeg: 224 decodes, zero scale changes.
+- Existing paid skill eval failures were not rerun; descriptions and skill instructions are unchanged.
+- led to: C-20261026-2
+
 ### T-20261022-7 · 2026-10-22 · claude plugin eval 2.1.281 under WSL2 --scaffold, sonnet · books track 6 · action-rank-cycle 3/3, action-winner-fit 5/6 (final run)
 - action-rank-cycle (new) 3/3: every run loaded the judge, ran `aw.py rank` and named the loop among the top three.
 - action-winner-fit (new) 2/3, then 3/6 after the skill said to rank an existing folder with aw.py, then 5/6 once the regex accepted "none of the six renders fit" (read from kept traces; two of the 3/6 misses were correct replies). The remaining miss is a trigger flake: the run never loaded the judge and answered by eye in 7 turns (it still said the renders do not match). One earlier run tallied the records by hand and recommended render_01 for the birds brief, the failure the case exists to catch. About 3 of 15 runs across the batches skipped the skill; the descriptions are at the budget, so no wording was added.
