@@ -14,6 +14,7 @@ import tempfile
 import unittest
 import urllib.request
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "skills" / "artwright" / "scripts"))
@@ -1033,15 +1034,33 @@ class Books12(unittest.TestCase):
         p = TMP / "smooth_q55.jpg"
         im.save(p, quality=55)
         args = aw.build().parse_args(["pixel", str(p)])
-        keep = aw.jpeg_blocks
-        aw.jpeg_blocks = lambda img, tol: 0.0
-        try:
-            self.assertEqual(aw.pixel_one(str(p), args)[0]["grid"]["scale"], 2)  # the block edges read as a grid
-        finally:
-            aw.jpeg_blocks = keep
+        self.assertEqual(aw.detect_grid(aw.load(p))["scale"], 2)
         g = aw.pixel_one(str(p), args)[0]["grid"]
         self.assertEqual(g["scale"], 1, g)
         self.assertIn("JPEG", g["note"])
+
+    @unittest.skipUnless(aw._pillow()[0], "writing a JPEG needs Pillow")
+    @unittest.skipUnless(aw.shutil.which("ffmpeg") and aw.shutil.which("ffprobe"), "JPEG fallback needs ffmpeg and ffprobe")
+    def test_ffmpeg_jpeg_blocks_are_not_a_small_grid(self):
+        Image = aw._pillow()[0]
+        from PIL import ImageFilter
+        rnd = random.Random(1)
+        im = Image.new("RGB", (96, 96))
+        im.putdata([tuple(rnd.randrange(256) for _ in range(3)) for _ in range(96 * 96)])
+        p = TMP / "smooth_ffmpeg_q55.jpg"
+        im.resize((768, 768), Image.BICUBIC).filter(ImageFilter.GaussianBlur(6)).save(p, quality=55)
+        with patch.object(aw, "_pillow", return_value=(None, None)):
+            img = aw.load(p)
+            self.assertEqual(aw.detect_grid(img)["scale"], 2)
+            lx, ly = aw._profiles(img, 24)
+            self.assertLess(min(aw._align(lx, 8)[0], aw._align(ly, 8)[0]), 0.8)
+            self.assertGreaterEqual(aw.jpeg_blocks(img, 24), 0.8)
+            args = aw.build().parse_args(["pixel", str(p)])
+            g = aw.pixel_one(str(p), args)[0]["grid"]
+            self.assertEqual(g["scale"], 1, g)
+            self.assertIn("JPEG", g["note"])
+            args.scale = 2
+            self.assertEqual(aw.pixel_one(str(p), args)[0]["grid"]["scale"], 2)
 
     @unittest.skipUnless(aw._pillow()[0], "writing a JPEG needs Pillow")
     def test_jpeg_ringing_does_not_hide_a_small_grid(self):
@@ -1063,6 +1082,11 @@ class Books12(unittest.TestCase):
             g = aw.pixel_one(str(p), aw.build().parse_args(["pixel", str(p)]))[0]
             self.assertEqual(g["grid"]["scale"], s, (name, g["grid"]))
             self.assertEqual(g["native_size"], [64, 64])
+            if s == 2 and aw.shutil.which("ffmpeg") and aw.shutil.which("ffprobe"):
+                with patch.object(aw, "_pillow", return_value=(None, None)):
+                    g = aw.pixel_one(str(p), aw.build().parse_args(["pixel", str(p)]))[0]
+                self.assertEqual(g["grid"]["scale"], s, (name, "ffmpeg", g["grid"]))
+                self.assertEqual(g["native_size"], [64, 64])
         from PIL import ImageFilter
         rnd = random.Random(1)
         sm = Image.new("RGB", (96, 96))

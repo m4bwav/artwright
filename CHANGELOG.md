@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.2 · 2026-10-26: C-20261026-2, JPEG block rejection with ffmpeg and measuring-copy documentation.
 - 0.7.1 · 2026-10-26 (owner: tag without asking, 2026-10-26): C-20261026-1, `pixel` finds a scale 2 or 3 grid in a quality 90 JPEG.
 - 0.7.0 · 2026-10-26 (owner's go-ahead 2026-10-26), carries 0.5.0 and 0.6.0: C-20261025-2, pixel measures (banding, pillow, corner doubles, interior jaggies, `--bg`,
   tile repetition), degrade banding and pillow, pixel-art and AI-look rows, material cues.
@@ -25,6 +26,17 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261026-2 · 2026-10-26 · Reject ffmpeg's smooth JPEG lattice (0.7.2)
+- because: user request, wiki findings in ai-docs/HANDOFF.md
+- files: skills/artwright/scripts/aw.py (jpeg_blocks, VERSION), tests/test_aw.py (Books12),
+  skills/artwright/references/cli.md (measuring copy), skills/artwright/references/sprite-json.md (edges_info),
+  .claude-plugin/plugin.json
+- The block guard checks luma as well as RGB steps. ffmpeg's chroma upsampling put enough colour steps on
+  the 2 px lattice to hide the 8 px block pattern in a smooth quality 55 JPEG. The fixture read scale 2;
+  it now reads scale 1 without Pillow. Explicit scales still bypass the guard; PNG decoding is unchanged.
+  Genuine scale 2 JPEG fixtures are checked through both decoders. Noise is documented at the measuring-copy
+  size, and geometry edge information at a long edge of at most 256 px.
 
 ### C-20261026-1 · 2026-10-26 · `pixel` finds a scale 2 or 3 grid in a high-quality JPEG (0.7.1); L-020
 - because: L-020, the round 2 handoff's open bug (a scale 2 palette JPEG at quality 90 read as scale 1)
