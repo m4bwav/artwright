@@ -107,6 +107,20 @@ the footer, and drop the double-tie known issue once the fix (`resolve()` return
   package on PYTHONPATH that raises ImportError works for every call.
 
 Related: see also [../HANDOFF.md](../HANDOFF.md), [../log.md](../log.md).
+
+## Since 0.7.2 (2026-10-26)
+
+[Release 0.7.2](https://github.com/m4bwav/artwright/releases/tag/v0.7.2) at `a185c05`;
+[PR #25](https://github.com/m4bwav/artwright/pull/25) merged. Wiki `0de6f45` documents the repaired ffmpeg
+JPEG guard, measuring-copy grain, release history and current version.
+
+The existing verifier ran against the released tag archive on Linux (Python 3.14.4, Pillow 13.0.0),
+Linux without Pillow, Windows (Python 3.14.6) and Windows without Pillow. Outputs remain in the private
+wiki kit under 0.7.2-specific names; earlier version recordings are preserved.
+
+Gates: 12 pages, zero errors/warnings; 102 outputs checked, zero missing, two labelled skips; snippets eight
+blocks, 90 commands, zero missing; prose zero strong findings. Live: 12 pages, zero failures; 59 anchors,
+zero broken. Historical plugin-details and older-version examples remain explicitly labelled.
 ## Since 0.3.0 (2026-10-23)
 
 Use `2026-10-23-wiki-verify.py` and its three outputs, kept in the owner's private notes (`wiki-build`; they print the masked home folder, which this repository's path guard refuses) (`.out.txt` is the Linux run with Pillow that the pages show, `.nopillow.out.txt`, `.win39.out.txt`). The 2026-10-22 script copied only aw.py, so every command fails on 0.2.0 and later (aw_measure.py), and it had been edited after its output was saved; replay an old version against its own saved output to catch that. Pages that name the version or commit are now 0.3.0 at 2c13c08: Home, FAQ, Development, Errors-and-Edge-Cases, Versions-and-Upgrading, _Footer.
