@@ -6,6 +6,20 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-021 · 2026-10-30 · Check the details the setting implies, not only the ones the brief names
+- Trigger: a set of about sixty medieval building sprites had been picked and animated over weeks; the game's owner
+  then noticed that fifteen heated buildings had no chimney, though winter heating is a core system. No brief named
+  a chimney, so no fit check asked for one.
+- Hypothesis: a fit check built only from the brief's words misses the functional details a viewer from that world
+  expects; they surface late, after the art has dependants (strips, anchors), when fixing costs more.
+- Rule: when splitting a brief, add a check for each functional detail the setting and the game's systems imply
+  (heat means a chimney, water means a well or dock, light means windows or lamps), and run that check across the
+  whole set once, before animation work builds on the stills.
+- Evidence: fifteen of twenty-two enclosed heated buildings lacked a chimney; each was fixed by a donor lift after the
+  fact, and every construction strip had to be re-made.
+- Scope: skill
+- Status: active · helpful 1 · harmful 0 · last_confirmed 2026-10-30
+
 ### L-020 · 2026-10-26 · On a JPEG, count a step only where it peaks: ringing hides a small grid
 - Trigger: `aw.py pixel` read scale 2 and scale 3 palette art saved at quality 90 (and 95) as scale 1; the share of
   steps on the true lattice was 0.56 at scale 2, near chance (0.5). A low-contrast scale 2 JPEG read as scale 8.
