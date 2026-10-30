@@ -60,7 +60,9 @@ Cost: a 16-image round robin in both orders is about 624k image tokens. Keep pai
 1. Split the brief into atomic yes/no checks: subjects, count, attributes, relations, camera and framing, light,
    style (by named traits), mood, text, forbidden items. A word naming a look ("golden hour", "overcast",
    "moonlit", "low angle", "horizon low") becomes the traits that show it, each its own check
-   ([references/rubric.md](references/rubric.md), criterion 1). Write them before looking.
+   ([references/rubric.md](references/rubric.md), criterion 1). Add the details the world implies even when the
+   brief is silent: a heated building in a cold, pre-industrial setting has a chimney; a well has a bucket; a dock
+   has water (L-021). Write them before looking.
 2. Cold read the image, then answer each check with the region that decides it.
 3. Verdict: `FITS`, `FITS WITH FIXES` or `DOES NOT FIT`; hard fails (wrong subject, wrong count, forbidden item,
    broken text the brief asked for) listed separately.

@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.3 · 2026-10-30: C-20261030-1, fit checks include the details the setting implies.
 - 0.7.2 · 2026-10-26: C-20261026-2, JPEG block rejection with ffmpeg and measuring-copy documentation.
 - 0.7.1 · 2026-10-26 (owner: tag without asking, 2026-10-26): C-20261026-1, `pixel` finds a scale 2 or 3 grid in a quality 90 JPEG.
 - 0.7.0 · 2026-10-26 (owner's go-ahead 2026-10-26), carries 0.5.0 and 0.6.0: C-20261025-2, pixel measures (banding, pillow, corner doubles, interior jaggies, `--bg`,
@@ -26,6 +27,13 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261030-1 · 2026-10-30 · Fit checks include the details the setting implies (0.7.3)
+- because: user request, L-021
+- files: skills/artwright-judge/SKILL.md (Fit to a brief, step 1), LEARNINGS.md (L-021), .claude-plugin/plugin.json,
+  skills/artwright/scripts/aw.py (VERSION)
+- Docs only. Splitting a brief now adds checks for functional details the world implies (a chimney on a heated
+  building) and runs them across the whole set before other work builds on it.
 
 ### C-20261026-2 · 2026-10-26 · Reject ffmpeg's smooth JPEG lattice (0.7.2)
 - because: user request, wiki findings in ai-docs/HANDOFF.md
