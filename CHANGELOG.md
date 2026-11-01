@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.4 · 2026-11-01: C-20261101-1, embedding similarity never passes count, text or binding checks.
 - 0.7.3 · 2026-10-30: C-20261030-1, fit checks include the details the setting implies.
 - 0.7.2 · 2026-10-26: C-20261026-2, JPEG block rejection with ffmpeg and measuring-copy documentation.
 - 0.7.1 · 2026-10-26 (owner: tag without asking, 2026-10-26): C-20261026-1, `pixel` finds a scale 2 or 3 grid in a quality 90 JPEG.
@@ -27,6 +28,12 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261101-1 · 2026-11-01 · Embedding similarity confirms the subject only (0.7.4)
+- because: user request (book learnings, Foster, *Generative Deep Learning* 2e, ch. 13)
+- files: skills/artwright-judge/SKILL.md (Fit to a brief, step 1), .claude-plugin/plugin.json,
+  skills/artwright/scripts/aw.py (VERSION)
+- Docs only. A CLIP-style score may confirm the subject but never passes count, text or attribute-binding checks.
 
 ### C-20261030-1 · 2026-10-30 · Fit checks include the details the setting implies (0.7.3)
 - because: user request, L-021

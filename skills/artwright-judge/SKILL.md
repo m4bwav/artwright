@@ -63,6 +63,8 @@ Cost: a 16-image round robin in both orders is about 624k image tokens. Keep pai
    ([references/rubric.md](references/rubric.md), criterion 1). Add the details the world implies even when the
    brief is silent: a heated building in a cold, pre-industrial setting has a chimney; a well has a bucket; a dock
    has water (L-021). Write them before looking.
+   Embedding (CLIP-style) similarity may confirm the subject; it never passes a count, text or attribute-binding
+   check (Foster, *Generative Deep Learning* 2e, ch. 13).
 2. Cold read the image, then answer each check with the region that decides it.
 3. Verdict: `FITS`, `FITS WITH FIXES` or `DOES NOT FIT`; hard fails (wrong subject, wrong count, forbidden item,
    broken text the brief asked for) listed separately.
