@@ -29,6 +29,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Changes
 
+### C-20261101-2 · 2026-11-01 · AI-look row 35: no voice
+- because: user request (book learnings, Simon, *Beyond Slop*, rule 5)
+- files: skills/artwright-judge/references/ai-look.md (table, verification line)
+- Docs only. A frame free of every other tell can still read as a stock render; the row asks whether it could be told apart from one and fixes it with the project's own inputs, not more prompt words. Also joins rows 30 to 34 back into the table (a blank line had split it).
+
 ### C-20261101-1 · 2026-11-01 · Embedding similarity confirms the subject only (0.7.4)
 - because: user request (book learnings, Foster, *Generative Deep Learning* 2e, ch. 13)
 - files: skills/artwright-judge/SKILL.md (Fit to a brief, step 1), .claude-plugin/plugin.json,
