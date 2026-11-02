@@ -24,9 +24,15 @@ RESEARCH.md.
 3. **Light logic.** One plan for the whole image: the key, a shadow family filled by sky or bounce, cast shadows
    that sharpen at contact, highlights tinted by their source, distance that recedes. `aw.py light` and `depth`
    point at where to look. An artificial or stylised brief can ask for broken daylight rules; judge against it.
+   Check that objects pick up some colour from their surroundings on the planes turning away and at the contour;
+   without it a subject looks cut out and pasted in. A floor reflection fades toward the viewer, never a full
+   flipped copy. A specular highlight is lighter and less saturated than the local colour; the strongest colour
+   sits in the lit matte area (Pickard, Color & Light, pp. 188-192).
 4. **Value and colour.** A few large value masses, not mid-grey mush; temperature as relative; one leading colour
    and accents placed with intent; harmony as a choice, not a formula (Itten's schemes predict nothing; Albers's
-   relativity holds).
+   relativity holds). Name the key: which value group carries the detail. Flag overmodelling, where the
+   lights drop into the midtones to model small forms, and exposure collapse, where different hues in the lights
+   bleach to one tint or the darks crush to one near-black (Pickard, Color & Light, pp. 21, 25, 56-57).
 5. **Rendering integrity** (a gate, not taste). Anatomy and hands; duplicated or merged objects; text; seams;
    perspective; mixels; two light directions in one composite.
 6. **Mechanism: does the machine work as drawn** (a gate, like 5). Apply it to any image whose subject or brief

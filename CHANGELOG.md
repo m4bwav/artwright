@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.5 · 2026-11-01 (owner: tag without asking, 2026-10-26), carries C-20261101-2: C-20261101-3, Pickard colour and light checks, AI-look rows 35 to 37.
 - 0.7.4 · 2026-11-01: C-20261101-1, embedding similarity never passes count, text or binding checks.
 - 0.7.3 · 2026-10-30: C-20261030-1, fit checks include the details the setting implies.
 - 0.7.2 · 2026-10-26: C-20261026-2, JPEG block rejection with ffmpeg and measuring-copy documentation.
@@ -28,6 +29,15 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261101-3 · 2026-11-01 · Colour and light checks from Pickard (0.7.5)
+- because: user request (book learnings, Pickard, *Artists' Master Series: Color & Light*, 3dtotal 2021)
+- files: skills/artwright-judge/references/rubric.md (Criteria 3 and 4), skills/artwright-judge/references/ai-look.md
+  (rows 36 and 37, verification line), skills/artwright/references/theory.md (Perception note), .claude-plugin/plugin.json,
+  skills/artwright/scripts/aw.py (VERSION)
+- Docs only. Light logic checks environment colour on turning planes, fading floor reflections and low-chroma
+  highlights; value and colour names the key and flags overmodelling and exposure collapse; two AI-look rows
+  (linear falloff, cut-out subject); a perception note on constancy and Lab opponent pairs.
 
 ### C-20261101-2 · 2026-11-01 · AI-look row 35: no voice
 - because: user request (book learnings, Simon, *Beyond Slop*, rule 5)
