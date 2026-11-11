@@ -173,3 +173,7 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 - wikiwright update pass from 0.3.0 to 0.7.1 (retargeted from 0.7.0 mid-pass when 0.7.1 was tagged). New on the wiki: `geomgate`, `sprite` and `setfit` sections, the 0.7.0 pixel craft numbers stated as reported with no pass lines (L-019), text bands and grain, the 0.6.0 and 0.7.1 JPEG grid rules, Versions and upgrading from 0.3.0, 0.4.0 or 0.4.2. Every output rerun: 169 cases on Linux with Pillow (shown), Linux without Pillow and Windows Python 3.9 with ffmpeg; the same script against v0.4.2 and the first script against 0.1.0 for the upgrade page. Gates: outputs 102 checked 0 missing, snippets 0 missing, check 0 errors, prose 0 strong, live 12 pages 0 failures. Tests on the v0.7.1 clone: 86 OK (1 skipped) on Windows and Linux.
 - Findings for the owner (no code changed) are in HANDOFF.md, "Wiki findings (2026-10-26)": the JPEG guard misses on the ffmpeg route, the grain estimate's scale, the CHANGELOG Releases list behind the tags, and two smaller ones.
 ## [2026-10-26] index | rebuilt (14 entries)
+
+## 2026-11-11: Works with section
+
+Added a README "Works with" section and a wiki Works-with page covering brandwright, polywright, pixelwright, cinewright, historywright, askwright, grindwright, taken from the real handoffs in both plugins' skills (askwright and tokenwright added where they fit). Part of a cross-plugin pass on Mark's request that each pairing be described from both sides.
