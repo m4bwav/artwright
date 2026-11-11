@@ -64,6 +64,20 @@ python aw.py rank --write                   # Bradley-Terry with ties into artwr
 
 All commands: [skills/artwright/references/cli.md](skills/artwright/references/cli.md).
 
+## Works with
+
+Each of these plugins works on its own. Together:
+
+- **[brandwright](https://github.com/m4bwav/brandwright)**: brandwright ranks its mock-ups by brand distance first, then hands the folder to artwright-judge for light, composition and brief fit. Brand fidelity stays brandwright's job and taste stays artwright's, so a mock-up has to pass both.
+- **[polywright](https://github.com/m4bwav/polywright)**: polywright renders turnarounds and concept views of a model, and artwright-judge reads them against the brief before any mesh work goes further.
+- **[pixelwright](https://github.com/m4bwav/pixelwright)**: artwright counts stair-step corner pixels and other pixel-art faults; pixelwright's `clean.corners` and its other fixing steps remove them.
+- **[cinewright](https://github.com/m4bwav/cinewright)**: cinewright-qc judges video takes. artwright judges the stills and reference frames that feed them, so each picture is judged by the plugin built for it.
+- **[historywright](https://github.com/m4bwav/historywright)**: Facts about an artwork (date, maker, price, provenance) go through historywright, which comes back with sources and a confidence line. artwright keeps the visual reading.
+- **[askwright](https://github.com/m4bwav/askwright)**: When the final pick is a person's, artwright's ranked shortlist goes on an askwright page, with images side by side and one case at a time.
+- **[grindwright](https://github.com/m4bwav/grindwright)**: grindwright's art lane uses artwright to check card and placeholder graphics before a person picks.
+
+More on each pairing, with an example flow: [Works with](https://github.com/m4bwav/artwright/wiki/Works-with) on the wiki.
+
 ## Install
 
 Claude Code: add this repository as a plugin marketplace and install `artwright`:
