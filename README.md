@@ -75,6 +75,7 @@ Each of these plugins works on its own. Together:
 - **[historywright](https://github.com/m4bwav/historywright)**: Facts about an artwork (date, maker, price, provenance) go through historywright, which comes back with sources and a confidence line. artwright keeps the visual reading.
 - **[askwright](https://github.com/m4bwav/askwright)**: When the final pick is a person's, artwright's ranked shortlist goes on an askwright page, with images side by side and one case at a time.
 - **[grindwright](https://github.com/m4bwav/grindwright)**: grindwright's art lane uses artwright to check card and placeholder graphics before a person picks.
+- **[fractalwright](https://github.com/m4bwav/fractalwright)**: artwright judges and critiques fractalwright's renders (light, composition, colour) before a pick.
 
 More on each pairing, with an example flow: [Works with](https://github.com/m4bwav/artwright/wiki/Works-with) on the wiki.
 
