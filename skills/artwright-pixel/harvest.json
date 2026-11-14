@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "targets": [
+    {
+      "kind": "reddit",
+      "sub": "PixelArt",
+      "keep": "critique threads naming concrete pixel-art faults and fixes"
+    },
+    {
+      "kind": "reddit",
+      "sub": "AnimatedPixelArt",
+      "weight": "low",
+      "keep": "animation critique: frame timing, smear frames, consistency"
+    }
+  ]
+}

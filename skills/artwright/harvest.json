@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "targets": [
+    {
+      "kind": "reddit",
+      "sub": "GameArt",
+      "keep": "game art critique and style/readability techniques"
+    }
+  ]
+}
