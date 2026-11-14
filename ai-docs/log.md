@@ -177,3 +177,5 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 ## 2026-11-11: Works with section
 
 Added a README "Works with" section and a wiki Works-with page covering brandwright, polywright, pixelwright, cinewright, historywright, askwright, grindwright, taken from the real handoffs in both plugins' skills (askwright and tokenwright added where they fit). Part of a cross-plugin pass on Mark's request that each pairing be described from both sides.
+
+## [2026-11-14] update | README Works with: fractalwright (new public plugin), mirroring its own section
