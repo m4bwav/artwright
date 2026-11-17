@@ -92,6 +92,10 @@ Four tracks; every refresh runs at least one query on each, scoped to the period
 
 ## Findings log
 
+### R-20261117-1 · 2026-11-17 · klad, a paint app a coding agent drives (technique harvest, Hacker News 50454951)
+- Source: https://github.com/klad-app/klad (read 2026-11-17; nothing run): 2D paint and animation app driven by CLI and JSON op batches, plain-file drawings, three agent skills (tool, drawing craft, pixel art). App licence PolyForm Internal Use 1.0.0; docs, skills and client MIT.
+- Taken: a research-only row in artwright-pixel's editor list. Aseprite MCP stays the editor route.
+
 ### R-20261021-1 · 2026-10-21 · Creation pass
 - Summary: Eight parallel research passes in creation mode (A art history and theory, B media and craft, C digital and pixel art, D AI generation, E AI evaluation, F facts and markets, G tooling and efficiency, H testing), each capped at about 25 searches and steered to direct API fetches. Result: AI art judging is weak and order-sensitive but improvable by procedure; no used art critic exists; museum and price sources moved or closed; the gold facts changed in 2026. Five passes hit a session usage limit and were resumed. Cost: searches 125 · fetches 218 · tool calls 429.
 - Track: subject

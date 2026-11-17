@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.6 · 2026-11-17: C-20261117-1, klad research-only row in the pixel editor list.
 - 0.7.5 · 2026-11-01 (owner: tag without asking, 2026-10-26), carries C-20261101-2: C-20261101-3, Pickard colour and light checks, AI-look rows 35 to 37.
 - 0.7.4 · 2026-11-01: C-20261101-1, embedding similarity never passes count, text or binding checks.
 - 0.7.3 · 2026-10-30: C-20261030-1, fit checks include the details the setting implies.
@@ -29,6 +30,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261117-1 · 2026-11-17 · klad row in the pixel editor list (0.7.6)
+- because: R-20261117-1; user request (technique harvest D15)
+- files: skills/artwright-pixel/references/pixel-art.md (Fixers and editors to point to), RESEARCH.md, plugin.json, aw.py VERSION
+- Docs only; research-only row, no route change.
 
 ### C-20261101-3 · 2026-11-01 · Colour and light checks from Pickard (0.7.5)
 - because: user request (book learnings, Pickard, *Artists' Master Series: Color & Light*, 3dtotal 2021)
@@ -61,7 +67,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 - because: user request, wiki findings in ai-docs/HANDOFF.md
 - files: skills/artwright/scripts/aw.py (jpeg_blocks, VERSION), tests/test_aw.py (Books12),
   skills/artwright/references/cli.md (measuring copy), skills/artwright/references/sprite-json.md (edges_info),
-  .claude-plugin/plugin.json
+  .claude-plugin/plugin.json, aw.py VERSION
 - The block guard checks luma as well as RGB steps. ffmpeg's chroma upsampling put enough colour steps on
   the 2 px lattice to hide the 8 px block pattern in a smooth quality 55 JPEG. The fixture read scale 2;
   it now reads scale 1 without Pillow. Explicit scales still bypass the guard; PNG decoding is unchanged.
@@ -73,7 +79,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 - files: skills/artwright/scripts/aw.py (_peak_profiles, _lattice_contrast, _profiles, detect_grid, pixel_one,
   VERSION),
   tests/test_aw.py (Books12.test_jpeg_ringing_does_not_hide_a_small_grid), LEARNINGS.md (L-020),
-  .claude-plugin/plugin.json
+  .claude-plugin/plugin.json, aw.py VERSION
 - On a JPEG, `pixel` counts a colour step only where it peaks along its row or column, so the ringing beside an
   edge no longer scatters steps off the lattice. Scale 2 and 3 palette art saved at quality 90 now reads at its
   scale instead of 1, and a low-contrast scale 2 JPEG that read as 8 reads as 2. The 8 px block guard still uses
