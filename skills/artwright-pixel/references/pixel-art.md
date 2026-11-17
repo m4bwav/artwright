@@ -87,6 +87,7 @@ artwright reports what is wrong; these tools fix or edit. Do not rebuild them.
 | unfake.js / unfake-core | Browser tool and Rust CLI: detect, snap, downscale, quantise; Python port unfake.py | MIT | https://github.com/jenissimo/unfake.js |
 | diivi/aseprite-mcp | Edit in Aseprite over MCP; `lint_sprite`, `get_color_stats`, `compare_frames`. `run_lua_script` runs any code on the host | MIT | https://github.com/diivi/aseprite-mcp |
 | aseprite-ai-artist | Draw and edit in Aseprite over MCP; read-only pixel-critic agent, 62 rules | MIT | https://github.com/with-pebbly/aseprite-ai-artist |
+| klad (research only, not a route) | Paint and animation app an agent drives by CLI (stroke, set, fill, export, undo; JSON op batches), no image model; a drawing is a folder of plain files so strokes stay editable. Its MIT pixel-art skill is worth reading against these rules (R-20261117-1) | App PolyForm Internal Use 1.0.0 (no redistribution); format docs, CLI reference, skills and client MIT | https://github.com/klad-app/klad |
 
 Both MCP servers need the user's own Aseprite 1.3+ (paid, or built from source for personal use; the EULA forbids redistributing binaries). Licences and activity checked on the GitHub API 2026-10-21 (verified: yes). Which fixer fails least on the same sprites is untested (verified: no).
 
