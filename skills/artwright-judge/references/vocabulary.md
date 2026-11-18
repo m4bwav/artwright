@@ -557,4 +557,6 @@ Worked example. Brief: "a fox in a winter forest in the style of [a living child
 
 > A red fox standing in a snowy birch forest at dusk. Gouache on cold-press paper, matte opaque colour with visible dry-brush texture. Limited palette of slate blue, warm cream and one rust-orange accent on the fox. Rounded simple shapes, no outlines, small dark dot eyes. Soft overcast light, low contrast, high-key snow. Fox small in the lower third with wide negative space above, eye-level view. Mid-century picture-book sensibility, slight paper grain.
 
+Describe the choices, not the person: the slots above, never "like X". Blend traits from two or three sources (artists, a movement, a medium) so the result is influence, not a copy of one hand (Kleon, *Steal Like an Artist*, ch. 2; book rule, unverified).
+
 One line to the user: "Replaced the artist's name with the traits of the look (artwright does not prompt with living artists' names)."

@@ -92,6 +92,13 @@ Four tracks; every refresh runs at least one query on each, scoped to the period
 
 ## Findings log
 
+### R-20261117-3 · 2026-11-17 · Tanizaki, *In Praise of Shadows* (1933), and Kleon, *Steal Like an Artist* (2012) (technique harvest)
+  - Summary: Tanizaki: beauty placed in graded shadow, so a frame lit evenly everywhere has no chosen darkness. Kleon: borrow from many sources and transform rather than copy one; constraints help an open brief; ask what was left out. Only the lighting ideas are taken from Tanizaki; his dated remarks on race and women are excluded.
+  - Track: subject
+  - Sources: Jun'ichirō Tanizaki, *In Praise of Shadows* (tr. Harper and Seidensticker); Austin Kleon, *Steal Like an Artist*, ch. 2 and 10
+  - Magnitude: 0.1 (book rules, unverified; no check on our tools)
+  - Applied: ai-look.md row 38; artwright SKILL.md critique step 2; vocabulary.md living-artist recipe; artwright-judge SKILL.md fit step 1. Not taken: lineage method for curate and a traditions.md source line (notes only).
+
 ### R-20261117-2 · 2026-11-17 · Edwards, *Drawing on the Right Side of the Brain* (2012), and Polster, *Ambigrams Revealed* (technique harvest)
 - Summary: crest shadow as the fourth aspect of light on a rounded form; perspective convergence by height against the horizon, plumb verticals, one vanishing point per parallel set; edges shared by both shapes; repeated symbols where the view should vary them; frontal and three-quarter head proportions as a loose guide. Polster: four axes for a lettering mark and a reader not told the word.
 - Track: subject
