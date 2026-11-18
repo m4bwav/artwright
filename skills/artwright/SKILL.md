@@ -63,6 +63,8 @@ contradiction, say so in one line and refresh after the task. Then route:
 2. **Formal analysis** with [references/craft.md](references/craft.md): the greyscale read (`aw.py stats --notan`),
    value groups, focal point, eye path, balance, colour and temperature, light logic (`aw.py light`), air
    (`aw.py depth`), line, edges, space, rendering integrity. `aw.py comp` gives masses, focal margin, border pull.
+   Ask too: is the darkness designed (where the shadow masses sit and whether they hold the composition), and what
+   was left out and whether that omission helps.
 3. **Critic pass.** Each claim names a region ("upper left, the sky band", "the right hand") and a reason. Drop
    any claim that cannot point at something. No "looks good", no "feels", no "somewhat".
 4. **Verdict:** the top two or three issues, most important first, one concrete fix each; then what works and

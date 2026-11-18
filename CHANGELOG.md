@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.8 · 2026-11-17: C-20261117-3, flat even light row, designed-darkness and omission questions, blended style rewrite, open-brief constraint.
 - 0.7.7 · 2026-11-17: C-20261117-2, crest shadow row and drawing checks (perspective, shared edge, symbol repeat, heads, lettering).
 - 0.7.6 · 2026-11-17: C-20261117-1, klad research-only row in the pixel editor list.
 - 0.7.5 · 2026-11-01 (owner: tag without asking, 2026-10-26), carries C-20261101-2: C-20261101-3, Pickard colour and light checks, AI-look rows 35 to 37.
@@ -31,6 +32,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261117-3 · 2026-11-17 · Shadow, omission and blended-style checks (0.7.8)
+- because: R-20261117-3; user request (technique harvest, Tanizaki and Kleon books; book rules, unverified)
+- files: skills/artwright-judge/references/ai-look.md (row 38), skills/artwright/SKILL.md (Critique of one work, step 2), skills/artwright-judge/references/vocabulary.md (Living artist → traits), skills/artwright-judge/SKILL.md (Fit to a brief, step 1), RESEARCH.md, .claude-plugin/plugin.json, skills/artwright/scripts/aw.py (VERSION)
+AI-look row 38 names flat, evenly bright light; critique asks whether the darkness is designed and what was left out; a style rewrite describes choices and blends two or three sources; an open brief gets one hard constraint.
 
 ### C-20261117-2 · 2026-11-17 · Crest shadow and drawing checks (0.7.7)
 - because: R-20261117-2; user request (technique harvest, Edwards and Polster books; book rules, unverified)
