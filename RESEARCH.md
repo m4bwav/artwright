@@ -92,6 +92,13 @@ Four tracks; every refresh runs at least one query on each, scoped to the period
 
 ## Findings log
 
+### R-20261117-2 · 2026-11-17 · Edwards, *Drawing on the Right Side of the Brain* (2012), and Polster, *Ambigrams Revealed* (technique harvest)
+- Summary: crest shadow as the fourth aspect of light on a rounded form; perspective convergence by height against the horizon, plumb verticals, one vanishing point per parallel set; edges shared by both shapes; repeated symbols where the view should vary them; frontal and three-quarter head proportions as a loose guide. Polster: four axes for a lettering mark and a reader not told the word.
+- Track: subject
+- Sources: Betty Edwards, *Drawing on the Right Side of the Brain* (4th ed., 2012), ch. 6-8, 10; Scott Kim's foreword and Burkard Polster, *Ambigrams Revealed*
+- Magnitude: 0.1 (book rules, unverified; no check on our tools)
+- Applied: skills/artwright/references/craft.md (Light logic: Crest shadow row; Drawing checks). Not taken: the hemisphere framing, the first-shape check and a convergence measure (notes only); no ambigram generator.
+
 ### R-20261117-1 · 2026-11-17 · klad, a paint app a coding agent drives (technique harvest, Hacker News 50454951)
 - Source: https://github.com/klad-app/klad (read 2026-11-17; nothing run): 2D paint and animation app driven by CLI and JSON op batches, plain-file drawings, three agent skills (tool, drawing craft, pixel art). App licence PolyForm Internal Use 1.0.0; docs, skills and client MIT.
 - Taken: a research-only row in artwright-pixel's editor list. Aseprite MCP stays the editor route.
