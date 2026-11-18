@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.7 · 2026-11-17: C-20261117-2, crest shadow row and drawing checks (perspective, shared edge, symbol repeat, heads, lettering).
 - 0.7.6 · 2026-11-17: C-20261117-1, klad research-only row in the pixel editor list.
 - 0.7.5 · 2026-11-01 (owner: tag without asking, 2026-10-26), carries C-20261101-2: C-20261101-3, Pickard colour and light checks, AI-look rows 35 to 37.
 - 0.7.4 · 2026-11-01: C-20261101-1, embedding similarity never passes count, text or binding checks.
@@ -30,6 +31,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261117-2 · 2026-11-17 · Crest shadow and drawing checks (0.7.7)
+- because: R-20261117-2; user request (technique harvest, Edwards and Polster books; book rules, unverified)
+- files: skills/artwright/references/craft.md (Light logic, Drawing checks), RESEARCH.md, .claude-plugin/plugin.json, skills/artwright/scripts/aw.py (VERSION)
+- Docs only. A crest shadow row with a four-aspect light check, and a new section: perspective audit, shared-edge test, symbol repeat, head-proportion guide and a short lettering mark critique.
 
 ### C-20261117-1 · 2026-11-17 · klad row in the pixel editor list (0.7.6)
 - because: R-20261117-1; user request (technique harvest D15)

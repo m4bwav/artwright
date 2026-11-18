@@ -77,6 +77,7 @@ stylised brief can break any of them on purpose: judge against the brief, never 
 | Shadow colour | A shadow takes the colour of the bright things it can see: blue from a clear sky, grey under cloud. Up-facing shadow planes go cool, down-facing ones pick up warm bounce from the ground. Shadows as warm as the light (`warm_shadows`) mean no sky fill | book: Gurney CL pp. 50, 66-67 |
 | Shadow chroma | In one surface, the shadow is darker, duller and cooler than the light, by about the same amount for every colour. Shadows more saturated than the lights (`glowing_shadows`) read as glowing | book: Gurney CL p. 52 |
 | Form and cast shadows | Light side, terminator, core shadow, reflected light (darker than any lit part), and the darkest occlusion at contact. A cast shadow is sharp at its base and softens and widens away from the caster | book: Gurney CL pp. 46-47, 50 |
+| Crest shadow | On a rounded form, a dim band sits on the turn between the highlight side and the reflected light. Check all four aspects on any round thing: highlight, crest shadow, reflected light, cast shadow (the darkest). No crest band or no reflected light reads flat; reflected light as bright as the lit side breaks the logic | no (book rule, unverified: Edwards ch. 10) |
 | Texture | Texture shows most in the half-tone next to the terminator, little in full light, almost none in shadow. Even texture everywhere is a rendering tell | book: Gurney CL p. 47 |
 | Highlights and rims | A highlight is a reflection of the source and takes its colour on paint, plastic, skin, wood and glass; on metal it takes the metal's colour too (see Material cues); pure white is rare. A rim needs a source behind and a dark ground, takes a lighter version of the local colour, and varies in width | book: Gurney CL pp. 60, 162-165 |
 | Backlit thin things | Leaves, sails and ears lit from behind are the most saturated notes in the scene | book: Gurney CL pp. 152-155 |
@@ -177,6 +178,16 @@ Subtractive (carving: tool marks, chisel facets), additive (modelling: thumb and
 | Photomechanical reproduction | A regular dot or square pattern under magnification (halftone, offset): not an original print | yes, B-F16 |
 
 Reference: Bamber Gascoigne, *How to Identify Prints* (1986, 2004).
+
+## Drawing checks
+
+Book rules, unverified (Edwards, *Drawing on the Right Side of the Brain*, 2012; Polster, *Ambigrams Revealed*). No `aw.py` command measures these; read them by eye.
+
+- **Perspective audit** for buildings, interiors and rendered scenes. Find the horizon (eye level). Horizontal edges above it run down toward their vanishing point, those on it stay flat, those below run up. Walls and posts stay plumb unless the view looks steeply up or down. Each set of parallel edges meets at one point on the horizon; extend two of them and see if they agree. Sets that meet at different points, or tilt the wrong way for their height, are the fault to name.
+- **Shared edge.** An outline belongs to both shapes it divides. A carefully drawn figure set against a vague, uniform ground shows the edge was seen from one side only; check the ground side with the same care.
+- **Symbol repeat.** Copies that should change with the view but do not (every wheel the same oval, every chair leg one length, a row of identical windows receding without shrinking) mean a remembered sign was drawn, not the thing seen. Common in AI images too.
+- **Head proportions**, a guide only, since faces vary: the eyes sit near halfway down the head, about one eye width apart; when the head tilts, the eye line stays square to the face's centre line; in a three-quarter view the far side is narrower than the near one. Matching halves in a turned head is the usual tell.
+- **Lettering mark critique** (logos, wordmarks, ambigrams): judge four things, how easily it reads, how it looks, whether every stroke earns its place, and whether the form carries the meaning. Test reading on someone not told the word; the maker always reads it. A model reading rotated or stylised text is not yet a proven stand-in for that reader.
 
 ## Critique frameworks
 
