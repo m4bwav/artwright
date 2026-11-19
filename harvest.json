@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "targets": [
+    {
+      "kind": "github",
+      "query": "comfyui style transfer",
+      "keep": "top 10 by stars; new entries and their owners' repos become harvest targets"
+    },
+    {
+      "kind": "github",
+      "url": "https://github.com/cubiq/ComfyUI_IPAdapter_plus",
+      "keep": "comfyui-top10 harvest seed O3; new nodes, releases and the owner's (cubiq) other repos"
+    }
+  ]
+}
