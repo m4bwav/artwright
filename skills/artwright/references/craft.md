@@ -63,6 +63,11 @@ Then run `aw.py comp --subject x,y,w,h` and look again wherever the model and th
   paintings. A two-value study has a valley in the middle of its histogram (`stats` bimodality). verified: book
   (Gurney IR pp. 156-157)
 - A gradient leads the eye from dark toward light. verified: book (Roberts p. 34)
+- Three value groups, at most five, that do not overlap: a light inside the shadow group brighter than a dark in the
+  light group is overmodelling. Key the picture for its lights or its darks on purpose, not both. On a lit form the
+  value drops slowly then faster toward the terminator; an even ramp goes dark too soon (AI-look row 36). Judge value
+  in L* or greyscale, never a brightness slider: a less saturated colour reads lighter. verified: no (book rule,
+  unverified: Pickard, *Color & Light*, pp. 20-26, 41)
 
 ## Light logic
 
@@ -76,12 +81,15 @@ stylised brief can break any of them on purpose: judge against the brief, never 
 | Two families | Lit and shadow sides stay apart in value; in sun the gap is wide (about half the value scale), and fill or bounce never rivals the key. Haze, cloud and light ground narrow it (`low_value_gap` is right for overcast) | book: Gurney CL p. 48 |
 | Shadow colour | A shadow takes the colour of the bright things it can see: blue from a clear sky, grey under cloud. Up-facing shadow planes go cool, down-facing ones pick up warm bounce from the ground. Shadows as warm as the light (`warm_shadows`) mean no sky fill | book: Gurney CL pp. 50, 66-67 |
 | Shadow chroma | In one surface, the shadow is darker, duller and cooler than the light, by about the same amount for every colour. Shadows more saturated than the lights (`glowing_shadows`) read as glowing | book: Gurney CL p. 52 |
-| Form and cast shadows | Light side, terminator, core shadow, reflected light (darker than any lit part), and the darkest occlusion at contact. A cast shadow is sharp at its base and softens and widens away from the caster | book: Gurney CL pp. 46-47, 50 |
+| Chroma on the lit side | Matte colour is most saturated on the plane facing the light and greys toward the shadow; whiteness belongs to the separate specular. A lit side that bleaches as it brightens reads chalky (`light` report_only `chalky_lights`; with `--box` on one matte object) | no (book rule, unverified: Pickard pp. 101-102) |
+| Shadow ratio | Ambient light sets how dark shadows go: about half way to black on a white ground, three quarters on mid grey. Every object in one scene keeps about the same ratio (`light --box` per object, report_only `shadow_ratio`) | no (book rule, unverified: Pickard p. 107) |
+| Form and cast shadows | Light side, terminator, core shadow, reflected light (darker than any lit part, strong only near the bouncing surface, and inside the shadow group), and the darkest occlusion at contact. A cast shadow is sharp at its base and softens and widens away from the caster | book: Gurney CL pp. 46-47, 50 |
 | Crest shadow | On a rounded form, a dim band sits on the turn between the highlight side and the reflected light. Check all four aspects on any round thing: highlight, crest shadow, reflected light, cast shadow (the darkest). No crest band or no reflected light reads flat; reflected light as bright as the lit side breaks the logic | no (book rule, unverified: Edwards ch. 10) |
 | Texture | Texture shows most in the half-tone next to the terminator, little in full light, almost none in shadow. Even texture everywhere is a rendering tell | book: Gurney CL p. 47 |
 | Highlights and rims | A highlight is a reflection of the source and takes its colour on paint, plastic, skin, wood and glass; on metal it takes the metal's colour too (see Material cues); pure white is rare. A rim needs a source behind and a dark ground, takes a lighter version of the local colour, and varies in width | book: Gurney CL pp. 60, 162-165 |
 | Backlit thin things | Leaves, sails and ears lit from behind are the most saturated notes in the scene | book: Gurney CL pp. 152-155 |
 | Bright sources | A strong light wears a halo of its own colour that eats into nearby edges; starbursts, rings and hexagons are camera artefacts, not vision | book: Gurney CL p. 166 |
+| Source colour | Sun, fire and tungsten run orange through white to blue; green or violet light means a filter, LED or other artificial source. Moonlight is dim and low in chroma, not blue | no (book rule, unverified: Pickard pp. 115-121) |
 | One plan | Every element obeys one lighting plan: same side, same colour, same hardness. Two light directions in one composite is an integrity failure | book: Gurney CL p. 210; IR p. 72 |
 | Photo look | Shadows clipped to black, highlights to white, weak colour shifts, snapshot framing, stiff gesture, random detail: the marks of copying a photo, and common in images trained on photos | book: Gurney CL pp. 170-171; IR pp. 64-65 |
 
@@ -96,6 +104,7 @@ How a surface's light says what it is made of. Use them to check a render or a p
 | Highlight size | Smoother is smaller and brighter, rougher broader and dimmer. A large, very bright highlight contradicts itself | book: CGPP §14.9.3 pp. 359-361 |
 | Soft materials | Skin, wax, marble and milk carry light under the surface: the shadow edge softens and warms (red on skin), colour bleeds within the object | book: CGPP §27.13.2 pp. 738-739 |
 | Coloured glass and water | Transmitted colour deepens with thickness: thick parts darker and more saturated, thin edges paler | book: CGPP §14.10.3 p. 368 |
+| Two highlights | The form highlight (plane facing the light, most saturated) and the specular (brightest, least saturated) meet only when the eye is at the light. The specular never touches the terminator: a lit sliver always lies between, unless a cast shadow crosses. Skin sits in orange at moderate chroma with organic shifts to red and pink | no (book rule, unverified: Pickard pp. 191-192, 197-198) |
 | Grounding | A contact shadow decides whether an object touches the surface; even a faint, roughly shaped one does it. None reads as floating | book: CGPP §5.6 pp. 112-113 |
 
 ## Atmosphere and distance
@@ -123,6 +132,9 @@ How a surface's light says what it is made of. Use them to check a render or a p
 - Too much colour fails more often than too much grey: everything at full strength ("fruit salad", `fruit_salad`)
   is the commoner fault, and "mud" usually comes from poor value planning, not from the mixture. One strong colour
   backed by greys mixed from the picture's own colours holds together. verified: book (Gurney CL pp. 80-81, 106-107)
+- Exposure in colour: in the lightest and darkest tenth, different colours should still read apart. All lights
+  going to one white, or all darks to one black, is over- or underexposure (`light` report_only hue sectors at the
+  ends against the middle). verified: no (book rule, unverified: Pickard pp. 55-58)
 - No flat colour: large areas grade in hue, value and chroma (a clear sky, a lawn, a wall). verified: book (Gurney
   CL pp. 82-85)
 - Saturation hierarchy: the most saturated area should be where attention belongs; uniform high saturation flattens the image and is a common AI tell. verified: no (practice; reward tuning drives oversaturation, R-20261021-5)
