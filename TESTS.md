@@ -8,6 +8,16 @@ Entry shape: `### T-YYYYMMDD-n · date · harness · env · passed/total`, then 
 
 ## Runs
 
+### T-20261120-1 · 2026-11-20 · `aw.py diversity` on own renders and drawn fixtures · Windows · passed
+- 92 tests run (4 new diversity cases: four copies read samey with every pair flagged; four distinct drawn images
+  read varied with no pair under the flag; one twin in a varied batch is the only flagged pair; one image fails
+  soft), one museum-network test skipped. Skill checks: 0 problems. Budget passes, aw.py 87 KB (yellow).
+- Z-Image Turbo, 8 seeds of one prompt (a man in a blue suit and scarf in an office; one pose and framing by eye):
+  mean 0.256, min 0.191; a second prompt's 8 seeds 0.254. Both `samey` at the 0.3 default.
+- Sprite prompts, 4 seeds each: 0.35, 0.39, 0.43 (`varied`); 13 different prompts 0.52; a 400 px resized copy of
+  one seed against its original 0.021 (flagged at 0.1).
+- led to: C-20261120-1
+
 ### T-20261026-1 · 2026-10-26 · offline CLI and decoder regressions · Windows · passed
 - 87 tests run, one museum-network test skipped, no failures. Skill checks: 0 problems. Budget passes,
   aw.py 86 KB (yellow). Diff whitespace check passes.

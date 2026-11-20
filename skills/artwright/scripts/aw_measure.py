@@ -8,7 +8,7 @@ pointer to look at, never a grade. Thresholds were set from flag rates on museum
 
 import math
 
-from aw import Fail, Img, Path, alpha_mask, crop, de2000, flatten, gray_img, lab, load, luma_list, mean_sd, out, resize_box, resize_nearest, save_png, small, sobel
+from aw import Fail, Img, Path, alpha_mask, crop, de2000, dhash, flatten, gray_img, ham, inputs, lab, load, luma_list, mean_sd, out, resize_box, resize_nearest, save_png, small, sobel
 
 HUES = ((20, "pink"), (50, "red"), (80, "orange"), (115, "yellow"), (165, "green"), (225, "cyan"), (290, "azure"),
         (315, "blue"), (345, "magenta"), (361, "pink"))
@@ -922,3 +922,77 @@ def tile_repetition(img):
            "flat_border_sides": [("top", "bottom", "left", "right")[i] for i in rows]}
     res["repetition_suspected"] = max(abs(glr), abs(gtb)) > TILE_RAMP or cv > TILE_SPREAD or bool(rows)
     return res
+
+
+# ----- diversity: how varied a batch of takes is (idea after ReDiverse, arXiv:2611.18550, which scores a model's
+# diversity as the mean pairwise distance between seeds of one prompt; that paper uses DINO and LPIPS, these are
+# CPU descriptors written for artwright, so the numbers are artwright's own scale, not the paper's)
+
+DIV_EDGE = 16    # luma grid for the structure term
+DIV_CELLS = 4    # colour layout grid (cells a side)
+DIV_DE = 50.0    # mean delta-E76 per cell that counts as fully different colour
+
+
+def div_desc(img):
+    """Three cheap descriptors: z-scored 16x16 luma, a 4x4 grid of mean CIELAB, and the 64-bit dHash."""
+    flat = Img(img.w, img.h, bytearray(b"".join(bytes((r, g, b, 255)) for r, g, b in flatten(img, (128, 128, 128)))))
+    lum = luma_list(resize_box(flat, DIV_EDGE, DIV_EDGE))
+    m, sd = mean_sd(lum)
+    z = [(v - m) / sd for v in lum] if sd > 1e-6 else [0.0] * len(lum)
+    cells = [lab(p) for p in flatten(resize_box(flat, DIV_CELLS, DIV_CELLS))]
+    return {"z": z, "flat": sd <= 1e-6, "lab": cells, "dhash": dhash(flat)}
+
+
+def div_dist(p, q):
+    """Distance 0 (same picture) to about 1 (unrelated): mean of structure, colour layout and dHash terms."""
+    if p["flat"] or q["flat"]:
+        s = 0.0 if p["flat"] and q["flat"] else 0.5
+    else:
+        r = sum(a * b for a, b in zip(p["z"], q["z"])) / len(p["z"])
+        s = max(0.0, min(1.0, (1 - r) / 2))
+    c = min(1.0, sum(math.dist(a, b) for a, b in zip(p["lab"], q["lab"])) / len(p["lab"]) / DIV_DE)
+    h = ham(p["dhash"], q["dhash"]) / 64
+    return (s + c + h) / 3, s, c, h
+
+
+def cmd_diversity(a):
+    files = inputs(a.images)
+    if len(files) < 2:
+        raise Fail("diversity needs two or more images (got %d)" % len(files))
+    descs = [div_desc(load(f)) for f in files]
+    pairs, near = [], []
+    best = {f: (2.0, None) for f in files}
+    terms = [0.0, 0.0, 0.0]
+    for i in range(len(files)):
+        for j in range(i + 1, len(files)):
+            d, s, c, h = div_dist(descs[i], descs[j])
+            pairs.append(d)
+            for k, v in enumerate((s, c, h)):
+                terms[k] += v
+            for x, y in ((files[i], files[j]), (files[j], files[i])):
+                if d < best[x][0]:
+                    best[x] = (d, y)
+            if d < a.flag:
+                near.append({"a": files[i], "b": files[j], "distance": round(d, 4),
+                             "structure": round(s, 4), "colour": round(c, 4), "dhash": round(h, 4)})
+    n = len(pairs)
+    mean = sum(pairs) / n
+    sp = sorted(pairs)
+    in_near = {x for p in near for x in (p["a"], p["b"])}
+    samey = mean < a.samey or len(in_near) * 2 > len(files)
+    verdict = "samey" if samey else "varied"
+    line = "%s: %d takes, mean distance %.3f (min %.3f), %d near-identical pair%s below %.2f" % (
+        verdict, len(files), mean, sp[0], len(near), "" if len(near) == 1 else "s", a.flag)
+    return out({
+        "verdict": verdict, "line": line, "count": len(files), "pairs": n,
+        "distance": {"mean": round(mean, 4), "min": round(sp[0], 4), "median": round(sp[n // 2], 4),
+                     "max": round(sp[-1], 4)},
+        "terms": {"structure": round(terms[0] / n, 4), "colour": round(terms[1] / n, 4), "dhash": round(terms[2] / n, 4)},
+        "near_identical": sorted(near, key=lambda p: p["distance"]),
+        "nearest": sorted(({"file": f, "nearest": best[f][1], "distance": round(best[f][0], 4)} for f in files),
+                          key=lambda r: r["distance"]),
+        "thresholds": {"flag": a.flag, "samey_mean": a.samey,
+                       "rule": "samey when the mean is below samey_mean or flagged pairs touch over half the takes"},
+        "method": {"name": "structure+colour-layout+dhash", "version": 1, "source": "idea after arXiv:2611.18550",
+                   "note": "a description of spread, not a grade; read the nearest pairs before rerolling"},
+    })

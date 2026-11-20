@@ -179,3 +179,8 @@ local use, so it is closed for him. HANDOFF and next-session-prompt.md updated; 
 Added a README "Works with" section and a wiki Works-with page covering brandwright, polywright, pixelwright, cinewright, historywright, askwright, grindwright, taken from the real handoffs in both plugins' skills (askwright and tokenwright added where they fit). Part of a cross-plugin pass on Mark's request that each pairing be described from both sides.
 
 ## [2026-11-14] update | README Works with: fractalwright (new public plugin), mirroring its own section
+
+## [2026-11-20] build | `aw.py diversity` (0.8.0), from the technique harvest (arXiv:2611.18550, ReDiverse)
+Batch spread on CPU: mean of a 16x16 z-scored luma correlation term, a 4x4 CIELAB layout term and dHash. Thresholds
+(flag 0.1, samey 0.3) set on Z-Image Turbo renders: one-prompt seeds 0.25 (visibly one pose), sprite seeds 0.35 to 0.43,
+mixed prompts 0.52, resized copy 0.02. Uncalibrated against owner labels; T-20261120-1.

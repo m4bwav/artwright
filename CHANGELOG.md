@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.8.0 · 2026-11-20: C-20261120-1, `aw.py diversity` (batch spread, near-identical pairs, varied or samey).
 - 0.7.10 · 2026-11-19: C-20261119-2, Ware craft rows (form in value, wide-angle stretch); no measure.
 - 0.7.9 · 2026-11-19: C-20261119-1, `light` report_only (chalky lights, shadow ratio, exposure hue sectors) and Pickard craft rows.
 - 0.7.8 · 2026-11-17: C-20261117-3, flat even light row, designed-darkness and omission questions, blended style rewrite, open-brief constraint.
@@ -34,6 +35,18 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261120-1 · 2026-11-20 · `aw.py diversity`: how varied a batch of takes is (0.8.0)
+- because: user request (technique harvest, paper arXiv:2611.18550, ReDiverse, verdict adopt-partly: its diversity
+  measure, mean pairwise distance across seeds of one prompt, is a cheap batch check; T-20261120-1)
+- files: skills/artwright/scripts/aw_measure.py (diversity), skills/artwright/scripts/aw.py (parser, version),
+  skills/artwright/references/cli.md (command table), skills/artwright/SKILL.md (batch of seeds),
+  skills/artwright-judge/SKILL.md (A batch, step 1), tests/test_aw.py, .claude-plugin/plugin.json
+- New command `diversity IMG|DIR... [--flag 0.1] [--samey 0.3]`: mean, min, median and max pairwise distance from
+  three CPU terms (z-scored 16x16 luma correlation, 4x4 CIELAB layout, dHash), near-identical pairs, each take's
+  nearest neighbour, and a one-line verdict, `varied` or `samey`. Written fresh from the paper's description (it
+  uses DINO and LPIPS; artwright keeps to the standard library), cited as arXiv:2611.18550. Thresholds set on
+  Z-Image Turbo renders, uncalibrated against owner labels.
 
 ### C-20261119-2 · 2026-11-19 · Ware 2012 craft rows (0.7.10)
 - because: user request (book learnings round 6, Ware, *Information Visualization*, 3rd ed., 2012; book rules)
