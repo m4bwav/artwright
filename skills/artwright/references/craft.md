@@ -32,7 +32,7 @@ composition flags") says where to look; confirm it by eye before it becomes a fi
 | Intervals and clusters | Neat rows, equal spacing and equal sizes look staged. Cluster faces and detail tightly against large quiet areas; a simple light shape behind the key head lifts it from a busy ground. Not measured | book: Roberts p. 30; Gurney IR pp. 174-175 |
 | Tangents and mergers | Edges that just touch (a head against the frame, a horizon meeting a shoulder), a horizon through a head (`horizon_through_head`), a pole growing from a head, two silhouettes fused into one shape. Overlap clearly or separate | no; mergers book: Mateu-Mestre FI1 p. 26 |
 | Horizon and camera height | Where the horizon sits (low, middle or high band, or none) and how high the camera is. Do they fit the feeling asked for? A horizon at exactly half splits the frame (`horizon_split`). Eye level cuts every standing figure on flat ground at the same height | book: Mateu-Mestre FI1 pp. 40-41; Gurney IR pp. 40-41 |
-| Ground contact and scale | Feet on one ground plane; size falls off consistently with distance | book: Mateu-Mestre FI1 p. 71 |
+| Ground contact and scale | Feet on one ground plane; size falls off consistently with distance. A judged object (product, model) shot wider than about 30 degrees across looks stretched | book: Mateu-Mestre FI1 p. 71; Ware 2012 p. 245 |
 | Silhouette | Fill the main figure black: the action, the face and both hands should still read, with limbs clear of the body | book: Gurney IR pp. 158-159 |
 | Shape grouping | Neighbouring shapes of similar value fuse into a few big patterns, so a busy scene still reads; save the black-against-white jump for the subject (`fragmented` when no big shapes form) | book: Gurney IR pp. 162-163 |
 | Depth devices | Overlap, size change, a dark foreground element framing the view (repoussoir), linear perspective with one horizon, atmosphere (below) | no; repoussoir book: Gurney IR pp. 180-181 |
@@ -54,19 +54,19 @@ Then run `aw.py comp --subject x,y,w,h` and look again wherever the model and th
 
 ## Value
 
-- Posterise to three and then four values. A strong design still reads as a few large shapes; a weak one turns
+- Posterise to three, then four values. A strong design still reads as a few large shapes; a weak one turns
   mostly mid-grey with small scattered shapes (`mid_dominant`, `fragmented`). verified: book (Roberts pp. 44-47;
   Mateu-Mestre FI1 p. 34); notan after Arthur Wesley Dow, *Composition*, 1899
-- The subject usually carries the strongest value contrast. A "70/25/5" split of dominant, secondary and accent
+- The subject usually has the strongest value contrast. A "70/25/5" split of dominant, secondary and accent
   values is a heuristic, not a rule. verified: no (practice, B-F20)
-- Muddy values: middle tones everywhere, no clear light or dark mass. Common in AI images and in overworked
+- Muddy values: middle tones everywhere, no clear light or dark mass. Common in AI images and overworked
   paintings. A two-value study has a valley in the middle of its histogram (`stats` bimodality). verified: book
   (Gurney IR pp. 156-157)
 - A gradient leads the eye from dark toward light. verified: book (Roberts p. 34)
 - Three value groups, at most five, that do not overlap: a light inside the shadow group brighter than a dark in the
   light group is overmodelling. Key the picture for its lights or its darks on purpose, not both. On a lit form the
   value drops slowly then faster toward the terminator; an even ramp goes dark too soon (AI-look row 36). Judge value
-  in L* or greyscale, never a brightness slider: a less saturated colour reads lighter. verified: no (book rule,
+  in L* or greyscale, never a brightness slider (a less saturated colour reads lighter); form modelled in hue alone goes flat there (Ware 2012 p. 113). verified: no (book rule,
   unverified: Pickard, *Color & Light*, pp. 20-26, 41)
 
 ## Light logic
@@ -88,10 +88,10 @@ stylised brief can break any of them on purpose: judge against the brief, never 
 | Texture | Texture shows most in the half-tone next to the terminator, little in full light, almost none in shadow. Even texture everywhere is a rendering tell | book: Gurney CL p. 47 |
 | Highlights and rims | A highlight is a reflection of the source and takes its colour on paint, plastic, skin, wood and glass; on metal it takes the metal's colour too (see Material cues); pure white is rare. A rim needs a source behind and a dark ground, takes a lighter version of the local colour, and varies in width | book: Gurney CL pp. 60, 162-165 |
 | Backlit thin things | Leaves, sails and ears lit from behind are the most saturated notes in the scene | book: Gurney CL pp. 152-155 |
-| Bright sources | A strong light wears a halo of its own colour that eats into nearby edges; starbursts, rings and hexagons are camera artefacts, not vision | book: Gurney CL p. 166 |
+| Bright sources | A strong light wears a halo of its own colour that eats nearby edges; starbursts, rings and hexagons are camera artefacts | book: Gurney CL p. 166 |
 | Source colour | Sun, fire and tungsten run orange through white to blue; green or violet light means a filter, LED or other artificial source. Moonlight is dim and low in chroma, not blue | no (book rule, unverified: Pickard pp. 115-121) |
 | One plan | Every element obeys one lighting plan: same side, same colour, same hardness. Two light directions in one composite is an integrity failure | book: Gurney CL p. 210; IR p. 72 |
-| Photo look | Shadows clipped to black, highlights to white, weak colour shifts, snapshot framing, stiff gesture, random detail: the marks of copying a photo, and common in images trained on photos | book: Gurney CL pp. 170-171; IR pp. 64-65 |
+| Photo look | Clipped shadows and highlights, weak colour shifts, snapshot framing, stiff gesture, random detail: marks of copying a photo, common in AI images | book: Gurney CL pp. 170-171; IR pp. 64-65 |
 
 ## Material cues
 

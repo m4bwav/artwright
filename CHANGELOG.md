@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.10 · 2026-11-19: C-20261119-2, Ware craft rows (form in value, wide-angle stretch); no measure.
 - 0.7.9 · 2026-11-19: C-20261119-1, `light` report_only (chalky lights, shadow ratio, exposure hue sectors) and Pickard craft rows.
 - 0.7.8 · 2026-11-17: C-20261117-3, flat even light row, designed-darkness and omission questions, blended style rewrite, open-brief constraint.
 - 0.7.7 · 2026-11-17: C-20261117-2, crest shadow row and drawing checks (perspective, shared edge, symbol repeat, heads, lettering).
@@ -33,6 +34,14 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261119-2 · 2026-11-19 · Ware 2012 craft rows (0.7.10)
+- because: user request (book learnings round 6, Ware, *Information Visualization*, 3rd ed., 2012; book rules)
+- files: skills/artwright/references/craft.md (Value, Composition ground row, Light logic photo-look and bright-source
+  rows trimmed), .claude-plugin/plugin.json, skills/artwright/scripts/aw.py (VERSION)
+- Form modelled in hue alone goes flat in greyscale (p. 113); a judged object shot wider than about 30 degrees looks
+  stretched (p. 245). Rows only: the luminance-vs-hue mask measure was not validated, so no `aw.py` change. Two rows
+  trimmed to keep the knowledge files at 200 KB.
 
 ### C-20261119-1 · 2026-11-19 · Pickard light report and craft rows (0.7.9)
 - because: L-022; user request (book learnings round 6, Pickard, *Artists' Master Series: Color & Light*, 3dtotal 2021; book rules, unverified)
