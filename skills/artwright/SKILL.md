@@ -31,6 +31,8 @@ contradiction, say so in one line and refresh after the task. Then route:
 - `aw.py info <img>` first: size and token cost. Never Read an image larger than 1568 px on its long edge; fit it:
   `aw.py fit <img> -o <out.png> --long 1024` (about 1,300 tokens).
 - Detail goes by crop (`--crop x,y,w,h` or `--cell 3x3:4`), never by sending the whole image larger.
+- A batch of seeds: `aw.py diversity <folder>` gives mean and minimum pairwise distance, near-identical pairs and a
+  one-line `varied` or `samey`; samey seeds call for a prompt or model change, not more rerolls (judge: artwright-judge).
 - Several images, or "show them side by side": one contact sheet (`aw.py sheet <files or folder> -o sheet.png`),
   then one Read of it. Never one Read per image, never a hand-written PIL or ImageMagick script.
 - Colours ("main colours", "palette", "how much of it is red"): `aw.py palette <img>` gives the colours and their

@@ -33,7 +33,9 @@ from two candidates to four or more degrades models about seven times as much as
 
 ## A batch
 
-1. Dedupe: `aw.py dedupe <dir>`; drop near-copies (keep the first of each group). When the candidates were
+1. Dedupe: `aw.py dedupe <dir>`; drop near-copies (keep the first of each group). `aw.py diversity <dir>`
+   says whether the seeds differ at all: `samey` means more rerolls of the same prompt will not help, so change
+   the prompt, guidance or model before ranking; its `nearest` list names the redundant takes. When the candidates were
    painted over a 3D render and the render folder exists, run `aw.py geomgate <render dir> <img>` on each and
    rank only those with `pass: true`; list the rest with their `failing_gates`, never as close losers. A
    candidate that joins a series (loading screens, chapter plates) runs `aw.py setfit <img> --refs <the series>`

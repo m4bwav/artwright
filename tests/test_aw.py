@@ -264,6 +264,38 @@ class Hashes(unittest.TestCase):
         self.assertEqual(len(r["groups"]), 1)
         self.assertEqual(r["threshold"]["algo"], "dhash")
 
+    def test_diversity_copies_are_samey(self):
+        a = save(waves(64, 48), "dv-a.png")
+        copies = [a] + [save(waves(64, 48), "dv-a%d.png" % i) for i in range(3)]
+        code, r = run("diversity", *copies, "--json")
+        self.assertEqual(code, 0)
+        self.assertEqual(r["verdict"], "samey")
+        self.assertEqual(r["distance"]["max"], 0)
+        self.assertEqual(len(r["near_identical"]), 6)
+        self.assertTrue(r["line"].startswith("samey: 4 takes"))
+
+    def test_diversity_distinct_are_varied(self):
+        fs = [save(blocks(64, 48, 3, 70 + i), "dv-b%d.png" % i) for i in range(3)]
+        fs.append(save(gradient(64, 48, horizontal=False), "dv-g.png"))
+        code, r = run("diversity", *fs)
+        self.assertEqual(r["verdict"], "varied")
+        self.assertEqual(r["near_identical"], [])
+        self.assertGreater(r["distance"]["min"], r["thresholds"]["flag"])
+        self.assertGreater(r["distance"]["mean"], r["thresholds"]["samey_mean"])
+
+    def test_diversity_flags_one_twin_in_a_varied_batch(self):
+        fs = [save(blocks(64, 48, 3, 80 + i), "dv-c%d.png" % i) for i in range(4)]
+        fs.append(save(blocks(64, 48, 3, 80), "dv-twin.png"))
+        code, r = run("diversity", *fs, "--flag", "0.05")
+        self.assertEqual(r["verdict"], "varied")
+        self.assertEqual(len(r["near_identical"]), 1)
+        self.assertEqual({r["near_identical"][0]["a"], r["near_identical"][0]["b"]}, {fs[0], fs[4]})
+        self.assertEqual(r["nearest"][0]["distance"], 0)
+
+    def test_diversity_needs_two(self):
+        code, r = run("diversity", save(waves(16, 16), "dv-one.png"))
+        self.assertEqual((code, r["ok"]), (1, False))
+
 
 class CompareRank(unittest.TestCase):
     def setUp(self):
