@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.7.9 · 2026-11-19: C-20261119-1, `light` report_only (chalky lights, shadow ratio, exposure hue sectors) and Pickard craft rows.
 - 0.7.8 · 2026-11-17: C-20261117-3, flat even light row, designed-darkness and omission questions, blended style rewrite, open-brief constraint.
 - 0.7.7 · 2026-11-17: C-20261117-2, crest shadow row and drawing checks (perspective, shared edge, symbol repeat, heads, lettering).
 - 0.7.6 · 2026-11-17: C-20261117-1, klad research-only row in the pixel editor list.
@@ -32,6 +33,13 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261119-1 · 2026-11-19 · Pickard light report and craft rows (0.7.9)
+- because: L-022; user request (book learnings round 6, Pickard, *Artists' Master Series: Color & Light*, 3dtotal 2021; book rules, unverified)
+- files: skills/artwright/scripts/aw_measure.py (`light` report_only), skills/artwright/references/craft.md (Value,
+  Light logic, Material cues, Colour), skills/artwright/references/cli.md (light), tests/test_aw.py, LEARNINGS.md,
+  .claude-plugin/plugin.json, skills/artwright/scripts/aw.py (VERSION)
+`light` adds a report-only block (chalky lit side, shadow ratio, hue sectors in the lightest, middle and darkest tenth); craft rows for value groups and falloff, lit-side chroma, shadow ratio, near-only bounce, source colour and moonlight, form versus specular highlight, skin, and exposure in colour.
 
 ### C-20261117-3 · 2026-11-17 · Shadow, omission and blended-style checks (0.7.8)
 - because: R-20261117-3; user request (technique harvest, Tanizaki and Kleon books; book rules, unverified)

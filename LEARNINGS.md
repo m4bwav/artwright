@@ -6,6 +6,16 @@ Write an entry the moment a real signal happens: a user correction, the same err
 
 ## Active
 
+### L-022 · 2026-11-19 · A whole-frame lit-side chroma test misfires on a subject over a white ground
+- Trigger: `light` report_only `chalky_lights` on 24 ComfyUI stills fired on 2: a green creature on a white ground
+  (lit-side chroma 83 in the darker half, 1 in the brighter: the ground, not the form) and a sunlit SUV.
+- Hypothesis: without `--box`, the "lit family" mixes the subject's lit side with a bright neutral ground, so any
+  coloured subject on white reads chalky.
+- Rule: keep `chalky_lights`, `shadow_ratio` and the exposure hue sectors report-only; read them only with `--box`
+  on one matte object, and confirm by eye. No flag until owner-labelled renders back a threshold.
+- Scope: skill
+- Status: active · helpful 0 · harmful 0 · last_confirmed 2026-11-19
+
 ### L-021 · 2026-10-30 · Check the details the setting implies, not only the ones the brief names
 - Trigger: a set of about sixty medieval building sprites had been picked and animated over weeks; the game's owner
   then noticed that fifteen heated buildings had no chimney, though winter heating is a core system. No brief named

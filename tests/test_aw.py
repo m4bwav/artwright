@@ -499,6 +499,24 @@ class Measures(unittest.TestCase):
         self.assertGreater(r["temp_shift_b"], 30)
         self.assertFalse(run("light", src, "--box", "1,2,3")[1]["ok"])
 
+    def test_light_report_chalky_and_ratio(self):
+        def ball(chalky):
+            def fn(x, y):
+                if x < 32:
+                    return aw.lab_rgb(30, 12, 18)  # shadow side
+                f = (x - 32) / 63  # lit side, darker to brighter
+                c = 30 * (1 - f) + 2 * f if chalky else 24 + 8 * f
+                return aw.lab_rgb(60 + 28 * f, c * 0.55, c * 0.83)
+            return fn
+        good = run("light", save(paint(96, 64, ball(False)), "ball_good.png"))[1]["report_only"]
+        bad = run("light", save(paint(96, 64, ball(True)), "ball_chalky.png"))[1]["report_only"]
+        self.assertFalse(good["chalky_lights"], good)
+        self.assertTrue(bad["chalky_lights"], bad)
+        self.assertGreater(good["shadow_ratio"], 0.4)
+        self.assertLess(good["shadow_ratio"], 0.7)
+        r = run("light", save(paint(96, 64, ball(False)), "ball_good.png"))[1]
+        self.assertEqual(r["flags"], [])  # report only: never a flag
+
     def test_gamut_shapes(self):
         code, r = run("gamut", save(paint(48, 48, lambda x, y: aw.lab_rgb(30 + x, 20, 40)), "mono.png"),
                       "--overlay", TMP / "hull.png")

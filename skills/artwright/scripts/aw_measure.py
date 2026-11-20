@@ -192,6 +192,40 @@ def light_split(px):
     return t, [p for p in keep if p[0] > t], [p for p in keep if p[0] <= t], e
 
 
+def hue_sectors(px, cmin=8):
+    """30-degree CIELAB hue bins holding at least 5% of the chromatic pixels (C* >= cmin) in px."""
+    c = [hue_of(p[1], p[2]) for p in px if chroma(p) >= cmin]
+    if len(c) < max(8, len(px) // 20):
+        return 0
+    bins = [0] * 12
+    for h in c:
+        bins[int(h // 30) % 12] += 1
+    return sum(1 for v in bins if v >= len(c) * 0.05)
+
+
+def light_report(px, li, fl, fs):
+    """Pickard's chalky lights, shadow ratio and exposure in colour: numbers only, no flags (not validated)."""
+    sv = sorted(p[0] for p in li)
+    top = pct(sv, 0.98)  # the brightest 2% are left to specular highlights
+    body = [p for p in li if p[0] <= top]
+    mid_l = pct(sorted(p[0] for p in body), 0.5) if body else 0
+    upper = [chroma(p) for p in body if p[0] > mid_l]
+    lower = [chroma(p) for p in body if p[0] <= mid_l]
+    cu, cl = (med(upper) if upper else 0.0), (med(lower) if lower else 0.0)
+    allv = sorted(p[0] for p in px)
+    hi_, lo_ = pct(allv, 0.9), pct(allv, 0.1)
+    return {"lit_chroma_upper": round(cu, 2), "lit_chroma_lower": round(cl, 2),
+            "chalky_lights": bool(cl >= 10 and cu < 0.7 * cl),
+            "shadow_ratio": round(1 - fs["L_median"] / fl["L_median"], 3) if fl["L_median"] else None,
+            "hue_sectors_top10": hue_sectors([p for p in px if p[0] >= hi_]),
+            "hue_sectors_mid": hue_sectors([p for p in px if lo_ < p[0] < hi_]),
+            "hue_sectors_bottom10": hue_sectors([p for p in px if p[0] <= lo_]),
+            "note": "report only, never a flag: chalky_lights when the brighter half of the lit side (top 2% left to "
+                    "speculars) is under 0.7 of the darker half's chroma; shadow_ratio is how far shadows sit toward "
+                    "black, compare it across objects with --box; hue sectors far fewer at the ends than the middle "
+                    "mean colours merge in the lights or darks (Pickard, Color & Light, pp. 55-58, 101-102, 107)"}
+
+
 def cmd_light(a):
     s, px, keep, alpha = lab_opaque(load(a.image), a.edge)
     b = box_arg(a.box, s.w, s.h)
@@ -222,7 +256,7 @@ def cmd_light(a):
         read.append("light and shadow sides close in value: reads overcast or over-filled (fine if the brief is)")
     if sep < SEP_WEAK:
         read.append("one value family more than two (separation %.2f): the light and shadow numbers are weak" % sep)
-    return out({"file": a.image, "alpha": alpha,
+    return out({"file": a.image, "alpha": alpha, "report_only": light_report(px, li, fl, fs),
                 "proxy": "box" if b else "global (one surface with --box is more trustworthy)",
                 "threshold_L": round(t, 1), "separation": round(sep, 3), "lights": fl, "shadows": fs, "value_gap": gap,
                 "value_gap_steps": round(gap / 10, 1), "temp_shift_b": ts, "tint_shift_a": tt, "chroma_ratio": cr,
