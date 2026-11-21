@@ -549,6 +549,18 @@ class Measures(unittest.TestCase):
         r = run("light", save(paint(96, 64, ball(False)), "ball_good.png"))[1]
         self.assertEqual(r["flags"], [])  # report only: never a flag
 
+    def test_gamut_edges(self):
+        vib = paint(48, 48, lambda x, y: aw.lab_rgb(55, 60, 40) if (x // 8 + y // 8) % 2 else aw.lab_rgb(55, -55, 40))
+        code, r = run("gamut", save(vib, "vib.png"))
+        self.assertIn("vibrating_edge", r["flags"])
+        ok = paint(48, 48, lambda x, y: aw.lab_rgb(30, 60, 40) if (x // 8 + y // 8) % 2 else aw.lab_rgb(80, -55, 40))
+        code, r = run("gamut", save(ok, "novib.png"))
+        self.assertNotIn("vibrating_edge", r["flags"])
+        self.assertEqual(r["edges"]["vanishing"], 0)
+        van = paint(48, 48, lambda x, y: aw.lab_rgb(60, 50, 30) if (x // 8 + y // 8) % 2 else aw.lab_rgb(60, 35, 50))
+        code, r = run("gamut", save(van, "van.png"))
+        self.assertTrue(any("dissolve" in t for t in r["readings"]))
+
     def test_gamut_shapes(self):
         code, r = run("gamut", save(paint(48, 48, lambda x, y: aw.lab_rgb(30 + x, 20, 40)), "mono.png"),
                       "--overlay", TMP / "hull.png")

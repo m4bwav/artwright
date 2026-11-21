@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.8.1 · untagged: C-20261121-1, `gamut` edges (`vibrating_edge`) and Albers colour rows.
 - 0.8.0 · 2026-11-20: C-20261120-1, `aw.py diversity` (batch spread, near-identical pairs, varied or samey).
 - 0.7.10 · 2026-11-19: C-20261119-2, Ware craft rows (form in value, wide-angle stretch); no measure.
 - 0.7.9 · 2026-11-19: C-20261119-1, `light` report_only (chalky lights, shadow ratio, exposure hue sectors) and Pickard craft rows.
@@ -35,6 +36,15 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261121-1 · 2026-11-21 · `gamut` edges and Albers colour rows (0.8.1)
+- because: user request (book-learnings round 7, track 66: Albers, *Interaction of Color*)
+- files: skills/artwright/scripts/aw_measure.py (colour_edges, cmd_gamut), skills/artwright/scripts/aw.py (version),
+  skills/artwright/references/cli.md (flags), skills/artwright/references/craft.md (Colour), tests/test_aw.py,
+  .claude-plugin/plugin.json
+- `gamut` now reports `edges` (boundary pairs, vibrating and vanishing counts and shares) and flags `vibrating_edge`;
+  a vanishing share adds a reading. Craft rows: equal-lightness edges, ground subtracts, plausible transparency,
+  quantity over hue rules, photos misreport values. Thresholds are first guesses, untuned.
 
 ### C-20261120-1 · 2026-11-20 · `aw.py diversity`: how varied a batch of takes is (0.8.0)
 - because: user request (technique harvest, paper arXiv:2611.18550, ReDiverse, verdict adopt-partly: its diversity

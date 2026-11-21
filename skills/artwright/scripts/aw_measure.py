@@ -305,10 +305,34 @@ def draw_line(img, p, q, c):
             img.put(x, y, c)
 
 
+def colour_edges(px, keep, w, h):
+    """Albers pp. 61-64: across real colour boundaries (dE >= 8 between 4-neighbours), count vibrating edges
+    (both chromatic, hue apart over 90 degrees, L* within 5) and vanishing ones (hue within 30, L* within 3)."""
+    n = vib = van = 0
+    for y in range(h):
+        for x in range(w):
+            i = y * w + x
+            if not keep[i]:
+                continue
+            for j in ((i + 1) if x + 1 < w else -1, (i + w) if y + 1 < h else -1):
+                if j < 0 or not keep[j]:
+                    continue
+                p, q = px[i], px[j]
+                if math.dist(p, q) < 8:
+                    continue
+                n += 1
+                if chroma(p) > 15 and chroma(q) > 15:
+                    dh, dl = hdist(hue_of(p[1], p[2]), hue_of(q[1], q[2])), abs(p[0] - q[0])
+                    vib += dh > 90 and dl < 5
+                    van += dh <= 30 and dl < 3
+    return {"boundary_pairs": n, "vibrating": vib, "vanishing": van,
+            "vibrating_share": round(vib / n, 3) if n else 0.0, "vanishing_share": round(van / n, 3) if n else 0.0}
+
+
 def cmd_gamut(a):
     s, px, keep, alpha = lab_opaque(load(a.image), a.edge)
     cols = [c[:3] for c, k in zip(s.pixels(), keep) if k]
-    px = [p for p, k in zip(px, keep) if k]
+    allpx, px = px, [p for p, k in zip(px, keep) if k]
     n = len(px)
     ca, cb = sum(p[1] for p in px) / n, sum(p[2] for p in px) / n
     res = {"file": a.image, "alpha": alpha, "cast": {"a": round(ca, 2), "b": round(cb, 2), "C": round(math.hypot(ca, cb), 2),
@@ -363,6 +387,12 @@ def cmd_gamut(a):
     if shape == "full" and mc > 30:
         flags.append("fruit_salad")
         read.append("every hue at high chroma: no family leads")
+    res["edges"] = colour_edges(allpx, keep, s.w, s.h)
+    if res["edges"]["vibrating_share"] > 0.25 and res["edges"]["vibrating"] >= 20:
+        flags.append("vibrating_edge")
+        read.append("strong hue contrast at equal lightness along edges: they flicker (fine only if intended)")
+    if res["edges"]["vanishing_share"] > 0.25 and res["edges"]["vanishing"] >= 20:
+        read.append("neighbouring hues at equal lightness: edges dissolve (check silhouettes and text)")
     res.update(shape=shape, hue_sectors=nocc, sectors=[round(v, 3) for v in sec], area_fraction=round(af, 3),
                chroma_median=round(mc, 1), families=[{"mass": round(m, 3), "hue": hue_name(hh)} for m, hh in cm],
                flags=flags, readings=read, note=HEUR + "; sectors are 30-degree CIELAB hue bins from 0 (a* axis)")
