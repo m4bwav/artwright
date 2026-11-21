@@ -184,3 +184,4 @@ Added a README "Works with" section and a wiki Works-with page covering brandwri
 Batch spread on CPU: mean of a 16x16 z-scored luma correlation term, a 4x4 CIELAB layout term and dHash. Thresholds
 (flag 0.1, samey 0.3) set on Z-Image Turbo renders: one-prompt seeds 0.25 (visibly one pose), sprite seeds 0.35 to 0.43,
 mixed prompts 0.52, resized copy 0.02. Uncalibrated against owner labels; T-20261120-1.
+- 2026-11-21: 0.8.2, book round 7 track 74 (McCloud Understanding Comics B3b): craft.md cartoon level 1-5, masking, line-mood table; rubric style coherence allows masking. check_skills 0, test_aw 93 OK, budget yellow no red.

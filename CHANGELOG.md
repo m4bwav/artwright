@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.8.2 · untagged: C-20261121-2, cartoon level, masking and line-mood rows; no measure.
 - 0.8.1 · untagged: C-20261121-1, `gamut` edges (`vibrating_edge`) and Albers colour rows.
 - 0.8.0 · 2026-11-20: C-20261120-1, `aw.py diversity` (batch spread, near-identical pairs, varied or samey).
 - 0.7.10 · 2026-11-19: C-20261119-2, Ware craft rows (form in value, wide-angle stretch); no measure.
@@ -36,6 +37,13 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261121-2 · 2026-11-21 · Cartoon level, masking and line mood (0.8.2)
+- because: user request (book-learnings round 7, track 74: McCloud, *Understanding Comics*, B3b page read)
+- files: skills/artwright/references/craft.md (Cartoon level and line mood), skills/artwright-judge/references/rubric.md
+  (style coherence), skills/artwright/scripts/aw.py (version), .claude-plugin/plugin.json
+- Cartoon level 1-5 with one level per set, simplification judged by the marks kept, masking (simple figure over a
+  detailed ground) is not a style clash, and a six-row line-to-mood table. By eye; no measure.
 
 ### C-20261121-1 · 2026-11-21 · `gamut` edges and Albers colour rows (0.8.1)
 - because: user request (book-learnings round 7, track 66: Albers, *Interaction of Color*)
