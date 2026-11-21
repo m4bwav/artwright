@@ -138,6 +138,20 @@ How a surface's light says what it is made of. Use them to check a render or a p
 - No flat colour: large areas grade in hue, value and chroma (a clear sky, a lawn, a wall). verified: book (Gurney
   CL pp. 82-85)
 - Saturation hierarchy: the most saturated area should be where attention belongs; uniform high saturation flattens the image and is a common AI tell. verified: no (practice; reward tuning drives oversaturation, R-20261021-5)
+- Edges at equal lightness: strong hue contrast at the same L* makes the edge vibrate (flicker, doubled lines;
+  `vibrating_edge`); neighbouring hues at the same L* make it vanish. Neither survives a greyscale check; a figure,
+  logo or text must differ in L*, not only in hue. verified: book (Albers, *Interaction of Color*, pp. 61-64)
+- The ground subtracts its own hue and lightness: an accent on a ground of its own hue or value goes dead, the same
+  colour on two grounds reads as two colours. Judge an accent on the ground it will sit on. verified: book (Albers
+  pp. 9, 20-21)
+- Plausible transparency: an overlap reads as see-through only when its colour lies between both parents in
+  lightness and chroma; the parent it leans toward reads on top, an exact middle goes flat. Outside that range it
+  reads as a third opaque shape. Soft boundaries (small steps) read near, hard ones far. verified: book (Albers pp.
+  24-31)
+- Quantity over hue rules: area and recurrence change a palette's mood more than the choice of scheme; name which
+  colour dominates by area. verified: book (Albers p. 43)
+- Photos misreport values: do not take a reference photo's lights and darks as what the eye saw. verified: book
+  (Albers pp. 13-14; film-era, the warning holds)
 - Harmony is a choice, not a test. Itten's schemes generate palettes; they do not grade them. Itten's seven contrasts (hue, light-dark, cold-warm, complementary, simultaneous, saturation, extension) are useful names for what a palette is doing. verified: yes for the schemes' lack of evidence (B-F11); the list of contrasts is from *The Art of Color* (1961), no
 
 ## Gestalt and design principles

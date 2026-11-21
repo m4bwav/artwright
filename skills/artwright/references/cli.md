@@ -65,6 +65,7 @@ share of the AI set each one flagged is in brackets.
 | `glowing_shadows` (light) | shadow chroma over 1.15 times the lights' (13%) | the glowing-shadow look |
 | `low_value_gap` (light) | light and shadow medians under 2 steps apart (21%) | overcast or over-filled; wrong only when the brief says sun |
 | `fruit_salad` (gamut) | seven or more hue sectors and median chroma over 30 (0%) | no colour family leads |
+| `vibrating_edge` (gamut) | over 25% of colour boundaries (dE 8 or more, at least 20 pairs) join two chromatic hues over 90 degrees apart within 5 L* (new, untuned) | the edges flicker; right only for Op Art or a deliberate shout (Albers p. 61). `edges` also counts vanishing pairs (hue within 30, L* within 3), a reading only |
 | `competing_accent` (accents) | an accent of 0.2% or more, 0.35 from the focal cell, accents under 5% in all (4%) | an off-hue spot pulls the eye off the subject |
 | `no_recession` (depth) | far band's contrast and chroma both at least 95% of the middle band's (15%) | the distance does not recede (the band proxy is weak) |
 | `warm_distance` (depth) | far band's b* 3 above the middle's (4%) | right only toward a low sun |
