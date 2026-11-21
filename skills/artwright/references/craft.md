@@ -205,6 +205,23 @@ Subtractive (carving: tool marks, chisel facets), additive (modelling: thumb and
 
 Reference: Bamber Gascoigne, *How to Identify Prints* (1986, 2004).
 
+### Cartoon level and line mood
+
+Book rules, unverified (McCloud, *Understanding Comics*, 1993, pp. 30, 42-43, 126). Read by eye.
+
+- **Cartoon level 1-5** for a character: 1 photo, 2 realistic drawing, 3 simplified, 4 cartoon, 5 near-icon (dot eyes, line mouth). The higher the level, the more viewers can read themselves into the face. Characters in one set sit at one level; a mismatch is the finding. Simplification is judged by whether the marks left are the meaning-bearing ones (eyes, mouth, silhouette), not by how few marks remain.
+- **Masking**: a simple figure over a more detailed ground is a choice, not a clash (see the rubric's style coherence).
+- **Line mood**: check the brief's mood against the line.
+
+| Line | Reads as |
+|---|---|
+| Bold, heavy blacks | grim, adult |
+| Gentle curves, open line | whimsy, innocence |
+| Jagged, hostile | angst |
+| Dense ink puddles, fraying | decay |
+| Crisp, elegant | cool sophistication, irony |
+| Uneven, struggling | inner conflict |
+
 ## Drawing checks
 
 Book rules, unverified (Edwards, *Drawing on the Right Side of the Brain*, 2012; Polster, *Ambigrams Revealed*). No `aw.py` command measures these; read them by eye.

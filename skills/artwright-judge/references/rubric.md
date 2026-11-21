@@ -47,7 +47,7 @@ RESEARCH.md.
    painting was made over a 3D render, the render shows the working layout: compare against it, and judge any
    measure on the painting relative to the render's own score in the same zone, never against a fixed number
    (L-015).
-7. **Style coherence.** One consistent style; it matches the movement or reference asked for, by named traits.
+7. **Style coherence.** One consistent style; it matches the movement or reference asked for, by named traits. Masking is not a clash: a simpler, iconic figure over a more detailed ground is a valid choice when the figure is the simpler of the two; the reverse loses identification (McCloud, *Understanding Comics*, 1993, pp. 42-43).
 8. **Expressive intent.** Mood and story match the brief, including briefs that ask for rough or "ugly" work.
 
 ## Procedure
