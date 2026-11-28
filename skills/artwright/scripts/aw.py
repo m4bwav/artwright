@@ -18,6 +18,7 @@ Commands (details: ../references/cli.md):
   pixel IMG... [--budget N] [--palette PAL] [--scale S] [--tile] [--frames] [--preview OUT]
   hash IMG... | dedupe IMG|DIR... [--threshold N]       64-bit aHash and dHash, Hamming groups
   diversity IMG|DIR... [--flag D] [--samey M]           spread of a batch of takes: pairwise distances, near-twins
+  yardstick RENDERS TARGETS [--against PREV] [--out F]  a look round's dE2000 to target stills
   compare prepare A B [--work DIR] | compare record PAIR ORDER PICK [--work DIR] [--confidence C] [--criteria ...]
   rank [--work DIR] [--next N] [--write]                Bradley-Terry with ties; Swiss pairs for the next round
   cache get|put|stats|label|agreement ...               verdict store and calibration under ARTWRIGHT_HOME
@@ -45,7 +46,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.8.2"
+VERSION = "0.9.0"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
@@ -1972,6 +1973,14 @@ def build():
     p.add_argument("--flag", type=float, default=0.1, help="pair distance below this is near-identical")
     p.add_argument("--samey", type=float, default=0.3, help="batch mean distance below this reads samey")
     p.add_argument("--json", action="store_true", help="accepted for symmetry; output is always one JSON object")
+    p = sp.add_parser("yardstick")
+    p.add_argument("renders", help="a render or a folder of them")
+    p.add_argument("targets", help="a target still or a folder; paired with renders by file name")
+    p.add_argument("--grid", type=int, default=8)
+    p.add_argument("--against", help="the last round's --out JSON")
+    p.add_argument("--worse-all", type=float, default=0.2)
+    p.add_argument("--worse-view", type=float, default=1.0)
+    p.add_argument("--out")
     p = sp.add_parser("compare")
     p.add_argument("action", choices=["prepare", "record"])
     p.add_argument("args", nargs="*")
