@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.9.0 · untagged: C-20261128-1, `aw.py yardstick` (a look round scored against target stills).
 - 0.8.2 · untagged: C-20261121-2, cartoon level, masking and line-mood rows; no measure.
 - 0.8.1 · untagged: C-20261121-1, `gamut` edges (`vibrating_edge`) and Albers colour rows.
 - 0.8.0 · 2026-11-20: C-20261120-1, `aw.py diversity` (batch spread, near-identical pairs, varied or samey).
@@ -38,10 +39,10 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Changes
 
-### C-20261128-1 · 2026-11-28 · `aw.py yardstick`: a look round scored against target stills
+### C-20261128-1 · 2026-11-28 · `aw.py yardstick`: a look round scored against target stills (0.9.0)
 because: harvest look-yardstick-de (a game team's look run notes, read with the developer's permission; idea only, no code read).
 files: skills/artwright/scripts/aw_measure.py (`cmd_yardstick`), skills/artwright/scripts/aw.py (parser, docstring), skills/artwright/references/cli.md (row), tests/test_aw.py (`Yardstick`).
-Renders and target stills paired by file name; mean CIEDE2000 over an 8x8 grid of mean CIELAB per view, the mean of all views, lightness, chroma and contrast shifts; `--against` the last round's `--out` keeps the round when all views lose at most 0.2 and no view more than 1.0. No version bump in this change.
+Renders and target stills paired by file name; mean CIEDE2000 over an 8x8 grid of mean CIELAB per view, the mean of all views, lightness, chroma and contrast shifts; `--against` the last round's `--out` keeps the round when all views lose at most 0.2 and no view more than 1.0.
 
 ### C-20261121-2 · 2026-11-21 · Cartoon level, masking and line mood (0.8.2)
 - because: user request (book-learnings round 7, track 74: McCloud, *Understanding Comics*, B3b page read)

@@ -46,7 +46,7 @@ import urllib.request
 import zlib
 from pathlib import Path
 
-VERSION = "0.8.2"
+VERSION = "0.9.0"
 UA = "artwright/%s (+https://github.com/m4bwav/artwright)" % VERSION
 IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 TIERS = {"standard": (1568, 1568), "high": (2576, 4784)}  # long edge px, max visual tokens (R-20261021-11)
