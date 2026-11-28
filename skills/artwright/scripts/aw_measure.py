@@ -1,4 +1,4 @@
-"""aw_measure.py: light, colour and composition measures for aw.py (light, gamut, accents, depth, comp).
+"""aw_measure.py: light, colour and composition measures for aw.py (light, gamut, accents, depth, comp, hatch).
 
 Imported by aw.py; run them through it (`aw.py light IMG`). Every number is a description in CIELAB and every flag a
 pointer to look at, never a grade. Thresholds were set from flag rates on museum works and AI stills (ai-docs log,
@@ -1091,4 +1091,89 @@ def cmd_yardstick(a):
         res["line"] += "; %+.2f against the last round: %s" % (d_all, "keep" if ok else "drop")
     if a.out:
         Path(a.out).write_text(json.dumps(res, indent=1), encoding="utf-8")
+    return out(res)
+
+
+# harvestwright: kevintngo-procedural-rpg https://github.com/kevintngo/procedural-rpg tier - 2026-11-28
+# Stroke direction: a structure tensor summed per block from Scharr gradients. The plain central difference was
+# tried first and pulls every angle toward 45 and 135 degrees (up to 17 degrees off on 4 px hatching); Scharr
+# recovers synthetic angles within about 3 degrees (ai-docs log, 2026-11-28).
+HATCH_MIXED = 0.35  # share within +-10 degrees below this: no one direction (uncalibrated; five screenshots)
+
+
+def _hatch_votes(lum, w, h, b):
+    nbx, nby = (w - 2) // b, (h - 2) // b
+    jxx, jyy, jxy = ([0.0] * (nbx * nby) for _ in range(3))
+    for y in range(1, 1 + nby * b):
+        r0, r1, r2 = (y - 1) * w, y * w, (y + 1) * w
+        row = ((y - 1) // b) * nbx
+        for x in range(1, 1 + nbx * b):
+            a, c, g, k = lum[r0 + x - 1], lum[r0 + x + 1], lum[r2 + x - 1], lum[r2 + x + 1]
+            gx = 3 * (c + k - a - g) + 10 * (lum[r1 + x + 1] - lum[r1 + x - 1])
+            gy = 3 * (a + c - g - k) + 10 * (lum[r0 + x] - lum[r2 + x])  # y up, so angles read counter-clockwise
+            i = row + (x - 1) // b
+            jxx[i] += gx * gx
+            jyy[i] += gy * gy
+            jxy[i] += gx * gy
+    votes = []
+    for i in range(nbx * nby):
+        e = jxx[i] + jyy[i]
+        coh = math.sqrt((jxx[i] - jyy[i]) ** 2 + 4 * jxy[i] ** 2) / e if e > 1e-9 else 0.0
+        ang = (math.degrees(0.5 * math.atan2(2 * jxy[i], jxx[i] - jyy[i])) + 90.0) % 180.0
+        votes.append((e, coh, ang))
+    return votes
+
+
+def _hatch_peak(angs, skip=None):
+    hist = [0] * 180
+    for v in angs:
+        hist[int(v) % 180] += 1
+    best, centre = -1, 0
+    for c in range(180):
+        if skip is not None and abs((c - skip + 90) % 180 - 90) <= 20:
+            continue
+        n = sum(hist[(c + d) % 180] for d in range(-10, 11))
+        if n > best:
+            best, centre = n, c
+    near = [v for v in angs if abs((v - centre + 90) % 180 - 90) <= 10]
+    if near:  # circular mean on doubled angles
+        sx = sum(math.cos(math.radians(2 * v)) for v in near)
+        sy = sum(math.sin(math.radians(2 * v)) for v in near)
+        centre = (math.degrees(math.atan2(sy, sx)) / 2) % 180
+    share = sum(1 for v in angs if abs((v - centre + 90) % 180 - 90) <= 10) / max(len(angs), 1)
+    return round(centre, 1), round(share, 3)
+
+
+def cmd_hatch(a):
+    s = load(a.image)
+    if max(s.w, s.h) > a.max:
+        f = a.max / max(s.w, s.h)
+        s = resize_box(s, max(1, round(s.w * f)), max(1, round(s.h * f)))
+    w, h, b = s.w, s.h, a.block
+    if w < 2 + 2 * b or h < 2 + 2 * b:
+        raise Fail("image too small for --block %d" % b)
+    votes = _hatch_votes([v * 255.0 for v in luma_list(s)], w, h, b)
+    cut = pct(sorted(v[0] for v in votes), 0.4)
+    live = [v for v in votes if v[0] > cut and v[0] > 1e-6]
+    angs = [v[2] for v in live if v[1] > 0.35]
+    res = {"file": a.image, "size": [w, h], "block": b, "blocks": len(votes),
+           "coherent_share": round(len(angs) / max(len(live), 1), 3), "note": HEUR,
+           "convention": "degrees counter-clockwise from the image x axis, y up; 0 is horizontal, 90 vertical"}
+    if len(angs) < 8:
+        res.update(dominant_angle=None, share_pm10=0.0, flags=[], readings=["fewer than 8 coherent blocks: no strokes, or strokes that cross inside each block (cross-hatching)"])
+        return out(res)
+    dom, share = _hatch_peak(angs)
+    sec, sshare = _hatch_peak(angs, skip=dom)
+    flags, read = [], []
+    res.update(dominant_angle=dom, peak_bin=int(round(dom / 10.0)) * 10 % 180, share_pm10=share, uniform_share=round(21 / 180, 3))
+    if sshare > 0.15:
+        res["second"] = {"angle": sec, "share_pm10": sshare}
+        read.append("a second direction at %.0f degrees (%.0f%% of blocks): crossed or mixed strokes" % (sec, sshare * 100))
+    if share < HATCH_MIXED:
+        flags.append("mixed_hatch")
+        read.append("%.0f%% of coherent blocks within 10 degrees of %.0f: no single stroke direction, if the image "
+                    "is meant to be hatched" % (share * 100, dom))
+    else:
+        read.append("%.0f%% of coherent blocks within 10 degrees of %.0f degrees" % (share * 100, dom))
+    res.update(flags=flags, readings=read)
     return out(res)

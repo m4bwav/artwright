@@ -7,6 +7,7 @@ The museum fixture test (pinned SHA-256, Cleveland CC0) runs only with AW_NET=1 
 import contextlib
 import io
 import json
+import math
 import os
 import random
 import sys
@@ -638,6 +639,33 @@ class Measures(unittest.TestCase):
         self.assertIn("competing_accent", far["flags"])
         code, r = run("accents", save(paint(32, 32, lambda x, y: aw.lab_rgb(40 + x, -30, 25)), "acc_none.png"))
         self.assertEqual(r["accents"], [])
+
+    # harvestwright: kevintngo-procedural-rpg https://github.com/kevintngo/procedural-rpg tier - 2026-11-28
+    def test_hatch_angles(self):
+        def lines(angles, gap=6):
+            def f(x, y):
+                for t in angles:  # y up: a stroke at t degrees rises to the right
+                    c, s = math.cos(math.radians(t)), math.sin(math.radians(t))
+                    if (-x * s - y * c) % gap < 2:
+                        return (60, 60, 60)
+                return (235, 235, 235)
+            return f
+        for t in (10, 30, 45, 62, 75, 120, 152):
+            code, r = run("hatch", save(paint(160, 160, lines([t])), "hatch_%d.png" % t))
+            self.assertLess(abs((r["dominant_angle"] - t + 90) % 180 - 90), 4, (t, r["dominant_angle"]))
+            self.assertGreater(r["share_pm10"], 0.9)
+            self.assertEqual(r["flags"], [])
+        code, r = run("hatch", save(paint(160, 160, lines([60])), "hatch_60.png"))
+        self.assertEqual(r["peak_bin"], 60)
+        left, right = lines([30]), lines([120])
+        code, r = run("hatch", save(paint(160, 160, lambda x, y: left(x, y) if x < 80 else right(x, y)), "hatch_lr.png"))
+        got = sorted([r["dominant_angle"], r["second"]["angle"]])
+        self.assertLess(abs(got[0] - 30), 6)
+        self.assertLess(abs(got[1] - 120), 6)
+        code, r = run("hatch", save(paint(160, 160, lines([30, 120], gap=9)), "hatch_x.png"))
+        self.assertLess(r["coherent_share"], 0.2)  # strokes crossing inside a block cancel: no direction
+        code, r = run("hatch", save(noise(160, 160, [(0, 0, 0), (255, 255, 255)], seed=4), "hatch_noise.png"))
+        self.assertLess(r["share_pm10"], 0.25)
 
     def test_depth_recession(self):
         src, flat = degrade(paint(96, 96, landscape), "land", "haze-off")

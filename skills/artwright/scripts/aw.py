@@ -14,6 +14,7 @@ Commands (details: ../references/cli.md):
   gamut IMG [--overlay OUT]        hue sectors, gamut shape and area, colour cast
   accents IMG | depth IMG [--depth MAP [--far-bright]]  off-hue accents and where they sit; atmospheric recession
   comp IMG [--subject x,y,w,h] [--out DIR]  value masses, focal margin, border pull, tangents, horizon, hot spots
+  hatch IMG [--block N]            stroke direction: dominant angle, share within 10 degrees, mixed_hatch
   palette IMG [-k N] [--against PAL]                    median-cut colours; delta-E 2000 to a palette
   pixel IMG... [--budget N] [--palette PAL] [--scale S] [--tile] [--frames] [--preview OUT]
   hash IMG... | dedupe IMG|DIR... [--threshold N]       64-bit aHash and dHash, Hamming groups
@@ -1948,6 +1949,11 @@ def build():
     sp.choices["comp"].add_argument("--text-band", action="append",
                                     help="x,y,w,h fractions where text will sit (repeatable): edge and contrast pull")
     sp.choices["comp"].add_argument("--out", help="folder for masses3.png and masses4.png")
+    # harvestwright: kevintngo-procedural-rpg https://github.com/kevintngo/procedural-rpg tier - 2026-11-28
+    p = sp.add_parser("hatch")
+    p.add_argument("image")
+    p.add_argument("--block", type=int, default=16, help="block side in pixels for the structure tensor")
+    p.add_argument("--max", type=int, default=2048, help="longest side measured; larger images are box-reduced")
     p = sp.add_parser("palette")
     p.add_argument("image")
     p.add_argument("-k", type=int, default=8)
