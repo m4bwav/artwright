@@ -106,7 +106,7 @@ the footer, and drop the double-tie known issue once the fix (`resolve()` return
 - Hiding Pillow with `sys.modules['PIL'] = None` in a `-c` wrapper breaks `python -c` snippets; a stub `PIL`
   package on PYTHONPATH that raises ImportError works for every call.
 
-Related: see also [../HANDOFF.md](../HANDOFF.md), [../log.md](../log.md).
+Related: see also [../HANDOFF.md](../HANDOFF.md), [../log.md](../log/).
 
 ## Since 0.7.2 (2026-10-26)
 

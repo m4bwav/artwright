@@ -1,7 +1,7 @@
 # artwright handoff
 
 Updated 2026-10-26 (0.7.2 released; wiki published at 0de6f45). Older detail is in
-[log.md](log.md) and the decisions files.
+[log.md](log/) and the decisions files.
 
 ## State
 
@@ -77,5 +77,5 @@ upsampling; the guard now checks luma as well as RGB. Finding 6 is cosmetic and 
 
 ## Read first
 
-1. [log.md](log.md) (last entries), then the newest decisions file.
+1. [log.md](log/) (last entries), then the newest decisions file.
 2. `TESTS.md` for eval history; `references/cli.md` for every command.
