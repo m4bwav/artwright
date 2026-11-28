@@ -5,7 +5,9 @@ pointer to look at, never a grade. Thresholds were set from flag rates on museum
 2026-10-22) and stay uncalibrated against owner labels. Ideas after Gurney, *Color and Light*, and Roberts,
 *Mastering Composition*; the wording and methods are artwright's own.
 """
+# harvestwright: look-yardstick-de a game team's look run notes (read-only, developer permission) tier A 2026-11-28
 
+import json
 import math
 
 from aw import Fail, Img, Path, alpha_mask, crop, de2000, dhash, flatten, gray_img, ham, inputs, lab, load, luma_list, mean_sd, out, resize_box, resize_nearest, save_png, small, sobel
@@ -1026,3 +1028,67 @@ def cmd_diversity(a):
         "method": {"name": "structure+colour-layout+dhash", "version": 1, "source": "idea after arXiv:2611.18550",
                    "note": "a description of spread, not a grade; read the nearest pairs before rerolling"},
     })
+
+
+# ---------------------------------------------------------------- yardstick (look rounds against target stills)
+# Idea after a game team's look yardstick (developer's run notes, read with permission): every look round scores
+# the game's renders against fixed target stills in CIELAB, one number a view and one for all views, so a round is
+# kept or dropped on a number instead of on a fresh impression.
+
+YS_GRID = 8        # cells a side; mean CIELAB per cell, so a few pixels of framing drift barely move the score
+YS_WORSE_ALL = 0.2   # a round may lose at most this much on the mean of all views
+YS_WORSE_VIEW = 1.0  # and at most this much on any one view
+
+
+def ys_desc(img, grid):
+    flat = Img(img.w, img.h, bytearray(b"".join(bytes((r, g, b, 255)) for r, g, b in flatten(img, (128, 128, 128)))))
+    cells = [lab(p) for p in flatten(resize_box(flat, grid, grid))]
+    L = sorted(c[0] for c in (lab(p) for p in flatten(small(flat, 128))))
+    return cells, pct(L, 0.95) - pct(L, 0.05)
+
+
+def ys_pairs(renders, targets):
+    tmap = {Path(t).stem.lower(): t for t in inputs([targets])}
+    rs = inputs([renders])
+    if not rs or not tmap:
+        raise Fail("yardstick needs renders and targets")
+    pairs, missing = [], []
+    for r in rs:
+        t = tmap.get(Path(r).stem.lower())
+        if t is None and len(rs) == len(tmap) == 1:
+            t = next(iter(tmap.values()))
+        (pairs.append((r, t)) if t else missing.append(r))
+    if missing:
+        raise Fail("no target with the same file name for: %s" % ", ".join(missing))
+    return pairs
+
+
+def cmd_yardstick(a):
+    views = {}
+    for r, t in ys_pairs(a.renders, a.targets):
+        rc, rcon = ys_desc(load(r), a.grid)
+        tc, tcon = ys_desc(load(t), a.grid)
+        de = [de2000(p, q) for p, q in zip(rc, tc)]
+        dL = sum(p[0] - q[0] for p, q in zip(rc, tc)) / len(rc)
+        dC = sum(math.hypot(p[1], p[2]) - math.hypot(q[1], q[2]) for p, q in zip(rc, tc)) / len(rc)
+        views[Path(r).stem] = {"render": r, "target": t, "de": round(sum(de) / len(de), 2),
+                               "de_max_cell": round(max(de), 2), "lightness_shift": round(dL, 2),
+                               "chroma_shift": round(dC, 2), "contrast": round(rcon, 1),
+                               "target_contrast": round(tcon, 1)}
+    allv = round(sum(v["de"] for v in views.values()) / len(views), 2)
+    res = {"all": allv, "views": views, "grid": a.grid,
+           "line": "all views %.2f dE2000 over %d view%s" % (allv, len(views), "" if len(views) == 1 else "s")}
+    if a.against:
+        prev = json.loads(Path(a.against).read_text(encoding="utf-8"))
+        worse = {k: round(v["de"] - prev["views"][k]["de"], 2) for k, v in views.items() if k in prev.get("views", {})}
+        d_all = round(allv - prev["all"], 2)
+        bad = sorted(k for k, d in worse.items() if d > a.worse_view)
+        ok = d_all <= a.worse_all and not bad
+        res["against"] = {"file": a.against, "previous_all": prev["all"], "change_all": d_all, "change_views": worse,
+                          "views_over": bad, "pass": ok,
+                          "rule": "keep when all views lose at most %.2f and no view loses more than %.2f"
+                                  % (a.worse_all, a.worse_view)}
+        res["line"] += "; %+.2f against the last round: %s" % (d_all, "keep" if ok else "drop")
+    if a.out:
+        Path(a.out).write_text(json.dumps(res, indent=1), encoding="utf-8")
+    return out(res)

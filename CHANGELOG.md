@@ -38,6 +38,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Changes
 
+### C-20261128-1 · 2026-11-28 · `aw.py yardstick`: a look round scored against target stills
+because: harvest look-yardstick-de (a game team's look run notes, read with the developer's permission; idea only, no code read).
+files: skills/artwright/scripts/aw_measure.py (`cmd_yardstick`), skills/artwright/scripts/aw.py (parser, docstring), skills/artwright/references/cli.md (row), tests/test_aw.py (`Yardstick`).
+Renders and target stills paired by file name; mean CIEDE2000 over an 8x8 grid of mean CIELAB per view, the mean of all views, lightness, chroma and contrast shifts; `--against` the last round's `--out` keeps the round when all views lose at most 0.2 and no view more than 1.0. No version bump in this change.
+
 ### C-20261121-2 · 2026-11-21 · Cartoon level, masking and line mood (0.8.2)
 - because: user request (book-learnings round 7, track 74: McCloud, *Understanding Comics*, B3b page read)
 - files: skills/artwright/references/craft.md (Cartoon level and line mood), skills/artwright-judge/references/rubric.md

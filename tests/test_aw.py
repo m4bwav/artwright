@@ -297,6 +297,47 @@ class Hashes(unittest.TestCase):
         self.assertEqual((code, r["ok"]), (1, False))
 
 
+def look_view(shift, dark=0):
+    def fn(x, y):
+        return aw.lab_rgb(55 + ((x * 5 + y * 3) % 9) - 4 - dark + (20 if y < 32 else 0), -10 + shift, 12 - shift)
+    return paint(64, 64, fn)
+
+
+class Yardstick(unittest.TestCase):
+    def folder(self, name, views):
+        d = TMP / name
+        d.mkdir(exist_ok=True)
+        for k, img in views.items():
+            aw.save_png(img, d / (k + ".png"))
+        return d
+
+    def test_rounds_keep_and_drop(self):
+        tgt = self.folder("ys-target", {"sky": look_view(0), "wood": look_view(0, 8)})
+        r1 = self.folder("ys-r1", {"sky": look_view(12), "wood": look_view(12, 8)})
+        r2 = self.folder("ys-r2", {"sky": look_view(4), "wood": look_view(4, 8)})
+        r3 = self.folder("ys-r3", {"sky": look_view(0), "wood": look_view(14, 8)})
+        same = run("yardstick", tgt, tgt)[1]
+        self.assertEqual(same["all"], 0)
+        j1 = TMP / "ys-r1.json"
+        code, a = run("yardstick", r1, tgt, "--out", j1)
+        self.assertEqual(code, 0)
+        self.assertGreater(a["all"], 5)
+        self.assertEqual(set(a["views"]), {"sky", "wood"})
+        b = run("yardstick", r2, tgt, "--against", j1)[1]
+        self.assertLess(b["all"], a["all"])
+        self.assertTrue(b["against"]["pass"])
+        c = run("yardstick", r3, tgt, "--against", j1)[1]
+        self.assertLess(c["all"], a["all"] + 0.2)
+        self.assertFalse(c["against"]["pass"])
+        self.assertEqual(c["against"]["views_over"], ["wood"])
+
+    def test_unpaired_render_fails(self):
+        tgt = self.folder("ys-t2", {"sky": look_view(0)})
+        r = self.folder("ys-r4", {"sky": look_view(0), "lake": look_view(3)})
+        code, res = run("yardstick", r, tgt)
+        self.assertEqual((code, res["ok"]), (1, False))
+
+
 class CompareRank(unittest.TestCase):
     def setUp(self):
         self.work = TMP / ("work-%s" % self._testMethodName) / "artwright"
