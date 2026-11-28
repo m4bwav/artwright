@@ -6,6 +6,7 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
 
 ## Releases
 
+- 0.10.0 · 2026-11-28 (owner: tag without asking, 2026-10-26), carries 0.9.0, 0.8.2 and 0.8.1: C-20261128-2, `aw.py hatch` (stroke direction).
 - 0.9.0 · untagged: C-20261128-1, `aw.py yardstick` (a look round scored against target stills).
 - 0.8.2 · untagged: C-20261121-2, cartoon level, masking and line-mood rows; no measure.
 - 0.8.1 · untagged: C-20261121-1, `gamut` edges (`vibrating_edge`) and Albers colour rows.
@@ -38,6 +39,11 @@ Entry shape: `### C-YYYYMMDD-n · date · one-line summary`, then `because:` (ID
   (0.1.0 was installed locally, never tagged).
 
 ## Changes
+
+### C-20261128-2 · 2026-11-28 · `aw.py hatch`: stroke direction measure (0.10.0)
+because: harvest kevintngo-procedural-rpg (https://github.com/kevintngo/procedural-rpg, MIT; idea only, code written fresh).
+files: skills/artwright/scripts/aw_measure.py (`cmd_hatch`), skills/artwright/scripts/aw.py (parser, docstring), skills/artwright/references/cli.md (row, `mixed_hatch`), tests/test_aw.py (`test_hatch_angles`).
+Block structure tensor on Scharr gradients: dominant angle, share within 10 degrees, a second direction, and an uncalibrated `mixed_hatch` flag. The central difference was dropped because it pulls angles toward 45 and 135 degrees.
 
 ### C-20261128-1 · 2026-11-28 · `aw.py yardstick`: a look round scored against target stills (0.9.0)
 because: harvest look-yardstick-de (a game team's look run notes, read with the developer's permission; idea only, no code read).
